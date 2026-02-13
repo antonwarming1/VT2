@@ -7,3 +7,6 @@ et eller andet lort
 
 Noget andet lort
 >>>>>>> Stashed changes
+lnmlkmæklmklm
+
+llkmlkmk
