@@ -1,0 +1,32 @@
+Error Type is the type of error performed in the screwing, eks. normal screwing is A, where an anorther error is B.
+Use Capital letters(example A,B,C)
+
+Woodnumber is the number of the wood being use, every wood unit have a unique number. eks. 1 or 8.
+
+The detecting folder is the name of the folder where WSK3 program is saveing the data(kxml files) from the C30S controller. it have to be in the same folder as this program.
+
+The detecting folder needs to empty before starting.
+
+An example on a name of a json file is: date8A32.json
+'date' is the date
+'8' is the woodnumber
+'A' is the process type
+'32' is the the screw number
+
+normal is A
+under is b, can you get youre finger nail under
+Over is C
+Over is determined by using a screwdriver to see if the treads in the wood is bad by apply only a little bit of torque
+robot slip screw is S
+No screw is N
+
+New wood:
+Reset PLC counter
+Close convertsoftware
+Close WSK3 auto transmit
+restart robot program (check that modbus_5 is 0)
+check if there are enough screws in the feeder
+place new wood in write on top (date,woodnumber,processtype)
+Start WSK3 auto transmit
+start convert software and set and check (date, woodnumber, processtype) and start
+Check that convert software counter is 0
