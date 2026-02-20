@@ -34,4 +34,4 @@ if __name__ == "__main__":
     
     print("\nExtracted JSON Data:")
     for df in json_data:
-        print(df.head())
+        #print(df.head())
