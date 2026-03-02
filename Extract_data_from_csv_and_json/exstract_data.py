@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-PATH=r"D:\VT2"
+PATH=r"C:\Users\Lab_User\Documents\github\VT2\data\270220262"
 
 def extract_csv_data(path):
     csv_files = [f for f in os.listdir(path) if f.endswith('.csv')]
@@ -31,7 +31,10 @@ if __name__ == "__main__":
     print("Extracted CSV Data:")
     for df in csv_data:
         print(df.head())
+        print("\n")  # Add a newline for better separation between dataframes
+        print([df.columns for df in csv_data])  # Print column names for each CSV dataframe
     
     print("\nExtracted JSON Data:")
     for df in json_data:
-        #print(df.head())
+        print(df.head())
+        print([df.columns for df in json_data])  # Print column names for each JSON dataframe
