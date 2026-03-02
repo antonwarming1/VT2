@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-PATH=r"C:\Users\Lab_User\Documents\github\VT2\data\270220262"
+PATH=r"C:\github\VT2\data\020320261"
 
 def extract_csv_data(path):
     csv_files = [f for f in os.listdir(path) if f.endswith('.csv')]

@@ -1,6 +1,8 @@
 @echo off
 
 REM Get the current directory where the batch file is located
+
+
 set "batch_dir=%~dp0"
 
 REM Check if Python is installed
