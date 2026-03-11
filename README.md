@@ -304,7 +304,8 @@ def run(self):
         }
 ```
 
-**What happens:** The `ModbusReader` thread runs continuously in the background, polling the robot controller at ~400 Hz. It reads 7 holding registers containing the TCP (Tool Center Point) position, orientation, and joint current. The main loop calls `get_register_values()` to get the latest cached values without blocking.
+**What happens:** The `ModbusReader` thread runs continuously in the background, polling the robot controller at ~400 Hz. It reads 7 holding registers containing the TCP (Tool Center Point) position, orientation, and joint current. The main loop calls `get_register_values()` to get the latest cached values without blocking. 
+
 
 ---
 
