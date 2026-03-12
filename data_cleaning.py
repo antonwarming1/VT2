@@ -1,7 +1,7 @@
 """
 data_cleaning.py
 ================
-Cleans CSV and JSON data files in C:\\github\\VT2\\data\\<subfolder>:
+Cleans CSV and JSON data files in C:\\github\\VT2\\data_opsamling\\<subfolder>:
 
 1. CSV: Shifts time to start at 0 (for files where it doesn't)
 2. CSV: Checks for and reports NaN values
@@ -10,9 +10,11 @@ Cleans CSV and JSON data files in C:\\github\\VT2\\data\\<subfolder>:
 5. JSON: Checks for and reports NaN values
 6. JSON: Fixes Angle unit encoding (Â° -> °)
 
-Cleaned files are saved to C:\\github\\VT2\\data_cleaned\\<subfolder>.
+Cleaned files are saved to C:\\github\\VT2\\data_opsamling_cleaned\\<subfolder>.
 Run with: python data_cleaning.py <subfolder>
-Example:  python data_cleaning.py 020320261
+Example:  python data_cleaning.py Normal
+         python data_cleaning.py Under
+         python data_cleaning.py --all   (cleans all subfolders)
 """
 
 import pandas as pd
@@ -21,8 +23,8 @@ import shutil
 import sys
 from pathlib import Path
 
-DATA_ROOT = Path(r"C:\github\VT2\data")
-OUTPUT_ROOT = Path(r"C:\github\VT2\data_cleaned")
+DATA_ROOT = Path(r"C:\github\VT2\data_opsamling")
+OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
 
 
 def load_json(filepath):
@@ -105,21 +107,8 @@ def clean_json(filepath, output_path):
     return actions
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python data_cleaning.py <subfolder>")
-        print("Example: python data_cleaning.py 020320261")
-        print(f"\nAvailable subfolders: {[d.name for d in DATA_ROOT.iterdir() if d.is_dir()]}")
-        sys.exit(1)
-
-    subfolder = sys.argv[1]
-    data_dir = DATA_ROOT / subfolder
-    output_dir = OUTPUT_ROOT / subfolder
-
-    if not data_dir.exists():
-        print(f"Error: {data_dir} does not exist")
-        sys.exit(1)
-
+def clean_subfolder(data_dir, output_dir):
+    """Clean all CSV and JSON files in a single subfolder."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
     csv_files = sorted(data_dir.glob("*.csv"))
@@ -156,7 +145,36 @@ def main():
         else:
             print(f"{f.name}: OK (no changes needed)")
 
-    print(f"\nDone! {total_actions} total fixes applied.")
+    return total_actions
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python data_cleaning.py <subfolder>")
+        print("       python data_cleaning.py --all")
+        print("Example: python data_cleaning.py Normal")
+        print(f"\nAvailable subfolders: {[d.name for d in DATA_ROOT.iterdir() if d.is_dir()]}")
+        sys.exit(1)
+
+    arg = sys.argv[1]
+
+    if arg == "--all":
+        subfolders = sorted([d for d in DATA_ROOT.iterdir() if d.is_dir()])
+    else:
+        subfolders = [DATA_ROOT / arg]
+
+    grand_total = 0
+    for data_dir in subfolders:
+        if not data_dir.exists():
+            print(f"Error: {data_dir} does not exist")
+            sys.exit(1)
+        output_dir = OUTPUT_ROOT / data_dir.name
+        print(f"\n{'='*60}")
+        print(f"  {data_dir.name}")
+        print(f"{'='*60}")
+        grand_total += clean_subfolder(data_dir, output_dir)
+
+    print(f"\nDone! {grand_total} total fixes applied.")
 
 
 if __name__ == "__main__":

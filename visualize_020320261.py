@@ -1,7 +1,8 @@
 """
-Visualization of data from C:\\github\\VT2\\data\\020320261
+Visualization of data from C:\\github\\VT2\\data_opsamling
 - CSV data: Robot TCP positions and current over time
 - JSON data: Screwing cell data (Nset, Torque, Current, Angle, Depth) over time
+- Subfolders: Normal, Under
 """
 
 import os
@@ -14,9 +15,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 
-DATA_DIR = Path(r"C:\github\VT2\data\020320261")
+DATA_ROOT = Path(r"C:\github\VT2\data_opsamling")
 OUTPUT_DIR = Path(r"C:\github\VT2\visualizations")
 OUTPUT_DIR.mkdir(exist_ok=True)
+
+# Auto-assign colors to subfolders based on folder names
+_COLOR_CYCLE = ["tab:blue", "tab:red", "tab:green", "tab:orange", "tab:purple",
+                "tab:brown", "tab:pink", "tab:olive", "tab:cyan"]
+SUBFOLDER_COLORS = {
+    d.name: _COLOR_CYCLE[i % len(_COLOR_CYCLE)]
+    for i, d in enumerate(sorted(DATA_ROOT.iterdir())) if d.is_dir()
+}
 
 
 def load_csv(filepath):
@@ -42,13 +51,27 @@ def load_json(filepath):
 
 
 def get_file_groups():
-    """Group files by base name (e.g., 020320261A1) and return sorted list."""
-    files = os.listdir(DATA_DIR)
-    bases = set()
-    for f in files:
-        if f.endswith((".csv", ".json")):
-            bases.add(os.path.splitext(f)[0])
-    return sorted(bases)
+    """Return sorted list of (subfolder_name, base_name, full_path_dir) for all file groups."""
+    groups = []
+    for sub in sorted(DATA_ROOT.iterdir()):
+        if not sub.is_dir():
+            continue
+        bases = set()
+        for f in os.listdir(sub):
+            if f.endswith((".csv", ".json")):
+                bases.add(os.path.splitext(f)[0])
+        for b in sorted(bases):
+            groups.append((sub.name, b, sub))
+    return groups
+
+
+def _extract_label(base):
+    """Extract short label from base name by stripping the common date prefix."""
+    # Remove leading digits (e.g., '120320261' -> 'A1')
+    for i, ch in enumerate(base):
+        if ch.isalpha():
+            return base[i:]
+    return base
 
 
 def plot_csv_overview(file_groups):
@@ -62,23 +85,19 @@ def plot_csv_overview(file_groups):
         "Robot_I (A)"
     ]
 
-    # Color map for groups A, B, C
-    group_colors = {"A": "tab:blue", "B": "tab:orange", "C": "tab:green"}
-
-    for base in file_groups:
-        csv_path = DATA_DIR / f"{base}.csv"
+    for sub_name, base, data_dir in file_groups:
+        csv_path = data_dir / f"{base}.csv"
         if not csv_path.exists():
             continue
         df = load_csv(csv_path)
-        # Determine group letter (A, B, or C)
-        label_part = base.replace("020320261", "")
-        group = label_part[0] if label_part else "?"
-        color = group_colors.get(group, "tab:gray")
+        label_part = _extract_label(base)
+        label = f"{sub_name}/{label_part}"
+        color = SUBFOLDER_COLORS.get(sub_name, "tab:gray")
 
         for i, col in enumerate(csv_columns):
             row, c = divmod(i, 2)
             ax = axes[row][c]
-            ax.plot(df["Time (ms)"], df[col], label=label_part, color=color, alpha=0.6, linewidth=0.8)
+            ax.plot(df["Time (ms)"], df[col], label=label, color=color, alpha=0.6, linewidth=0.8)
             ax.set_ylabel(col)
             ax.grid(True, alpha=0.3)
 
@@ -104,24 +123,23 @@ def plot_json_overview(file_groups):
     fig, axes = plt.subplots(3, 2, figsize=(18, 12))
     fig.suptitle("JSON Data Overview — Screwing Cell (all files)", fontsize=16, fontweight="bold")
 
-    group_colors = {"A": "tab:blue", "B": "tab:orange", "C": "tab:green"}
     json_columns = None
 
-    for base in file_groups:
-        json_path = DATA_DIR / f"{base}.json"
+    for sub_name, base, data_dir in file_groups:
+        json_path = data_dir / f"{base}.json"
         if not json_path.exists():
             continue
         df = load_json(json_path)
         if json_columns is None:
             json_columns = [c for c in df.columns if c != "Time (ms)"]
-        label_part = base.replace("020320261", "")
-        group = label_part[0] if label_part else "?"
-        color = group_colors.get(group, "tab:gray")
+        label_part = _extract_label(base)
+        label = f"{sub_name}/{label_part}"
+        color = SUBFOLDER_COLORS.get(sub_name, "tab:gray")
 
         for i, col in enumerate(json_columns):
             row, c = divmod(i, 2)
             ax = axes[row][c]
-            ax.plot(df["Time (ms)"], df[col], label=label_part, color=color, alpha=0.6, linewidth=0.8)
+            ax.plot(df["Time (ms)"], df[col], label=label, color=color, alpha=0.6, linewidth=0.8)
             ax.set_ylabel(col)
             ax.grid(True, alpha=0.3)
 
@@ -140,10 +158,10 @@ def plot_json_overview(file_groups):
     print("Saved json_overview.png")
 
 
-def plot_individual_file(base):
+def plot_individual_file(sub_name, base, data_dir):
     """Plot detailed view of a single file (both CSV and JSON)."""
-    csv_path = DATA_DIR / f"{base}.csv"
-    json_path = DATA_DIR / f"{base}.json"
+    csv_path = data_dir / f"{base}.csv"
+    json_path = data_dir / f"{base}.json"
 
     has_csv = csv_path.exists()
     has_json = json_path.exists()
@@ -152,7 +170,7 @@ def plot_individual_file(base):
     fig, axes = plt.subplots(n_plots, 1, figsize=(14, 2 * n_plots), sharex=False)
     if n_plots == 1:
         axes = [axes]
-    fig.suptitle(f"Detailed View — {base}", fontsize=14, fontweight="bold")
+    fig.suptitle(f"Detailed View — {sub_name}/{base}", fontsize=14, fontweight="bold")
 
     idx = 0
     if has_csv:
@@ -178,9 +196,9 @@ def plot_individual_file(base):
 
     axes[-1].set_xlabel("Time (ms)")
     plt.tight_layout(rect=[0, 0, 1, 0.97])
-    plt.savefig(str(OUTPUT_DIR / f"{base}_detail.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(str(OUTPUT_DIR / f"{sub_name}_{base}_detail.png"), dpi=100, bbox_inches="tight")
     plt.close(fig)
-    print(f"Saved {base}_detail.png")
+    print(f"Saved {sub_name}_{base}_detail.png")
 
 
 def _find_col(df, keyword):
@@ -196,10 +214,8 @@ def plot_torque_vs_angle(file_groups):
     fig, ax = plt.subplots(figsize=(12, 7))
     fig.suptitle("Torque vs Angle — Screwing Curves (all files)", fontsize=16, fontweight="bold")
 
-    group_colors = {"A": "tab:blue", "B": "tab:orange", "C": "tab:green"}
-
-    for base in file_groups:
-        json_path = DATA_DIR / f"{base}.json"
+    for sub_name, base, data_dir in file_groups:
+        json_path = data_dir / f"{base}.json"
         if not json_path.exists():
             continue
         df = load_json(json_path)
@@ -207,10 +223,10 @@ def plot_torque_vs_angle(file_groups):
         torque_col = _find_col(df, "torque")
         if not angle_col or not torque_col:
             continue
-        label_part = base.replace("020320261", "")
-        group = label_part[0] if label_part else "?"
-        color = group_colors.get(group, "tab:gray")
-        ax.plot(df[angle_col], df[torque_col], label=label_part, color=color, alpha=0.6, linewidth=1)
+        label_part = _extract_label(base)
+        label = f"{sub_name}/{label_part}"
+        color = SUBFOLDER_COLORS.get(sub_name, "tab:gray")
+        ax.plot(df[angle_col], df[torque_col], label=label, color=color, alpha=0.6, linewidth=1)
 
     ax.set_xlabel("Angle", fontsize=12)
     ax.set_ylabel("Torque (Nm)", fontsize=12)
@@ -223,29 +239,32 @@ def plot_torque_vs_angle(file_groups):
 
 
 def plot_group_comparison(file_groups):
-    """Compare groups A, B, C side by side for key metrics."""
-    groups = {"A": [], "B": [], "C": []}
-    for base in file_groups:
-        label_part = base.replace("020320261", "")
-        group = label_part[0]
-        if group in groups:
-            groups[group].append(base)
+    """Compare Normal vs Under side by side for key metrics."""
+    groups = {}
+    for sub_name, base, data_dir in file_groups:
+        groups.setdefault(sub_name, []).append((base, data_dir))
 
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
-    fig.suptitle("Group Comparison (A vs B vs C) — Torque & Angle over Time",
+    n_groups = len(groups)
+    if n_groups == 0:
+        return
+
+    fig, axes = plt.subplots(2, n_groups, figsize=(9 * n_groups, 10))
+    if n_groups == 1:
+        axes = axes.reshape(2, 1)
+    group_names = sorted(groups.keys())
+    fig.suptitle(f"Group Comparison ({' vs '.join(group_names)}) — Torque & Angle over Time",
                  fontsize=16, fontweight="bold")
 
-    group_colors = {"A": "tab:blue", "B": "tab:orange", "C": "tab:green"}
-
-    for col_idx, (group, bases) in enumerate(groups.items()):
-        for base in bases:
-            json_path = DATA_DIR / f"{base}.json"
+    for col_idx, group_name in enumerate(group_names):
+        color = SUBFOLDER_COLORS.get(group_name, "tab:gray")
+        for base, data_dir in groups[group_name]:
+            json_path = data_dir / f"{base}.json"
             if not json_path.exists():
                 continue
             df = load_json(json_path)
             torque_col = _find_col(df, "torque")
             angle_col = _find_col(df, "angle")
-            label_part = base.replace("020320261", "")
+            label_part = _extract_label(base)
             if torque_col:
                 axes[0][col_idx].plot(df["Time (ms)"], df[torque_col],
                                       label=label_part, alpha=0.7, linewidth=1)
@@ -253,11 +272,11 @@ def plot_group_comparison(file_groups):
                 axes[1][col_idx].plot(df["Time (ms)"], df[angle_col],
                                       label=label_part, alpha=0.7, linewidth=1)
 
-        axes[0][col_idx].set_title(f"Group {group} — Torque", fontsize=12)
+        axes[0][col_idx].set_title(f"{group_name} — Torque", fontsize=12)
         axes[0][col_idx].set_ylabel("Torque (Nm)")
         axes[0][col_idx].grid(True, alpha=0.3)
         axes[0][col_idx].legend(fontsize=7)
-        axes[1][col_idx].set_title(f"Group {group} — Angle", fontsize=12)
+        axes[1][col_idx].set_title(f"{group_name} — Angle", fontsize=12)
         axes[1][col_idx].set_ylabel("Angle")
         axes[1][col_idx].set_xlabel("Time (ms)")
         axes[1][col_idx].grid(True, alpha=0.3)
@@ -271,7 +290,9 @@ def plot_group_comparison(file_groups):
 
 if __name__ == "__main__":
     file_groups = get_file_groups()
-    print(f"Found {len(file_groups)} file groups: {file_groups}")
+    print(f"Found {len(file_groups)} file groups:")
+    for sub, base, _ in file_groups:
+        print(f"  {sub}/{base}")
 
     # 1. CSV overview — all robot TCP data
     plot_csv_overview(file_groups)
@@ -282,10 +303,14 @@ if __name__ == "__main__":
     # 3. Torque vs Angle — classic screwing curve
     plot_torque_vs_angle(file_groups)
 
-    # 4. Group comparison A vs B vs C
+    # 4. Group comparison Normal vs Under
     plot_group_comparison(file_groups)
 
     # 5. Detailed view for first file as example
-    plot_individual_file(file_groups[4])
+    #plot_individual_file(*file_groups[0])
+
+    # 6. Detailed view for ALL screws (uncomment to enable)
+    for sub, base, data_dir in file_groups:
+        plot_individual_file(sub, base, data_dir)
 
     print("\nAll visualizations complete!")
