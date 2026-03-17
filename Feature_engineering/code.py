@@ -35,7 +35,7 @@ import pandas as pd
 from tsfresh import extract_features
 from tsfresh import select_features
 from tsfresh.utilities.dataframe_functions import impute
-from tsfresh.feature_extraction import EfficientFCParameters, MinimalFCParameters
+from tsfresh.feature_extraction import EfficientFCParameters
 
 DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
 OUTPUT_DIR = Path(r"C:\github\VT2\Feature_engineering")
@@ -122,8 +122,6 @@ def main():
     print(f"JSON long shape: {json_long.shape}")
 
     fc_params = EfficientFCParameters()
-    if "--minimal" in sys.argv:
-        fc_params = MinimalFCParameters()
 
     # Extract features from CSV (robot) data
     print("\nExtracting CSV (robot) features...")

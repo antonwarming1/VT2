@@ -1,6 +1,354 @@
 # Screwing Cell Task and Acoustics Data Collection
 
-This system collects synchronized data from a screwing-cell test rig, capturing robot kinematics, screwdriver torque/angle data, and acoustic signals during screw-driving operations.
+This system collects synchronized data from a screwing-cell test rig, capturing robot kinematics, screwdriver torque/angle data, and acoustic signals during screw-driving operations. The collected data is then cleaned, visualized, and processed through feature engineering and machine learning for classifying screw-driving operations as **Normal** or **Under** (under-torqued / faulty).
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Data Pipeline](#data-pipeline)
+- [Data Collection](#data-collection)
+- [Data Formats](#data-formats)
+- [Data Cleaning](#data-cleaning)
+- [Data Analysis & Visualization](#data-analysis--visualization)
+- [Feature Engineering](#feature-engineering)
+- [Machine Learning](#machine-learning)
+- [Folder Structure](#folder-structure)
+- [Scripts Reference](#scripts-reference)
+- [System Communication Overview](#system-communication-overview)
+
+---
+
+## Project Overview
+
+This project implements a complete pipeline for data-driven quality monitoring of an industrial screwing cell:
+
+1. **Data Collection** — Synchronized capture of robot kinematics, screwdriver sensor data, and audio from a UR10 robot / Weber C30S screwdriver / Siemens S7 PLC setup.
+2. **KXML-to-JSON Conversion** — Raw screwdriver data files (KXML/XML) are converted to JSON via a Tkinter GUI.
+3. **Data Cleaning** — Time normalization, negative-value clipping, NaN handling, and encoding fixes.
+4. **Visualization** — Overview and per-file plots of all sensor channels.
+5. **Feature Engineering** — Automated time-series feature extraction using tsfresh.
+6. **Machine Learning** — Classification of screwing operations into Normal vs. Under categories.
+
+---
+
+## Data Pipeline
+
+```
+  WSK3 (KXML files)    UR10 Robot (Modbus)    Microphone (PyAudio)    PLC Trigger (Snap7)
+        │                      │                      │                       │
+        ▼                      ▼                      ▼                       │
+  ConverterKxmlToJson.py   task_and_acustics_data_collection.py  ◄────────────┘
+        │                      │
+        ▼                      ▼
+   data/ (JSON+KXML)      data/ (CSV+WAV)
+        │                      │
+        └──────────┬───────────┘
+                   ▼
+           data_opsamling/          ← manually organized into Normal/ and Under/
+           (Normal/ + Under/)
+                   │
+                   ▼
+           data_cleaning.py
+                   │
+                   ▼
+           data_opsamling_cleaned/
+           (Normal/ + Under/)
+                   │
+         ┌─────────┴─────────┐
+         ▼                   ▼
+  visualize_020320261.py   Feature_engineering/code.py
+                                    │
+                                    ▼
+                           features_extracted.csv
+                           features_selected.csv
+                                    │
+                                    ▼
+                           ML_models_training/code.py
+```
+
+---
+
+## Data Collection
+
+Two applications run simultaneously during experiments:
+
+### task_and_acustics_data_collection.py (Background Service)
+
+Synchronizes three data streams, triggered by the PLC signal:
+
+| Stream | Source | Protocol | Rate | Output |
+|--------|--------|----------|------|--------|
+| Robot kinematics | UR10 via Modbus TCP (172.20.1.50:502) | Modbus | ~400 Hz | `.csv` |
+| Audio | Microphone via PyAudio | PCM 16-bit | 44.1 kHz | `.wav` |
+| PLC trigger | Siemens S7 PLC (172.20.1.148) | Snap7 | Polling | Start/Stop signal |
+
+When the PLC trigger goes **HIGH**, the script starts recording robot registers and audio. When it goes **LOW**, both recordings are saved to disk.
+
+### ConverterKxmlToJson.py (GUI Application)
+
+A Tkinter-based GUI that:
+- Monitors the `WSK3/` folder for new `.KXML` files from the Weber screwdriver controller
+- Converts KXML → JSON using `xmltodict` (via `folderManager.py`)
+- Sends session metadata (wood number, process type, date, counter) to the data collection script over **UDP port 6000**
+- Allows relabeling and deleting samples
+
+### Naming Convention
+
+Files follow the pattern: `{date}{wood_number}{process_type}{screw_number}`
+
+Example: `120320261A3.json` = Date 12/03/2026, Wood #1, Process A (Normal), Screw #3
+
+- **Process types**: `A` = Normal, `B/C/...` = various fault conditions
+
+---
+
+## Data Formats
+
+### CSV Files (Robot Kinematics)
+
+Each CSV file represents one screw-driving cycle recorded from the UR10 robot:
+
+| Column | Unit | Description |
+|--------|------|-------------|
+| `Time (ms)` | milliseconds | Timestamp (sampled at ~2-4 ms intervals, irregular) |
+| `TCP_x (mm)` | mm | Tool Center Point X position |
+| `TCP_y (mm)` | mm | Tool Center Point Y position |
+| `TCP_z (mm)` | mm | Tool Center Point Z position |
+| `TCP_rx (mm)` | radians | Tool orientation rotation X |
+| `TCP_ry (mm)` | radians | Tool orientation rotation Y |
+| `TCP_rz (mm)` | radians | Tool orientation rotation Z |
+| `Robot_I (A)` | amperes | Robot joint current |
+
+**Example** (first rows of a CSV):
+```
+Time (ms),TCP_x (mm),TCP_y (mm),TCP_z (mm),TCP_rx (mm),TCP_ry (mm),TCP_rz (mm),Robot_I (A)
+0.0,-80.9,-827.9,177.5,1.234,1.181,-1.205,1.232
+4.005,-80.9,-827.9,177.5,1.234,1.181,-1.205,1.232
+6.005,-80.9,-827.9,177.6,1.234,1.181,-1.205,1.197
+```
+
+**Characteristics:**
+- ~250-500 rows per file (varies per cycle duration)
+- Time intervals are non-uniform (typically 2-4 ms gaps)
+- Some files may have a non-zero starting time (fixed during cleaning)
+
+### JSON Files (Screwdriver Data)
+
+Each JSON file contains data from one screw-driving cycle captured by the Weber C30S controller. The data is stored in a nested XML-like structure:
+
+```
+JSON root
+└── XML_Data
+    └── Wsk3Vectors
+        ├── X_Axis          → time axis (ms)
+        └── Y_AxesList
+            └── AxisData[]  → one entry per signal channel
+                ├── Header {Name, Unit}
+                └── Values {float[]}
+```
+
+| Signal | Unit | Description |
+|--------|------|-------------|
+| `Nset` | rpm | Set speed (spindle target RPM) |
+| `Torque` | Nm | Measured torque |
+| `Current` | A | Motor current |
+| `Angle` | ° | Rotation angle |
+| `Depth` | mm | Screw penetration depth |
+
+**Characteristics:**
+- Uniform time steps (fixed sampling interval)
+- Typically ~200-400 data points per channel
+- Angle unit may have encoding artifacts (`Â°` instead of `°`)
+- Torque and Current may contain small negative values (sensor noise)
+
+---
+
+## Data Cleaning
+
+### data_cleaning.py
+
+Cleans raw data from `data_opsamling/` and writes cleaned files to `data_opsamling_cleaned/`.
+
+**Usage:**
+```bash
+python data_cleaning.py Normal        # clean one subfolder
+python data_cleaning.py Under         # clean another subfolder
+python data_cleaning.py --all         # clean all subfolders
+```
+
+**Cleaning operations performed:**
+
+| # | Data Type | Operation | Reason |
+|---|-----------|-----------|--------|
+| 1 | CSV | Shift time to start at 0 ms | Some files have non-zero start time |
+| 2 | CSV | Report and drop rows with NaN | Data integrity |
+| 3 | JSON | Clip negative Torque values to 0 | Sensor noise produces small negative readings |
+| 4 | JSON | Clip negative Current values to 0 | Sensor noise produces small negative readings |
+| 5 | JSON | Replace NaN values with 0 | Data integrity |
+| 6 | JSON | Fix Angle unit encoding (`Â°` → `°`) | UTF-8 encoding artifact from KXML conversion |
+
+### Dataset Organization (data_opsamling/)
+
+Before cleaning, the raw paired data files are organized into labeled subfolders:
+
+| Subfolder | Label | Description | Files |
+|-----------|-------|-------------|-------|
+| `Normal/` | 0 | Normal screw-driving operations | 5 paired CSV+JSON samples |
+| `Under/` | 1 | Under-torqued / faulty operations | 3 paired CSV+JSON samples |
+
+Each sample consists of a matching `.csv` (robot data) and `.json` (screwdriver data) file with the same filename stem.
+
+### cleaning_examples.py
+
+A diagnostic script that demonstrates each cleaning step with concrete examples from the dataset. It reports:
+1. **Time normalization** — which files have non-zero start times
+2. **Resampling analysis** — time gap statistics (min/max/mean/std)
+3. **Idle/startup phase detection** — how many rows are flat before movement begins
+4. **Outlier analysis** — IQR-based outlier counts in Robot_I and Torque
+5. **Screwing segmentation** — ramp-up / active / ramp-down phases in Nset
+6. **Encoding issues** — raw unit strings for Angle
+7. **Length normalization** — row count ranges across all files
+
+### analyze_data_quality.py
+
+Produces a full data quality report for all subfolders in `data_opsamling/`, including:
+- Null/duplicate/infinity checks for CSV and JSON
+- Time monotonicity verification
+- Constant column detection
+- IQR-based outlier detection (3x IQR)
+- Flat-region detection (>50% zero-diff)
+- Cross-file row count consistency
+- Negative value detection across all channels
+
+### compare_csv_json_timing.py
+
+Compares the timing characteristics between paired CSV and JSON files:
+- Row counts, mean time step, and total duration for both file types
+- Checks whether durations match within 100 ms tolerance
+- Highlights that CSV has irregular time steps vs. JSON's uniform sampling
+
+---
+
+## Data Analysis & Visualization
+
+### visualize_020320261.py
+
+Generates plots from `data_opsamling/` into `visualizations/`:
+
+- **csv_overview.png** — All CSV signals (TCP positions, orientations, current) overlaid by subfolder, color-coded by label
+- **json_overview.png** — All JSON signals (Nset, Torque, Current, Angle, Depth) overlaid by subfolder
+- **Per-file detail plots** — Individual detailed views of each sample showing all CSV and JSON channels
+
+### Extract_data_from_csv_and_json/exstract_data.py
+
+Simple utility to load and inspect CSV and JSON files from a data folder. Prints column names and first rows for quick exploration.
+
+---
+
+## Feature Engineering
+
+### Feature_engineering/code.py
+
+Extracts time-series features from the **cleaned** data (`data_opsamling_cleaned/`) using the [tsfresh](https://tsfresh.readthedocs.io/) library.
+
+**Usage:**
+```bash
+python Feature_engineering/code.py               # extract + select features
+python Feature_engineering/code.py --no-select    # extract only, skip selection
+```
+
+**Process:**
+1. Pairs CSV and JSON files by matching filename stems in `Normal/` and `Under/`
+2. Loads each pair into tsfresh long format with a shared `sample_id`
+3. Extracts features from **robot data** (CSV) and **screwdriver data** (JSON) separately using `EfficientFCParameters`
+4. Imputes missing values
+5. Prefixes columns (`robot_` / `screw_`) and merges into one feature matrix
+6. Optionally runs `tsfresh.select_features` to keep only statistically relevant features
+
+**Outputs:**
+
+| File | Description |
+|------|-------------|
+| `features_extracted.csv` | All tsfresh features from both data sources |
+| `features_selected.csv` | Subset of relevant features (after statistical selection) |
+| `labels.csv` | Class labels (0 = Normal, 1 = Under) |
+
+---
+
+## Machine Learning
+
+### ML_models_training/code.py
+
+Placeholder for classification model training. Intended to consume the feature matrices produced by the feature engineering step to train classifiers (e.g., Random Forest, SVM, etc.) to distinguish Normal from Under screwing operations.
+
+---
+
+## Folder Structure
+
+```
+VT2/
+├── data/                          Raw collected data (per experiment session)
+│   ├── 020320261/                 Date+wood session folders
+│   │   ├── 020320261A1.csv        Robot kinematics
+│   │   ├── 020320261A1.json       Screwdriver data (converted from KXML)
+│   │   └── ...
+│   └── ...
+├── data_kxml/                     Archived original KXML files
+├── data_opsamling/                Labeled dataset for ML (manually organized)
+│   ├── Normal/                    Normal screwing samples (CSV+JSON pairs)
+│   └── Under/                     Under-torqued samples (CSV+JSON pairs)
+├── data_opsamling_cleaned/        Cleaned version of data_opsamling/
+│   ├── Normal/
+│   └── Under/
+├── visualizations/                Generated plots from visualize_020320261.py
+├── visualizations_cleaned/        Generated plots from cleaned data
+├── Feature_engineering/
+│   ├── code.py                    tsfresh feature extraction
+│   ├── features_extracted.csv     Output: all features
+│   ├── features_selected.csv      Output: selected features
+│   └── labels.csv                 Output: class labels
+├── ML_models_training/
+│   └── code.py                    Model training (placeholder)
+├── Extract_data_from_csv_and_json/
+│   └── exstract_data.py           Data loading utility
+├── WSK3/                          Weber screwdriver KXML drop folder
+│
+├── task_and_acustics_data_collection.py   Main data collection service
+├── ConverterKxmlToJson.py                 GUI + KXML converter
+├── folderManager.py                       File system utility
+├── data_cleaning.py                       Data cleaning pipeline
+├── cleaning_examples.py                   Cleaning step demonstrations
+├── analyze_data_quality.py                Data quality reporting
+├── compare_csv_json_timing.py             CSV vs JSON timing analysis
+├── visualize_020320261.py                 Visualization generator
+├── servertest.py                          UDP server timing test
+├── Test.py                                Hello world test
+├── _test_tsfresh.py                       tsfresh minimal smoke test
+├── install_dependencies.bat               Dependency installer
+└── README.md                              This file
+```
+
+---
+
+## Scripts Reference
+
+| Script | Purpose | Input | Output |
+|--------|---------|-------|--------|
+| `task_and_acustics_data_collection.py` | Collect robot + audio data | UR10 Modbus, PLC, Microphone | `data/` CSV + WAV |
+| `ConverterKxmlToJson.py` | GUI, KXML→JSON conversion | WSK3 folder, user input | `data/` JSON, `data_kxml/` KXML |
+| `folderManager.py` | File operations helper | Called by ConverterKxmlToJson | Folder/file management |
+| `data_cleaning.py` | Clean CSV+JSON data | `data_opsamling/` | `data_opsamling_cleaned/` |
+| `cleaning_examples.py` | Show cleaning step examples | `data_opsamling/` | Console output |
+| `analyze_data_quality.py` | Data quality report | `data_opsamling/` | Console output |
+| `compare_csv_json_timing.py` | Compare CSV/JSON timing | `data_opsamling/` | Console output |
+| `visualize_020320261.py` | Generate plots | `data_opsamling/` | `visualizations/` PNG files |
+| `Feature_engineering/code.py` | Extract tsfresh features | `data_opsamling_cleaned/` | Feature CSV files |
+| `ML_models_training/code.py` | Train classifiers | Feature CSV files | (placeholder) |
+| `Extract_data_from_csv_and_json/exstract_data.py` | Quick data inspection | `data/020320261/` | Console output |
+| `servertest.py` | UDP server timing benchmark | — | Timing plot |
+| `_test_tsfresh.py` | Smoke test for tsfresh | — | `_test_output.csv` |
 
 ---
 
