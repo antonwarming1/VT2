@@ -671,7 +671,7 @@ while True:
 
             # Saving the audio data for the dashboard
             #save_recording(frames, "dashboard\\"+f"{today}{wood}{process}{counter}"+".wav")
-
+            print("Data saved to disk")
     # Give the loop delay to allow for the Web GUI to update
     # time.sleep(3)
 
