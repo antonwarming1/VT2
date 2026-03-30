@@ -612,8 +612,8 @@ while True:
         data = []
         
         #Recording audio
-        recorder = SoundRecorderThread()
-        recorder.start()
+        # recorder = SoundRecorderThread()
+        # recorder.start()
     
     register_values = modbus_reader.get_register_values()
     
@@ -662,15 +662,15 @@ while True:
             df.to_csv("dashboard\\"+f"{today}{wood}{process}{counter}"+".csv", index=False)
        
             
-            recorder.stop_recording()
-            frames = recorder.get_frames()
+            # recorder.stop_recording()
+            # frames = recorder.get_frames()
 
             # Save the recorded audio as a WAV file
-            filename = os.path.join(directory+"\{today}{wood}", f"{today}{wood}{today}{wood}{process}{counter}.wav")
-            save_recording(frames, filename_t+".wav")
+            # filename = os.path.join(directory+"\{today}{wood}", f"{today}{wood}{today}{wood}{process}{counter}.wav")
+            # save_recording(frames, filename_t+".wav")
 
             # Saving the audio data for the dashboard
-            save_recording(frames, "dashboard\\"+f"{today}{wood}{process}{counter}"+".wav")
+            # save_recording(frames, "dashboard\\"+f"{today}{wood}{process}{counter}"+".wav")
 
     # Give the loop delay to allow for the Web GUI to update
     # time.sleep(3)
