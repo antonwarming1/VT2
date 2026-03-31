@@ -4,10 +4,10 @@ Supports JSON and CSV data from class-specific folders
 """
 
 import os
-import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
@@ -19,6 +19,15 @@ from tensorflow.keras.optimizers import Adam
 import warnings
 warnings.filterwarnings('ignore')
 
+# Audio processing
+try:
+    import librosa
+    LIBROSA_AVAILABLE = True
+except ImportError:
+    LIBROSA_AVAILABLE = False
+    print("WARNING: librosa not installed. WAV file processing will be skipped.")
+    print("Install with: pip install librosa")
+
 
 # =====================================================================
 # CONFIGURATION - Modify these parameters for your use case
@@ -28,18 +37,23 @@ class Config:
     """Configuration class for easy customization"""
     
     # DATA CONFIGURATION
-    DATA_ROOT_FOLDER = r"C:\path\to\your\data\folder"  # SPECIFY YOUR DATA FOLDER
+    DATA_ROOT_FOLDER = r"C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Data fra tidligere project"  # Root folder
+    SUBFOLDERS = [
+        r"Dataset\Extrinsic data (clean)",  # Contains .wav files
+        r"Dataset\Intrinsic data",          # Contains .csv files
+        r"Dataset\Task data"                # Contains .csv files
+    ]
     CLASS_FOLDERS = {
-        0: "class_name_1",  # MODIFY: Replace with your actual class folder names
-        1: "class_name_2",
-        2: "class_name_3",
-        3: "class_name_4",
-        4: "class_name_5"
+        0: "N",
+        1: "NS",
+        2: "OT",
+        3: "P",
+        4: "UT"
     }
     
     # FILE EXTENSIONS TO LOAD
     LOAD_CSV = True
-    LOAD_JSON = True
+    LOAD_WAV = True  # Enable WAV audio file loading
     
     # DATA PREPROCESSING
     TEST_SIZE = 0.2
@@ -90,81 +104,128 @@ class DataLoader:
         features = numeric_df.values.flatten()
         return features
     
-    def load_json(self, file_path):
-        """Load and flatten JSON file to feature vector"""
-        with open(file_path, 'r') as f:
-            data = json.load(f)
+    def load_wav(self, file_path):
+        """Load WAV file and extract audio features using librosa"""
+        if not LIBROSA_AVAILABLE:
+            raise ImportError("librosa is required for WAV file processing")
         
-        # Flatten JSON structure
-        flat_data = self._flatten_json(data)
-        features = np.array(list(flat_data.values()), dtype=float)
-        return features
+        # Load audio file
+        y, sr = librosa.load(file_path, sr=None)
+        
+        # Extract features
+        features = []
+        
+        # Time-domain features
+        features.append(np.mean(y))  # Mean amplitude
+        features.append(np.std(y))   # Std amplitude
+        features.append(np.max(y))   # Max amplitude
+        features.append(np.min(y))   # Min amplitude
+        
+        # Zero crossing rate
+        zcr = librosa.feature.zero_crossing_rate(y)[0]
+        features.extend([np.mean(zcr), np.std(zcr)])
+        
+        # Spectral features
+        S = librosa.feature.melspectrogram(y=y, sr=sr)
+        S_db = librosa.power_to_db(S, ref=np.max)
+        
+        # Spectral centroid
+        centroid = librosa.feature.spectral_centroid(S=S_db)[0]
+        features.extend([np.mean(centroid), np.std(centroid)])
+        
+        # Spectral rolloff
+        rolloff = librosa.feature.spectral_rolloff(S=S_db)[0]
+        features.extend([np.mean(rolloff), np.std(rolloff)])
+        
+        # MFCC (Mel-frequency cepstral coefficients) - first 13
+        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+        for i in range(13):
+            features.append(np.mean(mfcc[i]))
+            features.append(np.std(mfcc[i]))
+        
+        return np.array(features, dtype=float)
     
-    def _flatten_json(self, data, parent_key='', sep='_'):
-        """Recursively flatten nested JSON structure"""
-        items = []
-        if isinstance(data, dict):
-            for k, v in data.items():
-                new_key = f"{parent_key}{sep}{k}" if parent_key else k
-                if isinstance(v, (dict, list)):
-                    items.extend(self._flatten_json(v, new_key, sep=sep).items())
-                else:
-                    try:
-                        items.append((new_key, float(v)))
-                    except (ValueError, TypeError):
-                        pass
-        elif isinstance(data, list):
-            for i, v in enumerate(data):
-                new_key = f"{parent_key}{sep}{i}" if parent_key else str(i)
-                if isinstance(v, (dict, list)):
-                    items.extend(self._flatten_json(v, new_key, sep=sep).items())
-                else:
-                    try:
-                        items.append((new_key, float(v)))
-                    except (ValueError, TypeError):
-                        pass
-        return dict(items)
     
     def load_from_folders(self):
-        """Load all data from class folders"""
+        """Load all data from multiple subfolders with class-specific folders"""
         print("Loading data from folders...")
+        print(f"Root folder: {self.config.DATA_ROOT_FOLDER}")
+        print(f"Subfolders: {self.config.SUBFOLDERS}")
+        print(f"Classes: {list(self.config.CLASS_FOLDERS.values())}\n")
         
-        for class_id, class_name in self.config.CLASS_FOLDERS.items():
-            class_folder = os.path.join(self.config.DATA_ROOT_FOLDER, class_name)
+        # Use Path for robust path handling
+        root_path = Path(self.config.DATA_ROOT_FOLDER)
+        
+        if not root_path.exists():
+            print(f"ERROR: Root folder not found: {root_path}")
+            return self.X, self.y
+        
+        # Loop through each subfolder
+        for subfolder_name in self.config.SUBFOLDERS:
+            subfolder_path = root_path / subfolder_name
             
-            if not os.path.exists(class_folder):
-                print(f"WARNING: Class folder not found: {class_folder}")
+            if not subfolder_path.exists():
+                print(f"WARNING: Subfolder not found: {subfolder_path}\n")
                 continue
             
-            file_count = 0
-            for filename in os.listdir(class_folder):
-                file_path = os.path.join(class_folder, filename)
-                
-                try:
-                    if filename.endswith('.csv') and self.config.LOAD_CSV:
-                        features = self.load_csv(file_path)
-                        self.X.append(features)
-                        self.y.append(class_id)
-                        file_count += 1
-                        
-                    elif filename.endswith('.json') and self.config.LOAD_JSON:
-                        features = self.load_json(file_path)
-                        self.X.append(features)
-                        self.y.append(class_id)
-                        file_count += 1
-                        
-                except Exception as e:
-                    print(f"ERROR loading {file_path}: {str(e)}")
+            print(f"Loading from subfolder: '{subfolder_name}'")
             
-            print(f"  Class '{class_name}' (ID: {class_id}): {file_count} files loaded")
+            # Loop through each class folder within the subfolder
+            for class_id, class_name in self.config.CLASS_FOLDERS.items():
+                class_folder = subfolder_path / class_name
+                
+                if not class_folder.exists():
+                    print(f"  WARNING: Class folder not found: {class_folder}")
+                    continue
+                
+                file_count = 0
+                for csv_file in class_folder.glob("*.csv"):
+                    try:
+                        features = self.load_csv(str(csv_file))
+                        self.X.append(features)
+                        self.y.append(class_id)
+                        file_count += 1
+                            
+                    except Exception as e:
+                        print(f"    ERROR loading {csv_file.name}: {str(e)}")
+                
+                # Load WAV files if available
+                if self.config.LOAD_WAV and LIBROSA_AVAILABLE:
+                    for wav_file in class_folder.glob("*.wav"):
+                        try:
+                            features = self.load_wav(str(wav_file))
+                            self.X.append(features)
+                            self.y.append(class_id)
+                            file_count += 1
+                                
+                        except Exception as e:
+                            print(f"    ERROR loading {wav_file.name}: {str(e)}")
+                
+                if file_count > 0:
+                    print(f"    Class '{class_name}' (ID: {class_id}): {file_count} files loaded")
+            
+            print()  # Blank line between subfolders
         
-        # Convert lists to numpy arrays
-        self.X = np.array(self.X)
-        self.y = np.array(self.y)
-        
-        print(f"\nTotal samples loaded: {len(self.X)}")
-        print(f"Feature vector shape: {self.X.shape}")
-        print(f"Class distribution: {np.bincount(self.y)}")
+        # Convert lists to numpy arrays, padding features to same size
+        if len(self.X) > 0:
+            # Find maximum feature size
+            max_features = max(len(x) for x in self.X)
+            print(f"Max feature size across all files: {max_features}")
+            
+            # Pad all features to the same size
+            X_padded = []
+            for features in self.X:
+                padded = np.pad(features, (0, max_features - len(features)), mode='constant', constant_values=0)
+                X_padded.append(padded)
+            
+            self.X = np.array(X_padded)
+            self.y = np.array(self.y)
+            
+            print(f"Total samples loaded: {len(self.X)}")
+            print(f"Feature vector shape: {self.X.shape}")
+            print(f"Class distribution: {np.bincount(self.y)}")
+        else:
+            print("ERROR: No data was loaded!")
         
         return self.X, self.y
 
