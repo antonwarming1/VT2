@@ -16,17 +16,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
-import warnings
-warnings.filterwarnings('ignore')
-
-# Audio processing
-try:
-    import librosa
-    LIBROSA_AVAILABLE = True
-except ImportError:
-    LIBROSA_AVAILABLE = False
-    print("WARNING: librosa not installed. WAV file processing will be skipped.")
-    print("Install with: pip install librosa")
+import librosa
 
 
 # =====================================================================
@@ -54,6 +44,10 @@ class Config:
     # FILE EXTENSIONS TO LOAD
     LOAD_CSV = True
     LOAD_WAV = True  # Enable WAV audio file loading
+    
+    # COLUMNS TO IGNORE (1-indexed: column 1 = index 0)
+    IGNORE_COLUMNS_INTRINSIC = [2, 5, 6]  # From Intrinsic data only
+    IGNORE_COLUMNS_TASK = []  # Leave empty to keep all Task columns
     
     # DATA PREPROCESSING
     TEST_SIZE = 0.2
@@ -95,9 +89,25 @@ class DataLoader:
         self.X = []
         self.y = []
         
-    def load_csv(self, file_path):
-        """Load and flatten CSV file to feature vector"""
+    def load_csv(self, file_path, folder_name=None):
+        """Load and flatten CSV file to feature vector
+        
+        Args:
+            file_path: Path to CSV file
+            folder_name: Name of subfolder (to determine which columns to ignore)
+        """
         df = pd.read_csv(file_path)
+        
+        # Drop ignored columns based on data source
+        if folder_name and "Intrinsic" in folder_name:
+            ignore_cols = [col - 1 for col in self.config.IGNORE_COLUMNS_INTRINSIC]
+            cols_to_drop = [df.columns[i] for i in ignore_cols if i < len(df.columns)]
+            df = df.drop(columns=cols_to_drop, errors='ignore')
+        elif folder_name and "Task" in folder_name:
+            ignore_cols = [col - 1 for col in self.config.IGNORE_COLUMNS_TASK]
+            cols_to_drop = [df.columns[i] for i in ignore_cols if i < len(df.columns)]
+            df = df.drop(columns=cols_to_drop, errors='ignore')
+        
         # Convert all columns to numeric, skip non-numeric columns
         numeric_df = df.apply(pd.to_numeric, errors='coerce')
         numeric_df = numeric_df.dropna(axis=1)  # Remove columns with NaN
@@ -106,44 +116,45 @@ class DataLoader:
     
     def load_wav(self, file_path):
         """Load WAV file and extract audio features using librosa"""
-        if not LIBROSA_AVAILABLE:
-            raise ImportError("librosa is required for WAV file processing")
+        try:
+            # Load audio file
+            y, sr = librosa.load(file_path, sr=None)
+            
+            # Extract features
+            features = []
+            
+            # Time-domain features
+            features.append(np.mean(y))  # Mean amplitude
+            features.append(np.std(y))   # Std amplitude
+            features.append(np.max(y))   # Max amplitude
+            features.append(np.min(y))   # Min amplitude
+            
+            # Zero crossing rate
+            zcr = librosa.feature.zero_crossing_rate(y)[0]
+            features.extend([np.mean(zcr), np.std(zcr)])
+            
+            # Spectral features (using original magnitude spectrogram)
+            S = np.abs(librosa.stft(y))
+            
+            # Spectral centroid
+            centroid = librosa.feature.spectral_centroid(S=S)[0]
+            features.extend([np.mean(centroid), np.std(centroid)])
+            
+            # Spectral rolloff
+            rolloff = librosa.feature.spectral_rolloff(S=S)[0]
+            features.extend([np.mean(rolloff), np.std(rolloff)])
+            
+            # MFCC (Mel-frequency cepstral coefficients) - first 13
+            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+            for i in range(13):
+                features.append(np.mean(mfcc[i]))
+                features.append(np.std(mfcc[i]))
+            
+            return np.array(features, dtype=float)
         
-        # Load audio file
-        y, sr = librosa.load(file_path, sr=None)
-        
-        # Extract features
-        features = []
-        
-        # Time-domain features
-        features.append(np.mean(y))  # Mean amplitude
-        features.append(np.std(y))   # Std amplitude
-        features.append(np.max(y))   # Max amplitude
-        features.append(np.min(y))   # Min amplitude
-        
-        # Zero crossing rate
-        zcr = librosa.feature.zero_crossing_rate(y)[0]
-        features.extend([np.mean(zcr), np.std(zcr)])
-        
-        # Spectral features
-        S = librosa.feature.melspectrogram(y=y, sr=sr)
-        S_db = librosa.power_to_db(S, ref=np.max)
-        
-        # Spectral centroid
-        centroid = librosa.feature.spectral_centroid(S=S_db)[0]
-        features.extend([np.mean(centroid), np.std(centroid)])
-        
-        # Spectral rolloff
-        rolloff = librosa.feature.spectral_rolloff(S=S_db)[0]
-        features.extend([np.mean(rolloff), np.std(rolloff)])
-        
-        # MFCC (Mel-frequency cepstral coefficients) - first 13
-        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
-        for i in range(13):
-            features.append(np.mean(mfcc[i]))
-            features.append(np.std(mfcc[i]))
-        
-        return np.array(features, dtype=float)
+        except Exception as e:
+            print(f"    WARNING: Could not extract features from {Path(file_path).name}: {str(e)}")
+            return None
     
     
     def load_from_folders(self):
@@ -181,7 +192,7 @@ class DataLoader:
                 file_count = 0
                 for csv_file in class_folder.glob("*.csv"):
                     try:
-                        features = self.load_csv(str(csv_file))
+                        features = self.load_csv(str(csv_file), folder_name=subfolder_name)
                         self.X.append(features)
                         self.y.append(class_id)
                         file_count += 1
@@ -190,16 +201,16 @@ class DataLoader:
                         print(f"    ERROR loading {csv_file.name}: {str(e)}")
                 
                 # Load WAV files if available
-                if self.config.LOAD_WAV and LIBROSA_AVAILABLE:
-                    for wav_file in class_folder.glob("*.wav"):
-                        try:
-                            features = self.load_wav(str(wav_file))
+                for wav_file in class_folder.glob("*.wav"):
+                    try:
+                        features = self.load_wav(str(wav_file))
+                        if features is not None:  # Skip if feature extraction failed
                             self.X.append(features)
                             self.y.append(class_id)
                             file_count += 1
-                                
-                        except Exception as e:
-                            print(f"    ERROR loading {wav_file.name}: {str(e)}")
+                            
+                    except Exception as e:
+                        print(f"    ERROR loading {wav_file.name}: {str(e)}")
                 
                 if file_count > 0:
                     print(f"    Class '{class_name}' (ID: {class_id}): {file_count} files loaded")
