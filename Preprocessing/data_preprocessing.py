@@ -1,40 +1,13 @@
 """
-data_preprocessing.py
-=====================
-Advanced preprocessing: aligns CSV/JSON, removes idle phase, resamples CSV.
+data_preprocessing.py — Runs AFTER data_cleaning.py.
 
-Runs AFTER data_cleaning.py (uses cleaned data from data_opsamling_cleaned).
-
-Steps performed:
-  1. Align CSV and JSON in time
-     - CSV starts recording ~200-230 ms before JSON
-     - Offset estimated from duration difference (both end at same event)
-     - CSV is trimmed so t=0 matches JSON t=0
-
-  2. Remove idle phase
-     - Detects when actual screwing begins using JSON Depth derivative
-     - Trims both CSV and JSON to start at the active screwing event
-     - Both signals shifted so active phase starts at t=0
-
-  3. Resample both CSV and JSON to uniform 2 ms time steps
-     - CSV is irregularly sampled (~2-36 ms gaps)
-     - JSON is sampled at 1 ms (downsampled to 2 ms)
-     - Both resampled via linear interpolation
-     - Optional Savitzky-Golay smoothing on CSV to reduce jitter/spikes
-
-Note: CSV and JSON may have different end times after preprocessing.
-      JSON typically runs ~450 ms longer (captures the final tightening phase
-      with Torque/Current peaks). This is intentional — trimming would remove
-      the most discriminative part of the signal.
-
-Output: data_opsamling_preprocessed/<subfolder>/
-
-Usage:
-  python data_preprocessing.py Normal
-  python data_preprocessing.py Under
-  python data_preprocessing.py --all
+Steps:
+  1. Remove idle phase (detected from JSON Depth derivative)
+  2. Resample both CSV and JSON to uniform time steps (linear interpolation)
+  3. Optional Savitzky-Golay smoothing on Robot_I
 """
 
+import copy
 import json
 import sys
 from pathlib import Path
@@ -44,59 +17,74 @@ import pandas as pd
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
 
-# ── Paths ────────────────────────────────────────────────────────────────────
-DATA_ROOT = Path(r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\data_opsamling_cleaned")
-OUTPUT_ROOT = Path(r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\data_opsamling_preprocessed")
 
-# ── Parameters ───────────────────────────────────────────────────────────────
-RESAMPLE_MS = 2              # Uniform sample interval for both CSV and JSON (ms)
-IDLE_DEPTH_RATE = 0.005      # Depth change rate threshold (mm/ms) for active detection
-IDLE_WINDOW = 50             # Rolling window (ms) for depth rate smoothing
-IDLE_MARGIN_MS = 100         # Keep this many ms before detected active start
-SMOOTH_CSV = True            # Apply Savitzky-Golay smoothing to CSV
-SMOOTH_COLS = ["Robot_I (A)"]  # Only smooth continuous signals (not step-like TCP positions)
-SAVGOL_WINDOW = 11           # Savitzky-Golay window length (must be odd)
-SAVGOL_POLY = 3              # Savitzky-Golay polynomial order
+# ── Config ───────────────────────────────────────────────────────────────────
+
+DATA_ROOT   = Path(r"C:\github\VT2\data_opsamling_cleaned")
+OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_preprocessed")
+
+PROCESS_SUBFOLDERS = ["--all"]   # ["Normal"], ["Normal","Under"], or ["--all"]
+
+RESAMPLE_MS    = 2       # Target sample interval (ms)
+IDLE_DEPTH_RATE = 0.005  # Depth rate threshold (mm/ms) to detect screwing start
+IDLE_WINDOW    = 50      # Rolling window size (ms) for smoothing the depth rate
+IDLE_MARGIN_MS = 100     # Keep this many ms before detected screwing start
+
+SMOOTH_CSV     = True            # Apply Savitzky-Golay smoothing to CSV columns
+SMOOTH_COLS    = ["Robot_I (A)"] # Which columns to smooth
+SAVGOL_WINDOW  = 11              # Must be odd
+SAVGOL_POLY    = 3
 
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# ── JSON helpers ─────────────────────────────────────────────────────────────
 
-def load_json(filepath):
-    with open(filepath, "r", encoding="utf-8") as f:
+def load_json(path):
+    """Read a JSON file and return the parsed data."""
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def save_json(data, filepath):
-    with open(filepath, "w", encoding="utf-8") as f:
+def save_json(data, path):
+    """Write data to a JSON file."""
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f)
 
 
 def json_to_df(data):
-    """Convert JSON screwing data to a DataFrame with Time (ms) column."""
-    vectors = data["XML_Data"]["Wsk3Vectors"]
-    x_vals = [float(v) for v in vectors["X_Axis"]["Values"]["float"]]
-    axes = vectors["Y_AxesList"]["AxisData"]
+    """
+    Convert the WSK3 JSON structure into a flat DataFrame.
 
-    result = {"Time (ms)": x_vals}
-    for axis in axes:
+    The JSON stores time in X_Axis and signal channels (Torque, Depth, etc.)
+    in Y_AxesList. This pulls them all into columns alongside a Time (ms) column.
+    """
+    vectors = data["XML_Data"]["Wsk3Vectors"]
+
+    # Time axis
+    time_values = [float(v) for v in vectors["X_Axis"]["Values"]["float"]]
+
+    # Build a dict: column name -> list of floats
+    columns = {"Time (ms)": time_values}
+    for axis in vectors["Y_AxesList"]["AxisData"]:
         name = axis["Header"]["Name"]
         values = [float(v) for v in axis["Values"]["float"]]
-        result[name] = values
+        columns[name] = values
 
-    return pd.DataFrame(result)
+    return pd.DataFrame(columns)
 
 
-def df_to_json(df, original_data):
-    """Write DataFrame values back into the JSON structure."""
-    data = json.loads(json.dumps(original_data))  # deep copy
+def df_to_json(df, original_json):
+    """
+    Write DataFrame values back into a copy of the original JSON structure.
+    This preserves all metadata while updating the numerical data.
+    """
+    data = copy.deepcopy(original_json)
     vectors = data["XML_Data"]["Wsk3Vectors"]
 
-    # Update X axis (Time)
+    # Update time axis
     vectors["X_Axis"]["Values"]["float"] = [str(v) for v in df["Time (ms)"].tolist()]
 
-    # Update Y axes
-    axes = vectors["Y_AxesList"]["AxisData"]
-    for axis in axes:
+    # Update each signal channel
+    for axis in vectors["Y_AxesList"]["AxisData"]:
         name = axis["Header"]["Name"]
         if name in df.columns:
             axis["Values"]["float"] = [str(v) for v in df[name].tolist()]
@@ -104,43 +92,19 @@ def df_to_json(df, original_data):
     return data
 
 
-# ── Step 1: Compute alignment offset ────────────────────────────────────────
+# ── Step 1: Detect and remove idle phase ─────────────────────────────────────
 
-def compute_offset(csv_df, json_df):
+def detect_active_start(json_df):
     """
-    Estimate the time offset between CSV and JSON recordings.
-    Both recordings end at the same screwing event, but CSV starts earlier.
-    offset = CSV_duration - JSON_duration (ms).
-    """
-    csv_duration = csv_df["Time (ms)"].iloc[-1] - csv_df["Time (ms)"].iloc[0]
-    json_duration = json_df["Time (ms)"].iloc[-1] - json_df["Time (ms)"].iloc[0]
-    offset = csv_duration - json_duration
-    return max(0.0, offset)
+    Find the time (ms) when the screw starts engaging.
 
+    How it works:
+      - Compute the absolute change in Depth between each sample
+      - Smooth it with a rolling average (IDLE_WINDOW samples)
+      - Find the first moment the smoothed rate exceeds IDLE_DEPTH_RATE
+      - Subtract IDLE_MARGIN_MS to keep a small buffer before that point
 
-def align_csv_to_json(csv_df, offset):
-    """
-    Trim the beginning of CSV by `offset` ms so it starts at the same time as JSON.
-    Returns a new DataFrame with adjusted time.
-    """
-    t0_csv = csv_df["Time (ms)"].iloc[0]
-    new_start = t0_csv + offset
-
-    # Keep rows from new_start onwards
-    aligned = csv_df[csv_df["Time (ms)"] >= new_start].copy()
-    # Shift time so it starts at 0
-    aligned["Time (ms)"] = aligned["Time (ms)"] - new_start
-    aligned = aligned.reset_index(drop=True)
-    return aligned
-
-
-# ── Step 2: Detect and remove idle phase ────────────────────────────────────
-
-def detect_active_start_json(json_df):
-    """
-    Detect when the screw actually engages by looking at the Depth derivative.
-    Returns the time (ms) when the active screwing phase begins,
-    or None if no active phase is detected (data should be discarded).
+    Returns None if no active screwing is detected (file should be skipped).
     """
     if "Depth" not in json_df.columns:
         return None
@@ -148,228 +112,163 @@ def detect_active_start_json(json_df):
     depth = json_df["Depth"].values
     time = json_df["Time (ms)"].values
 
-    # Compute smoothed absolute depth rate
-    depth_diff = np.abs(np.diff(depth))
-    if len(depth_diff) < IDLE_WINDOW:
+    # Absolute change in depth between consecutive samples
+    depth_change = np.abs(np.diff(depth))
+
+    if len(depth_change) < IDLE_WINDOW:
         return None
 
-    # Rolling mean of depth change rate
+    # Smooth the depth change with a rolling average
     kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
-    depth_rate = np.convolve(depth_diff, kernel, mode="valid")
+    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
 
-    # Find first index where rate exceeds threshold
-    active_indices = np.where(depth_rate > IDLE_DEPTH_RATE)[0]
-    if len(active_indices) == 0:
-        # No active screwing detected — data is unusable
-        return None
+    # Find where the smoothed rate first exceeds the threshold
+    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
 
-    active_idx = active_indices[0]
-    active_time = time[active_idx]
+    if len(above_threshold) == 0:
+        return None  # Depth never changes enough — no real screwing happened
 
-    # Apply margin: keep some ms before the detected start
-    return max(0.0, active_time - IDLE_MARGIN_MS)
+    first_active_time = time[above_threshold[0]]
+
+    # Keep a margin before the detected start
+    return max(0.0, first_active_time - IDLE_MARGIN_MS)
 
 
-def trim_idle(df, start_time_ms):
-    """Trim a DataFrame to start at start_time_ms and shift time to 0."""
+def trim_to_start(df, start_time_ms):
+    """
+    Remove all rows before start_time_ms and shift time so the new start is 0.
+    """
     trimmed = df[df["Time (ms)"] >= start_time_ms].copy()
-    trimmed["Time (ms)"] = trimmed["Time (ms)"] - start_time_ms
-    trimmed = trimmed.reset_index(drop=True)
-    return trimmed
+    trimmed["Time (ms)"] -= start_time_ms
+    return trimmed.reset_index(drop=True)
 
 
-# ── Step 3: Resample CSV to uniform time steps ─────────────────────────────
+# ── Step 2: Resample to uniform time steps ───────────────────────────────────
 
-def resample_df(df, interval_ms=RESAMPLE_MS, smooth=False, smooth_cols=None):
+def resample_uniform(df, smooth=False):
     """
-    Resample a DataFrame to uniform time steps using linear interpolation.
-    Optionally apply Savitzky-Golay smoothing to specified columns only.
-    """
-    time_orig = df["Time (ms)"].values
-    value_cols = [c for c in df.columns if c != "Time (ms)"]
+    Resample a DataFrame to uniform RESAMPLE_MS intervals using linear interpolation.
 
-    if len(time_orig) < 2:
+    CSV data comes in at irregular intervals (~2-36 ms gaps).
+    JSON data comes at 1 ms (gets downsampled to RESAMPLE_MS).
+    After this, both have the same uniform time grid.
+
+    If smooth=True, applies Savitzky-Golay smoothing to the columns in SMOOTH_COLS.
+    """
+    time_original = df["Time (ms)"].values
+
+    if len(time_original) < 2:
         return df
 
-    # Create uniform time grid
-    t_start = time_orig[0]
-    t_end = time_orig[-1]
-    time_uniform = np.arange(t_start, t_end + interval_ms / 2, interval_ms)
+    # Create a uniform time grid from start to end
+    time_uniform = np.arange(
+        time_original[0],
+        time_original[-1] + RESAMPLE_MS / 2,  # +half step to include the last point
+        RESAMPLE_MS
+    )
 
-    result = {"Time (ms)": time_uniform}
+    resampled = {"Time (ms)": time_uniform}
 
-    for col in value_cols:
-        values = df[col].values
+    for col in df.columns:
+        if col == "Time (ms)":
+            continue
 
-        # Linear interpolation
-        interp_func = interp1d(time_orig, values, kind="linear",
-                               bounds_error=False, fill_value="extrapolate")
-        resampled = interp_func(time_uniform)
+        # Interpolate this column onto the uniform time grid
+        interpolator = interp1d(
+            time_original, df[col].values,
+            kind="linear", bounds_error=False, fill_value="extrapolate"
+        )
+        values = interpolator(time_uniform)
 
-        # Optional smoothing (only for specified columns)
-        should_smooth = (smooth and len(resampled) >= SAVGOL_WINDOW
-                         and (smooth_cols is None or col in smooth_cols))
-        if should_smooth:
-            resampled = savgol_filter(resampled, SAVGOL_WINDOW, SAVGOL_POLY)
+        # Optionally smooth (only for columns like Robot_I, not step-like TCP positions)
+        if smooth and col in SMOOTH_COLS and len(values) >= SAVGOL_WINDOW:
+            values = savgol_filter(values, SAVGOL_WINDOW, SAVGOL_POLY)
 
-        result[col] = resampled
+        resampled[col] = values
 
-    return pd.DataFrame(result)
+    return pd.DataFrame(resampled)
 
 
-# ── Main pipeline ───────────────────────────────────────────────────────────
+# ── Pipeline ─────────────────────────────────────────────────────────────────
 
 def preprocess_pair(csv_path, json_path, out_csv, out_json):
     """
-    Full preprocessing pipeline for one CSV/JSON pair.
-    Returns list of actions taken.
+    Preprocess one CSV/JSON file pair:
+      1. Detect when screwing starts (from JSON Depth)
+      2. Trim both files to that start point
+      3. Resample both to uniform time steps
+      4. Save the results
     """
-    actions = []
-
-    # Load data
+    # Load both files
     csv_df = pd.read_csv(csv_path)
-    json_data = load_json(json_path)
-    json_df = json_to_df(json_data)
+    json_raw = load_json(json_path)
+    json_df = json_to_df(json_raw)
 
-    csv_len_orig = len(csv_df)
-    json_len_orig = len(json_df)
+    # Step 1: Find where screwing actually starts
+    active_start = detect_active_start(json_df)
 
-    # ── Step 1: Align CSV to JSON ──
-    offset = compute_offset(csv_df, json_df)
-    if offset > 0:
-        csv_df = align_csv_to_json(csv_df, offset)
-        actions.append(f"  Aligned: trimmed {offset:.0f} ms from CSV start "
-                       f"({csv_len_orig} → {len(csv_df)} rows)")
-
-    # ── Step 2: Remove idle phase ──
-    active_start = detect_active_start_json(json_df)
     if active_start is None:
-        actions.append("  SKIPPED: no active screwing detected (Depth never rises) — files not saved")
-        return actions, False  # signal to caller: do not save
+        print("  SKIPPED (no active screwing detected)")
+        return False
+
+    # Trim both CSV and JSON to start at the screwing event
     if active_start > 0:
-        json_df = trim_idle(json_df, active_start)
-        csv_df = trim_idle(csv_df, active_start)
-        actions.append(f"  Idle removed: cut first {active_start:.0f} ms "
-                       f"(JSON: {json_len_orig} → {len(json_df)}, "
-                       f"CSV: → {len(csv_df)} rows)")
+        csv_df = trim_to_start(csv_df, active_start)
+        json_df = trim_to_start(json_df, active_start)
+        print(f"  Idle removed: first {active_start:.0f} ms")
 
-    # ── Step 3: Resample both to uniform 2 ms ──
-    csv_len_before = len(csv_df)
-    json_len_before = len(json_df)
-    csv_df = resample_df(csv_df, smooth=SMOOTH_CSV, smooth_cols=SMOOTH_COLS)
-    json_df = resample_df(json_df, smooth=False)
-    actions.append(f"  Resampled CSV: {csv_len_before} → {len(csv_df)} rows @ {RESAMPLE_MS} ms")
-    actions.append(f"  Resampled JSON: {json_len_before} → {len(json_df)} rows @ {RESAMPLE_MS} ms")
-    if SMOOTH_CSV:
-        actions.append(f"  Smoothed CSV: Savitzky-Golay (window={SAVGOL_WINDOW}, poly={SAVGOL_POLY})")
+    # Step 2: Resample both to uniform time steps
+    csv_df = resample_uniform(csv_df, smooth=SMOOTH_CSV)
+    json_df = resample_uniform(json_df, smooth=False)
 
-    # ── Save ──
+    # Save
     csv_df.to_csv(out_csv, index=False)
+    save_json(df_to_json(json_df, json_raw), out_json)
 
-    # Write updated JSON back (preserving original structure)
-    json_out = df_to_json(json_df, json_data)
-    save_json(json_out, out_json)
-
-    # Summary info
-    csv_dur = csv_df["Time (ms)"].iloc[-1] if len(csv_df) > 0 else 0
-    json_dur = json_df["Time (ms)"].iloc[-1] if len(json_df) > 0 else 0
-    actions.append(f"  Final: CSV {csv_dur:.0f} ms ({len(csv_df)} pts), "
-                   f"JSON {json_dur:.0f} ms ({len(json_df)} pts)")
-
-    return actions, True
-
-
-def preprocess_subfolder(data_dir, output_dir):
-    """Preprocess all paired CSV/JSON files in a subfolder."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Find all base names that have both CSV and JSON
-    csv_files = {f.stem: f for f in sorted(data_dir.glob("*.csv"))}
-    json_files = {f.stem: f for f in sorted(data_dir.glob("*.json"))}
-    paired = sorted(set(csv_files.keys()) & set(json_files.keys()))
-    unpaired_csv = sorted(set(csv_files.keys()) - set(json_files.keys()))
-    unpaired_json = sorted(set(json_files.keys()) - set(csv_files.keys()))
-
-    print(f"Found {len(paired)} paired files, "
-          f"{len(unpaired_csv)} CSV-only, {len(unpaired_json)} JSON-only")
-    print(f"  Source: {data_dir}")
-    print(f"  Output: {output_dir}\n")
-
-    if unpaired_csv:
-        print(f"  WARNING: CSV without JSON: {unpaired_csv}")
-    if unpaired_json:
-        print(f"  WARNING: JSON without CSV: {unpaired_json}")
-
-    total_actions = 0
-    skipped = 0
-
-    for base in paired:
-        csv_path = csv_files[base]
-        json_path = json_files[base]
-        out_csv = output_dir / csv_path.name
-        out_json = output_dir / json_path.name
-
-        actions, saved = preprocess_pair(csv_path, json_path, out_csv, out_json)
-        print(f"{base}:")
-        for a in actions:
-            print(a)
-        total_actions += len(actions)
-        if not saved:
-            skipped += 1
-
-    if skipped:
-        print(f"\n  {skipped} file pair(s) skipped (no active screwing detected)")
-
-    # Copy unpaired files as-is (just cleaned, no alignment possible)
-    for base in unpaired_csv:
-        src = csv_files[base]
-        dst = output_dir / src.name
-        pd.read_csv(src).to_csv(dst, index=False)
-        print(f"{base}.csv: copied (no JSON pair)")
-
-    for base in unpaired_json:
-        src = json_files[base]
-        dst = output_dir / src.name
-        save_json(load_json(src), dst)
-        print(f"{base}.json: copied (no CSV pair)")
-
-    return total_actions
+    # Print summary
+    csv_end = csv_df["Time (ms)"].iloc[-1]
+    json_end = json_df["Time (ms)"].iloc[-1]
+    print(f"  CSV: {csv_end:.0f} ms ({len(csv_df)} pts)  "
+          f"JSON: {json_end:.0f} ms ({len(json_df)} pts)")
+    return True
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python data_preprocessing.py <subfolder>")
-        print("       python data_preprocessing.py --all")
-        print("Example: python data_preprocessing.py Normal")
-        available = [d.name for d in DATA_ROOT.iterdir() if d.is_dir()] if DATA_ROOT.exists() else []
-        print(f"\nAvailable subfolders: {available}")
-        sys.exit(1)
+    """Find all CSV/JSON pairs in the configured subfolders and preprocess them."""
 
-    arg = sys.argv[1]
-
-    if arg == "--all":
-        subfolders = sorted([d for d in DATA_ROOT.iterdir() if d.is_dir()])
+    # Resolve which subfolders to process
+    if PROCESS_SUBFOLDERS == ["--all"]:
+        if not DATA_ROOT.exists():
+            sys.exit(f"Error: {DATA_ROOT} does not exist")
+        subfolders = sorted(d for d in DATA_ROOT.iterdir() if d.is_dir())
     else:
-        subfolders = [DATA_ROOT / arg]
+        subfolders = [DATA_ROOT / name for name in PROCESS_SUBFOLDERS]
 
-    print(f"Resample interval: {RESAMPLE_MS} ms (both CSV and JSON)")
-    print(f"Idle detection: depth rate > {IDLE_DEPTH_RATE} mm/ms "
-          f"(window={IDLE_WINDOW} ms, margin={IDLE_MARGIN_MS} ms)")
-    print(f"Smoothing: {'Savitzky-Golay' if SMOOTH_CSV else 'OFF'}")
+    print(f"Resample: {RESAMPLE_MS} ms | Idle threshold: {IDLE_DEPTH_RATE} mm/ms | "
+          f"Smooth: {'SavGol' if SMOOTH_CSV else 'OFF'}\n")
 
-    grand_total = 0
-    for data_dir in subfolders:
-        if not data_dir.exists():
-            print(f"Error: {data_dir} does not exist")
-            sys.exit(1)
-        output_dir = OUTPUT_ROOT / data_dir.name
-        print(f"\n{'='*60}")
-        print(f"  {data_dir.name}")
-        print(f"{'='*60}")
-        grand_total += preprocess_subfolder(data_dir, output_dir)
+    for folder in subfolders:
+        if not folder.exists():
+            sys.exit(f"Error: {folder} does not exist")
 
-    print(f"\nDone! {grand_total} total steps applied.")
-    print(f"Output: {OUTPUT_ROOT}")
+        out_dir = OUTPUT_ROOT / folder.name
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        # Find file pairs (files that have both a .csv and .json with the same name)
+        csv_files = {f.stem: f for f in sorted(folder.glob("*.csv"))}
+        json_files = {f.stem: f for f in sorted(folder.glob("*.json"))}
+        paired = sorted(csv_files.keys() & json_files.keys())
+
+        print(f"{'='*50}\n  {folder.name} — {len(paired)} pairs\n{'='*50}")
+
+        for base in paired:
+            print(f"{base}:")
+            preprocess_pair(
+                csv_files[base], json_files[base],
+                out_dir / f"{base}.csv", out_dir / f"{base}.json"
+            )
+
+    print(f"\nDone! Output: {OUTPUT_ROOT}")
 
 
 if __name__ == "__main__":

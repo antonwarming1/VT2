@@ -26,6 +26,10 @@ from pathlib import Path
 DATA_ROOT = Path(r"C:\github\VT2\data_opsamling")
 OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
 
+# ── Config: which subfolders to process ──────────────────────────────────────
+# Set to ["--all"] to process all subfolders, or list specific ones:
+PROCESS_SUBFOLDERS = ["--all"]        # e.g. ["Normal"], ["Normal", "Under"], or ["--all"]
+
 
 def load_json(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -149,19 +153,14 @@ def clean_subfolder(data_dir, output_dir):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python data_cleaning.py <subfolder>")
-        print("       python data_cleaning.py --all")
-        print("Example: python data_cleaning.py Normal")
-        print(f"\nAvailable subfolders: {[d.name for d in DATA_ROOT.iterdir() if d.is_dir()]}")
-        sys.exit(1)
-
-    arg = sys.argv[1]
-
-    if arg == "--all":
+    # Resolve subfolders from config
+    if PROCESS_SUBFOLDERS == ["--all"]:
+        if not DATA_ROOT.exists():
+            print(f"Error: {DATA_ROOT} does not exist")
+            sys.exit(1)
         subfolders = sorted([d for d in DATA_ROOT.iterdir() if d.is_dir()])
     else:
-        subfolders = [DATA_ROOT / arg]
+        subfolders = [DATA_ROOT / name for name in PROCESS_SUBFOLDERS]
 
     grand_total = 0
     for data_dir in subfolders:
