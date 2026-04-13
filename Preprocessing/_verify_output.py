@@ -1,6 +1,6 @@
 import pandas as pd, json, numpy as np
 
-base = r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\data_opsamling_preprocessed\Normal\120320261A1"
+base = r"C:\github\VT2\data_opsamling_preprocessed\Normal\120320261A1"
 csv = pd.read_csv(f"{base}.csv")
 with open(f"{base}.json") as f:
     data = json.load(f)

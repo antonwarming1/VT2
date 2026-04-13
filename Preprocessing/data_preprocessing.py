@@ -68,6 +68,10 @@ def json_to_df(data):
         name = axis["Header"]["Name"]
         values = [float(v) for v in axis["Values"]["float"]]
         columns[name] = values
+    # show dataframe columns and last 3 values for each column
+    print("JSON DataFrame columns and last 3 values:")
+    for col, vals in columns.items():
+        print(f"  {col}: last 3 = {vals[-3:]}")
 
     return pd.DataFrame(columns)
 
