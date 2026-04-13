@@ -29,9 +29,9 @@ class Config:
     # DATA CONFIGURATION
     DATA_ROOT_FOLDER = r"C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Data fra tidligere project"  # Root folder
     SUBFOLDERS = [
-        r"Dataset\Extrinsic data (clean)",  # Contains .wav files
+        # r"Dataset\Extrinsic data (clean)",  # Contains .wav files
         r"Dataset\Intrinsic data",          # Contains .csv files
-        r"Dataset\Task data"                # Contains .csv files
+       #  r"Dataset\Task data"                # Contains .csv files
     ]
     CLASS_FOLDERS = {
         0: "N",
