@@ -26,9 +26,14 @@ from pathlib import Path
 DATA_ROOT = Path(r"C:\github\VT2\data_opsamling")
 OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
 
-# ── Config: which subfolders to process ──────────────────────────────────────
-# Set to ["--all"] to process all subfolders, or list specific ones:
-PROCESS_SUBFOLDERS = ["--all"]        # e.g. ["Normal"], ["Normal", "Under"], or ["--all"]
+# Old dataset (from earlier project)
+OLD_DATA_ROOT = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
+OLD_OUTPUT_ROOT = Path(r"C:\github\VT2\data_old_cleaned")
+
+# ── Config ───────────────────────────────────────────────────────────────────
+OLD_OR_NEW_DATA = ["old", "new"]       # ["old"], ["new"], or ["old", "new"]
+PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
+FOLDERS_OLD = ["Intrinsic data", "Task data"]  # For old data: which subfolders to include
 
 
 def load_json(filepath):
@@ -111,6 +116,43 @@ def clean_json(filepath, output_path):
     return actions
 
 
+def clean_intrinsic_csv(filepath, output_path):
+    """Clean a single Intrinsic CSV file (old dataset). Same signals as JSON."""
+    actions = []
+    df = pd.read_csv(filepath)
+
+    # Check for NaN
+    nan_count = df.isnull().sum().sum()
+    if nan_count > 0:
+        actions.append(f"  WARNING: {nan_count} NaN values — dropped rows")
+        df = df.dropna()
+
+    # Shift time to start at 0
+    time_col = "Time (ms)"
+    if time_col in df.columns:
+        t0 = df[time_col].iloc[0]
+        if t0 != 0.0:
+            df[time_col] = df[time_col] - t0
+            actions.append(f"  Time shifted by -{t0:.3f} ms")
+
+    # Clip negative Torque to 0
+    if "Torque (Nm)" in df.columns:
+        neg = (df["Torque (Nm)"] < 0).sum()
+        if neg > 0:
+            df["Torque (Nm)"] = df["Torque (Nm)"].clip(lower=0)
+            actions.append(f"  Torque: clipped {neg} negative values to 0")
+
+    # Clip negative Current to 0
+    if "Current (V)" in df.columns:
+        neg = (df["Current (V)"] < 0).sum()
+        if neg > 0:
+            df["Current (V)"] = df["Current (V)"].clip(lower=0)
+            actions.append(f"  Current: clipped {neg} negative values to 0")
+
+    df.to_csv(output_path, index=False)
+    return actions
+
+
 def clean_subfolder(data_dir, output_dir):
     """Clean all CSV and JSON files in a single subfolder."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -163,15 +205,52 @@ def main():
         subfolders = [DATA_ROOT / name for name in PROCESS_SUBFOLDERS]
 
     grand_total = 0
-    for data_dir in subfolders:
-        if not data_dir.exists():
-            print(f"Error: {data_dir} does not exist")
-            sys.exit(1)
-        output_dir = OUTPUT_ROOT / data_dir.name
-        print(f"\n{'='*60}")
-        print(f"  {data_dir.name}")
-        print(f"{'='*60}")
-        grand_total += clean_subfolder(data_dir, output_dir)
+
+    # ── Process new dataset ──
+    if "new" in OLD_OR_NEW_DATA:
+        for data_dir in subfolders:
+            if not data_dir.exists():
+                print(f"Error: {data_dir} does not exist")
+                sys.exit(1)
+            output_dir = OUTPUT_ROOT / data_dir.name
+            print(f"\n{'='*60}")
+            print(f"  {data_dir.name}")
+            print(f"{'='*60}")
+            grand_total += clean_subfolder(data_dir, output_dir)
+
+    # ── Process old dataset ──
+    if "old" in OLD_OR_NEW_DATA:
+        print(f"\n{'#'*60}")
+        print(f"  OLD DATASET")
+        print(f"{'#'*60}")
+        for folder_name in FOLDERS_OLD:
+            src_root = OLD_DATA_ROOT / folder_name
+            if not src_root.exists():
+                print(f"  Skipping {folder_name} (not found)")
+                continue
+            for label_dir in sorted(src_root.iterdir()):
+                if not label_dir.is_dir():
+                    continue
+                out_dir = OLD_OUTPUT_ROOT / folder_name / label_dir.name
+                out_dir.mkdir(parents=True, exist_ok=True)
+                csv_files = sorted(label_dir.glob("*.csv"))
+                wav_files = sorted(label_dir.glob("*.wav"))
+                print(f"\n--- {folder_name}/{label_dir.name} ({len(csv_files)} csv, {len(wav_files)} wav) ---")
+                for f in csv_files:
+                    out = out_dir / f.name
+                    if folder_name == "Intrinsic data":
+                        actions = clean_intrinsic_csv(f, out)
+                    else:
+                        actions = clean_csv(f, out)
+                    if actions:
+                        print(f"{f.name}:")
+                        for a in actions:
+                            print(a)
+                        grand_total += len(actions)
+                    else:
+                        print(f"{f.name}: OK")
+                for f in wav_files:
+                    shutil.copy2(f, out_dir / f.name)
 
     print(f"\nDone! {grand_total} total fixes applied.")
 

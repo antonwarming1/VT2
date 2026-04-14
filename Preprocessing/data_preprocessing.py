@@ -23,12 +23,19 @@ from scipy.signal import savgol_filter
 DATA_ROOT   = Path(r"C:\github\VT2\data_opsamling_cleaned")
 OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_preprocessed")
 
-PROCESS_SUBFOLDERS = ["--all"]   # ["Normal"], ["Normal","Under"], or ["--all"]
+# Old dataset (from earlier project)
+OLD_DATA_ROOT = Path(r"C:\github\VT2\data_old_cleaned")
+OLD_OUTPUT_ROOT = Path(r"C:\github\VT2\data_old_preprocessed")
+
+# ── Config ───────────────────────────────────────────────────────────────────
+OLD_OR_NEW_DATA = ["old", "new"]       # ["old"], ["new"], or ["old", "new"]
+PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
+FOLDERS_OLD = ["Intrinsic data", "Task data"]  # For old data: which subfolders to include
 
 RESAMPLE_MS    = 2       # Target sample interval (ms)
 IDLE_DEPTH_RATE = 0.005  # Depth rate threshold (mm/ms) to detect screwing start
 IDLE_WINDOW    = 50      # Rolling window size (ms) for smoothing the depth rate
-IDLE_MARGIN_MS = 100     # Keep this many ms before detected screwing start
+IDLE_MARGIN_MS = 0       # Keep this many ms before detected screwing start
 
 SMOOTH_CSV     = True            # Apply Savitzky-Golay smoothing to CSV columns
 SMOOTH_COLS    = ["Robot_I (A)"] # Which columns to smooth
@@ -69,11 +76,13 @@ def json_to_df(data):
         values = [float(v) for v in axis["Values"]["float"]]
         columns[name] = values
     # show dataframe columns and last 3 values for each column
+    df = pd.DataFrame(columns)
     print("JSON DataFrame columns and last 3 values:")
-    for col, vals in columns.items():
-        print(f"  {col}: last 3 = {vals[-3:]}")
+    print(df.columns.tolist()) # print column names
+    print(df.head(3))
+    print(df.tail(3))  # last 3 rows
 
-    return pd.DataFrame(columns)
+    return df
 
 
 def df_to_json(df, original_json):
@@ -137,6 +146,42 @@ def detect_active_start(json_df):
     # Keep a margin before the detected start
     return max(0.0, first_active_time - IDLE_MARGIN_MS)
 
+def detect_plateau(json_df):
+    """
+    Find the time (ms) when the depth plateaus after rising.
+
+    This can be used to trim the end of the screwing process, keeping only
+    the active screwing phase before it plateaus.
+
+    Returns None if no plateau is detected.
+    """
+    if "Depth" not in json_df.columns:
+        return None
+
+    depth = json_df["Depth"].values
+    time = json_df["Time (ms)"].values
+
+    depth_change = np.abs(np.diff(depth))
+
+    if len(depth_change) < IDLE_WINDOW:
+        return None
+
+    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
+    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
+
+    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
+
+    if len(above_threshold) == 0:
+        return None  # No active screwing detected
+
+    # Find where it drops back below threshold after being above (plateau)
+    below_after_active = np.where(smoothed_rate[above_threshold[0]:] <= IDLE_DEPTH_RATE)[0]
+
+    if len(below_after_active) == 0:
+        return None  # Never plateaus — depth keeps changing until the end
+
+    plateau_time = time[above_threshold[0] + below_after_active[0]]
+    return plateau_time
 
 def trim_to_start(df, start_time_ms):
     """
@@ -197,7 +242,7 @@ def resample_uniform(df, smooth=False):
 
 def preprocess_pair(csv_path, json_path, out_csv, out_json):
     """
-    Preprocess one CSV/JSON file pair:
+    Preprocess one CSV/JSON file pair (new dataset):
       1. Detect when screwing starts (from JSON Depth)
       2. Trim both files to that start point
       3. Resample both to uniform time steps
@@ -210,13 +255,17 @@ def preprocess_pair(csv_path, json_path, out_csv, out_json):
 
     # Step 1: Find where screwing actually starts
     active_start = detect_active_start(json_df)
+    plateau_time = detect_plateau(json_df)
 
     if active_start is None:
         print("  SKIPPED (no active screwing detected)")
         return False
 
-    # Trim both CSV and JSON to start at the screwing event
-    if active_start > 0:
+    if plateau_time is not None:
+        csv_df = trim_to_start(csv_df, plateau_time)
+        json_df = trim_to_start(json_df, plateau_time)
+        print(f"  Depth plateau trim: first {plateau_time:.0f} ms")
+    else:
         csv_df = trim_to_start(csv_df, active_start)
         json_df = trim_to_start(json_df, active_start)
         print(f"  Idle removed: first {active_start:.0f} ms")
@@ -237,6 +286,84 @@ def preprocess_pair(csv_path, json_path, out_csv, out_json):
     return True
 
 
+def detect_active_start_csv(df):
+    """detect_active_start but for old Intrinsic CSVs (column is 'Depth (mm)' not 'Depth')."""
+    if "Depth (mm)" not in df.columns:
+        return None
+    depth = df["Depth (mm)"].values
+    time = df["Time (ms)"].values
+    depth_change = np.abs(np.diff(depth))
+    if len(depth_change) < IDLE_WINDOW:
+        return None
+    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
+    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
+    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
+    if len(above_threshold) == 0:
+        return None
+    first_active_time = time[above_threshold[0]]
+    return max(0.0, first_active_time - IDLE_MARGIN_MS)
+
+
+def detect_plateau_csv(df):
+    """detect_plateau but for old Intrinsic CSVs (column is 'Depth (mm)' not 'Depth')."""
+    if "Depth (mm)" not in df.columns:
+        return None
+    depth = df["Depth (mm)"].values
+    time = df["Time (ms)"].values
+    depth_change = np.abs(np.diff(depth))
+    if len(depth_change) < IDLE_WINDOW:
+        return None
+    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
+    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
+    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
+    if len(above_threshold) == 0:
+        return None
+    below_after_active = np.where(smoothed_rate[above_threshold[0]:] <= IDLE_DEPTH_RATE)[0]
+    if len(below_after_active) == 0:
+        return None
+    return time[above_threshold[0] + below_after_active[0]]
+
+
+def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrinsic):
+    """
+    Preprocess one old-dataset pair (Task CSV + Intrinsic CSV):
+      1. Detect when screwing starts from Intrinsic Depth (mm)
+      2. Trim both files
+      3. Resample both to uniform time steps
+      4. Save the results
+    """
+    task_df = pd.read_csv(task_csv_path)
+    intr_df = pd.read_csv(intrinsic_csv_path)
+
+    active_start = detect_active_start_csv(intr_df)
+    plateau_time = detect_plateau_csv(intr_df)
+
+    if active_start is None:
+        print("  SKIPPED (no active screwing detected)")
+        return False
+
+    if plateau_time is not None:
+        task_df = trim_to_start(task_df, plateau_time)
+        intr_df = trim_to_start(intr_df, plateau_time)
+        print(f"  Depth plateau trim: first {plateau_time:.0f} ms")
+    else:
+        task_df = trim_to_start(task_df, active_start)
+        intr_df = trim_to_start(intr_df, active_start)
+        print(f"  Idle removed: first {active_start:.0f} ms")
+
+    task_df = resample_uniform(task_df, smooth=SMOOTH_CSV)
+    intr_df = resample_uniform(intr_df, smooth=False)
+
+    task_df.to_csv(out_task, index=False)
+    intr_df.to_csv(out_intrinsic, index=False)
+
+    task_end = task_df["Time (ms)"].iloc[-1]
+    intr_end = intr_df["Time (ms)"].iloc[-1]
+    print(f"  Task: {task_end:.0f} ms ({len(task_df)} pts)  "
+          f"Intrinsic: {intr_end:.0f} ms ({len(intr_df)} pts)")
+    return True
+
+
 def main():
     """Find all CSV/JSON pairs in the configured subfolders and preprocess them."""
 
@@ -251,28 +378,69 @@ def main():
     print(f"Resample: {RESAMPLE_MS} ms | Idle threshold: {IDLE_DEPTH_RATE} mm/ms | "
           f"Smooth: {'SavGol' if SMOOTH_CSV else 'OFF'}\n")
 
-    for folder in subfolders:
-        if not folder.exists():
-            sys.exit(f"Error: {folder} does not exist")
+    # ── Process new dataset ──
+    if "new" in OLD_OR_NEW_DATA:
+        for folder in subfolders:
+            if not folder.exists():
+                sys.exit(f"Error: {folder} does not exist")
 
-        out_dir = OUTPUT_ROOT / folder.name
-        out_dir.mkdir(parents=True, exist_ok=True)
+            out_dir = OUTPUT_ROOT / folder.name
+            out_dir.mkdir(parents=True, exist_ok=True)
 
-        # Find file pairs (files that have both a .csv and .json with the same name)
-        csv_files = {f.stem: f for f in sorted(folder.glob("*.csv"))}
-        json_files = {f.stem: f for f in sorted(folder.glob("*.json"))}
-        paired = sorted(csv_files.keys() & json_files.keys())
+            csv_files = {f.stem: f for f in sorted(folder.glob("*.csv"))}
+            json_files = {f.stem: f for f in sorted(folder.glob("*.json"))}
+            paired = sorted(csv_files.keys() & json_files.keys())
 
-        print(f"{'='*50}\n  {folder.name} — {len(paired)} pairs\n{'='*50}")
+            print(f"{'='*50}\n  {folder.name} — {len(paired)} pairs\n{'='*50}")
 
-        for base in paired:
-            print(f"{base}:")
-            preprocess_pair(
-                csv_files[base], json_files[base],
-                out_dir / f"{base}.csv", out_dir / f"{base}.json"
-            )
+            for base in paired:
+                print(f"{base}:")
+                preprocess_pair(
+                    csv_files[base], json_files[base],
+                    out_dir / f"{base}.csv", out_dir / f"{base}.json"
+                )
 
-    print(f"\nDone! Output: {OUTPUT_ROOT}")
+    # ── Process old dataset ──
+    if "old" in OLD_OR_NEW_DATA:
+        print(f"\n{'#'*50}")
+        print(f"  OLD DATASET")
+        print(f"{'#'*50}")
+        intrinsic_root = OLD_DATA_ROOT / "Intrinsic data"
+        task_root = OLD_DATA_ROOT / "Task data"
+        if not intrinsic_root.exists() or not task_root.exists():
+            print("  Old dataset not found, skipping.")
+        else:
+            for label_dir in sorted(intrinsic_root.iterdir()):
+                if not label_dir.is_dir():
+                    continue
+                label = label_dir.name
+                task_label_dir = task_root / label
+                if not task_label_dir.exists():
+                    print(f"  {label}: no matching Task data folder, skipping.")
+                    continue
+
+                out_dir = OLD_OUTPUT_ROOT / label
+                out_dir.mkdir(parents=True, exist_ok=True)
+
+                intr_files = {f.stem[1:]: f for f in sorted(label_dir.glob("*.csv"))}
+                task_files = {f.stem[1:]: f for f in sorted(task_label_dir.glob("*.csv"))}
+                paired = sorted(intr_files.keys() & task_files.keys())
+
+                print(f"\n{'='*50}\n  {label} — {len(paired)} pairs\n{'='*50}")
+
+                for base_id in paired:
+                    print(f"i{base_id} / t{base_id}:")
+                    preprocess_old_pair(
+                        task_files[base_id], intr_files[base_id],
+                        out_dir / f"t{base_id}.csv", out_dir / f"i{base_id}.csv"
+                    )
+
+    print(f"\nDone! Output:", end="")
+    if "new" in OLD_OR_NEW_DATA:
+        print(f" {OUTPUT_ROOT}", end="")
+    if "old" in OLD_OR_NEW_DATA:
+        print(f" {OLD_OUTPUT_ROOT}", end="")
+    print()
 
 
 if __name__ == "__main__":

@@ -14,9 +14,9 @@ matplotlib.rcParams["savefig.facecolor"] = "white"
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-CLEANED = Path(r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\data_opsamling_cleaned")
-PREPROCESSED = Path(r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\data_opsamling_preprocessed")
-OUTPUT = Path(r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\visualizations")
+CLEANED = Path(r"C:\github\VT2\data_opsamling_cleaned")
+PREPROCESSED = Path(r"C:\github\VT2\data_opsamling_preprocessed")
+OUTPUT = Path(r"C:\github\VT2\visualizations")
 OUTPUT.mkdir(exist_ok=True)
 
 SAMPLE = "120320261A1"
