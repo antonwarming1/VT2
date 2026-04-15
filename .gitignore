@@ -1,0 +1,12 @@
+
+# Data folders
+data/
+data_cleaned/
+data_kxml/
+data_opsamling/
+data_opsamling_cleaned/
+data_opsamling_final/
+data_opsamling_preprocessed/
+data_old_cleaned/
+data_old_preprocessed/
+Data fra tidligere project/

@@ -12,7 +12,7 @@ Configure which subfolders and features to process in each script's Config secti
 from Preprocessing.data_cleaning import main as clean
 from Preprocessing.data_preprocessing import main as preprocess
 from Preprocessing.exclude_features import main as exclude_features
-
+from Feature_engineering.code import main as feature_engineering
 
 def main():
     print("=" * 60)
@@ -31,6 +31,12 @@ def main():
     print("  Step 3/3: Exclude features")
     print("=" * 60)
     exclude_features()
+
+    print("\n")
+    print("=" * 60)
+    print("  Step 4/4: Feature engineering")
+    print("=" * 60)
+    feature_engineering()
 
     print("\n" + "=" * 60)
     print("  Pipeline complete!")

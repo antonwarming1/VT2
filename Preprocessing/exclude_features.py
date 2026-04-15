@@ -17,7 +17,7 @@ import pandas as pd
 
 # ── Config ───────────────────────────────────────────────────────────────────
 
-INPUT_ROOT  = Path(r"C:\github\VT2\data_opsamling_preprocessed")
+INPUT_ROOT  = Path(r"C:\github\VT2\data_old_preprocessed")
 OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_final")
 
 PROCESS_SUBFOLDERS = ["--all"]   # ["Normal"], ["Normal","Under"], or ["--all"]
@@ -37,6 +37,7 @@ EXCLUDE_CSV = [
 # Available: Nset, Torque, Current, Angle, Depth
 EXCLUDE_JSON = [
     "Nset",
+    
 ]
 
 

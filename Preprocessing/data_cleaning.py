@@ -31,7 +31,7 @@ OLD_DATA_ROOT = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
 OLD_OUTPUT_ROOT = Path(r"C:\github\VT2\data_old_cleaned")
 
 # ── Config ───────────────────────────────────────────────────────────────────
-OLD_OR_NEW_DATA = ["old", "new"]       # ["old"], ["new"], or ["old", "new"]
+OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"] Old data is from earlier project, different structure and signals than new data
 PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
 FOLDERS_OLD = ["Intrinsic data", "Task data"]  # For old data: which subfolders to include
 
@@ -128,12 +128,14 @@ def clean_intrinsic_csv(filepath, output_path):
         df = df.dropna()
 
     # Shift time to start at 0
+    """Note: Some Intrinsic CSV files already start at 0, but some don't. We want to ensure all start at 0 for consistency.
     time_col = "Time (ms)"
     if time_col in df.columns:
         t0 = df[time_col].iloc[0]
         if t0 != 0.0:
             df[time_col] = df[time_col] - t0
             actions.append(f"  Time shifted by -{t0:.3f} ms")
+            """
 
     # Clip negative Torque to 0
     if "Torque (Nm)" in df.columns:

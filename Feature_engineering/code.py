@@ -1,16 +1,20 @@
 """
 tsfresh_features.py
 ===================
-Extracts time-series features from cleaned CSV (robot) and JSON (screwing)
-data using tsfresh, then selects relevant features for classification.
+Extracts time-series features from old-format preprocessed data
+(Task CSV + Intrinsic CSV pairs) using tsfresh, then selects
+relevant features for classification.
 
 Data sources:
-  - CSV: TCP_x, TCP_y, TCP_z, TCP_rx, TCP_ry, TCP_rz, Robot_I
-  - JSON: Nset, Torque, Current, Angle, Depth
+  - Task CSV (t*.csv):      TCP_rx, TCP_ry, TCP_rz, Robot_I
+  - Intrinsic CSV (i*.csv): Nset, Torque, Current, Angle, Depth
 
 Labels:
-  - Normal  → 0
-  - Under   → 1
+  - N  (Normal)         → 0
+  - NS (Not Screwed)    → 1
+  - OT (Over-Torqued)   → 2
+  - P  (Pass)           → 3
+  - UT (Under-Torqued)  → 4
 
 Usage:
   python Feature_engineering/code.py
@@ -21,7 +25,6 @@ Output:
   Feature_engineering/features_selected.csv    — relevant features only
 """
 
-import json
 import sys
 import warnings
 import logging
@@ -37,9 +40,9 @@ from tsfresh import select_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
 
-DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
+DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_final")
 OUTPUT_DIR = Path(r"C:\github\VT2\Feature_engineering")
-LABEL_MAP = {"Normal": 0, "Under": 1}
+LABEL_MAP = {"N": 0, "NS": 1, "OT": 2, "P": 3, "UT": 4}
 
 
 def load_csv_timeseries(filepath, sample_id):
@@ -52,28 +55,13 @@ def load_csv_timeseries(filepath, sample_id):
     return df[["id", "time"] + value_cols]
 
 
-def load_json_timeseries(filepath, sample_id):
-    """Load a JSON file into tsfresh long format."""
-    with open(filepath, "r", encoding="utf-8") as f:
-        data = json.load(f)
 
-    vectors = data["XML_Data"]["Wsk3Vectors"]
-    x_vals = [float(v) for v in vectors["X_Axis"]["Values"]["float"]]
-    axes = vectors["Y_AxesList"]["AxisData"]
-
-    rows = {"id": [sample_id] * len(x_vals), "time": x_vals}
-    for axis in axes:
-        name = axis["Header"]["Name"]
-        vals = [float(v) for v in axis["Values"]["float"]]
-        rows[name] = vals
-
-    return pd.DataFrame(rows)
 
 
 def build_dataset():
-    """Build combined long-format DataFrames for CSV and JSON, plus labels."""
-    csv_frames = []
-    json_frames = []
+    """Build combined long-format DataFrames for Task and Intrinsic CSVs, plus labels."""
+    task_frames = []
+    intr_frames = []
     labels = {}
     sample_id = 0
 
@@ -83,50 +71,49 @@ def build_dataset():
             print(f"WARNING: {folder} not found, skipping")
             continue
 
-        csv_files = sorted(folder.glob("*.csv"))
-        json_files = sorted(folder.glob("*.json"))
+        # Pair t*.csv and i*.csv by matching the ID after the prefix letter
+        task_files = {f.stem[1:]: f for f in sorted(folder.glob("t*.csv"))}
+        intr_files = {f.stem[1:]: f for f in sorted(folder.glob("i*.csv"))}
+        paired = sorted(set(task_files) & set(intr_files))
 
-        # Pair CSV and JSON by matching stem (e.g. 120320261A1.csv + .json)
-        csv_stems = {f.stem: f for f in csv_files}
-        json_stems = {f.stem: f for f in json_files}
-        common_stems = sorted(set(csv_stems) & set(json_stems))
-
-        if not common_stems:
-            print(f"WARNING: No matching CSV/JSON pairs in {subfolder}")
+        if not paired:
+            print(f"WARNING: No matching Task/Intrinsic pairs in {subfolder}")
             continue
 
-        print(f"{subfolder} (label={label}): {len(common_stems)} paired samples")
+        print(f"{subfolder} (label={label}): {len(paired)} paired samples")
 
-        for stem in common_stems:
-            csv_df = load_csv_timeseries(csv_stems[stem], sample_id)
-            json_df = load_json_timeseries(json_stems[stem], sample_id)
-            csv_frames.append(csv_df)
-            json_frames.append(json_df)
+        for base_id in paired:
+            task_df = load_csv_timeseries(task_files[base_id], sample_id)
+            intr_df = load_csv_timeseries(intr_files[base_id], sample_id)
+            task_frames.append(task_df)
+            intr_frames.append(intr_df)
             labels[sample_id] = label
             sample_id += 1
 
-    csv_long = pd.concat(csv_frames, ignore_index=True)
-    json_long = pd.concat(json_frames, ignore_index=True)
+    task_long = pd.concat(task_frames, ignore_index=True)
+    intr_long = pd.concat(intr_frames, ignore_index=True)
     y = pd.Series(labels, name="label")
 
-    return csv_long, json_long, y
+    return task_long, intr_long, y
 
 
 def main():
     do_select = "--no-select" not in sys.argv
 
     print("Building dataset...")
-    csv_long, json_long, y = build_dataset()
-    print(f"Total samples: {len(y)}  (Normal: {(y == 0).sum()}, Under: {(y == 1).sum()})")
-    print(f"CSV long shape:  {csv_long.shape}")
-    print(f"JSON long shape: {json_long.shape}")
+    task_long, intr_long, y = build_dataset()
+    for label_name, label_val in LABEL_MAP.items():
+        print(f"  {label_name}: {(y == label_val).sum()}")
+    print(f"Total samples: {len(y)}")
+    print(f"Task long shape:      {task_long.shape}")
+    print(f"Intrinsic long shape: {intr_long.shape}")
 
     fc_params = EfficientFCParameters()
 
-    # Extract features from CSV (robot) data
-    print("\nExtracting CSV (robot) features...")
-    csv_features = extract_features(
-        csv_long,
+    # Extract features from Task (robot) data
+    print("\nExtracting Task (robot) features...")
+    task_features = extract_features(
+        task_long,
         column_id="id",
         column_sort="time",
         default_fc_parameters=fc_params,
@@ -134,13 +121,13 @@ def main():
         show_warnings=False,
         disable_progressbar=True,
     )
-    impute(csv_features)
-    print(f"  CSV features: {csv_features.shape}")
+    impute(task_features)
+    print(f"  Task features: {task_features.shape}")
 
-    # Extract features from JSON (screwing) data
-    print("Extracting JSON (screwing) features...")
-    json_features = extract_features(
-        json_long,
+    # Extract features from Intrinsic (screwing) data
+    print("Extracting Intrinsic (screwing) features...")
+    intr_features = extract_features(
+        intr_long,
         column_id="id",
         column_sort="time",
         default_fc_parameters=fc_params,
@@ -148,15 +135,15 @@ def main():
         show_warnings=False,
         disable_progressbar=True,
     )
-    impute(json_features)
-    print(f"  JSON features: {json_features.shape}")
+    impute(intr_features)
+    print(f"  Intrinsic features: {intr_features.shape}")
 
     # Prefix to avoid column name collisions
-    csv_features = csv_features.add_prefix("robot_")
-    json_features = json_features.add_prefix("screw_")
+    task_features = task_features.add_prefix("task_")
+    intr_features = intr_features.add_prefix("intr_")
 
     # Merge into one feature matrix
-    all_features = pd.concat([csv_features, json_features], axis=1)
+    all_features = pd.concat([task_features, intr_features], axis=1)
     all_features.index.name = "id"
     print(f"\nCombined features: {all_features.shape}")
 

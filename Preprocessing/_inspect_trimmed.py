@@ -4,7 +4,7 @@ import json
 import numpy as np
 from pathlib import Path
 
-CLEANED = Path(r"C:\Users\Anton\OneDrive\Dokumenter\GitHub\VT2\data_opsamling_cleaned")
+CLEANED=Path(r"C:\github\VT2\data_opsamling_cleaned")
 
 files = [
     ("Normal", "120320261A1"),
