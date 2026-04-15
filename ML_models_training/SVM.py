@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -18,12 +19,11 @@ def feature_extraction(df):
         'mean_torque': [df['Torque (Nm)'].mean()],
         'max_torque': [df['Torque (Nm)'].max()],
         'min_torque': [df['Torque (Nm)'].min()],
+        'std_torque': [df['Torque (Nm)'].std()],
         'mean_current': [df['Current (V)'].mean()],
         'max_current': [df['Current (V)'].max()],
         'min_current': [df['Current (V)'].min()],
-        #'mean_angle': [df['Angle (deg)'].mean()],
-        #'max_angle': [df['Angle (deg)'].max()],
-        #'min_angle': [df['Angle (deg)'].min()],
+        'std_current': [df['Current (V)'].std()],
         'torque_slope_max': [df['Torque (Nm)'].diff().max()],
         'torque_slope_std': [df['Torque (Nm)'].diff().std()],
         'current_slope_max': [df['Current (V)'].diff().max()],
@@ -42,36 +42,85 @@ def feature_build(path):
 
     return features
 
-            
+def visualize_features(all_features, labels):
+    """
+    Visualize the distribution of each feature across different classes using box plots.
+    """
+    class_names = ['N', 'NS', 'OT', 'P', 'UT']
+    features_df = all_features.copy()
+    features_df['label'] = labels
     
+    num_features = len(all_features.columns)
+    cols = 4  # Number of columns in subplot grid
+    rows = (num_features + cols - 1) // cols  # Calculate rows needed
     
+    fig, axes = plt.subplots(rows, cols, figsize=(16, 4 * rows))
+    axes = axes.flatten()
     
+    for i, feature in enumerate(all_features.columns):
+        ax = axes[i]
+        data = [features_df[features_df['label'] == j][feature] for j in range(5)]
+        ax.boxplot(data, tick_labels=class_names)
+        ax.set_title(f'{feature}')
+        ax.set_ylabel(feature)
+        ax.grid(True, alpha=0.3)
+    
+    # Hide unused subplots
+    for i in range(num_features, len(axes)):
+        axes[i].set_visible(False)
+    
+    plt.tight_layout()
+    plt.show(block=False)
+
 
 def main():
-    base_path = os.path.join(os.path.dirname(__file__), "..", "Data fra tidligere project", "Dataset", "Intrinsic data")
-    pathN = os.path.join(base_path, "N")
-    pathNS = os.path.join(base_path, "NS")
-    pathOT = os.path.join(base_path, "OT")
-    pathP = os.path.join(base_path, "P")
-    pathUT = os.path.join(base_path, "UT")
-    # Load features for each label group
-    featuresN = feature_build(pathN)
-    featuresNS = feature_build(pathNS)
-    featuresOT = feature_build(pathOT)
-    featuresP = feature_build(pathP)
-    featuresUT = feature_build(pathUT)
+    start_time = time.time()
 
-    # Concatenate all features into one DataFrame
-    all_features = pd.concat([featuresN, featuresNS, featuresOT, featuresP, featuresUT], ignore_index=True)
+    new_features = False # Set to True to extract features from CSV files, False to load from JSON
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), "features_and_labels.json")):
+        new_features = True
 
-    # Create labels: 0=N, 1=NS, 2=OT, 3=P, 4=UT
-    labels = ([0] * len(featuresN) + 
-              [1] * len(featuresNS) + 
-              [2] * len(featuresOT) + 
-              [3] * len(featuresP) + 
-              [4] * len(featuresUT))
-    labels = np.array(labels)
+    print(f"{new_features}")
 
+    if new_features == True:
+        base_path = os.path.join(os.path.dirname(__file__), "..", "Data fra tidligere project", "Dataset", "Intrinsic data")
+        # Load features for each label group
+        featuresN = feature_build(os.path.join(base_path, "N"))
+        featuresNS = feature_build(os.path.join(base_path, "NS"))
+        featuresOT = feature_build(os.path.join(base_path, "OT"))
+        featuresP = feature_build(os.path.join(base_path, "P"))
+        featuresUT = feature_build(os.path.join(base_path, "UT"))
+
+        # Concatenate all features into one DataFrame
+        all_features = pd.concat([featuresN, featuresNS, featuresOT, featuresP, featuresUT], ignore_index=True)
+
+        # Create labels: 0=N, 1=NS, 2=OT, 3=P, 4=UT
+        labels = ([0] * len(featuresN) + 
+                [1] * len(featuresNS) + 
+                [2] * len(featuresOT) + 
+                [3] * len(featuresP) + 
+                [4] * len(featuresUT))
+        labels = np.array(labels)
+
+        save_path = os.path.join(os.path.dirname(__file__), "features_and_labels.json")
+        with open(save_path, 'w') as f:
+            json.dump({
+                'features': all_features.to_dict(orient='list'),
+                'labels': labels.tolist()
+            }, f)
+
+    else:
+        # Load features and labels from JSON file
+        save_path = os.path.join(os.path.dirname(__file__), "features_and_labels.json")
+        with open(save_path, 'r') as f:
+            data = json.load(f)
+        all_features = pd.DataFrame(data['features'])
+        labels = np.array(data['labels'])
+
+    # Visualize features
+    visualize_features(all_features, labels)
+
+    print(f"labels: {labels}")
     print(f"Total samples: {len(all_features)}")
     print(f"Label distribution: {np.bincount(labels)}")
 
@@ -84,7 +133,7 @@ def main():
     X_test_scaled = scaler.transform(X_test)
 
     # Train SVM classifier
-    clf = svm.SVC(kernel='rbf', random_state=42)
+    clf = svm.SVC(kernel='rbf', random_state=42, decision_function_shape='ovr')
     clf.fit(X_train_scaled, y_train)
 
     # Predict on test set
@@ -99,6 +148,10 @@ def main():
     cm = confusion_matrix(y_test, y_pred)
     print(cm)
 
+    elapsed_time = time.time() - start_time
+    print(f"\nExecution time: {elapsed_time:.2f} seconds")
+
+
     # Display confusion matrix
     labels = ['N', 'NS', 'OT', 'P', 'UT']
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
@@ -107,6 +160,8 @@ def main():
     ax.set_title('SVM Confusion Matrix')
     plt.tight_layout()
     plt.show()
+
+    
 
 
 
