@@ -13,7 +13,7 @@ from scipy.io import wavfile
 
 OLD_CSV = r"C:\github\VT2\Data fra tidligere project\Dataset\Intrinsic data\N\i030520235006.csv"
 NEW_JSON = r"C:\github\VT2\data_opsamling\Normal\120320261A1.json"
-WAV_FILE = r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data\N\e030520236014.wav"
+WAV_FILE = r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data (clean)\N\e030520235006.wav"
 
 
 # ── Load data ────────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ plt.tight_layout()
 plt.savefig(f"{out_dir}/depth_new_json.png", dpi=150)
 plt.show()
 
-# 3) WAV waveform
+# 3) WAV waveform (amplitude)
 fig, ax = plt.subplots(figsize=(12, 4))
 ax.plot(wav_time_s, wav_data, color="tab:orange", linewidth=0.3)
 ax.set_xlabel("Time (s)")
