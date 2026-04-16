@@ -1,16 +1,20 @@
 """
 tsfresh_features.py
 ===================
-Extracts time-series features from cleaned CSV (robot) and JSON (screwing)
-data using tsfresh, then selects relevant features for classification.
+Extracts time-series features from preprocessed data using tsfresh,
+then selects relevant features for classification.
 
-Data sources:
-  - CSV: TCP_x, TCP_y, TCP_z, TCP_rx, TCP_ry, TCP_rz, Robot_I
-  - JSON: Nset, Torque, Current, Angle, Depth
+Supports two dataset formats (controlled by DATASET config):
 
-Labels:
-  - Normal  → 0
-  - Under   → 1
+Old data (Task CSV + Intrinsic CSV pairs):
+  - t*.csv → keeps: Robot_I (A)
+  - i*.csv → keeps: Torque (Nm), Current (V)
+  - Labels: N, NS, OT, P, UT
+
+New data (CSV + JSON pairs, same filename stem):
+  - CSV  → keeps: Robot_I (A)
+  - JSON → keeps: Torque, Current
+  - Labels: Normal, Under
 
 Usage:
   python Feature_engineering/code.py
@@ -19,6 +23,7 @@ Usage:
 Output:
   Feature_engineering/features_extracted.csv   — all extracted features
   Feature_engineering/features_selected.csv    — relevant features only
+  Feature_engineering/labels.csv               — class labels
 """
 
 import json
@@ -37,153 +42,183 @@ from tsfresh import select_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
 
-DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
+
+# ── Config ───────────────────────────────────────────────────────────────────
+
+DATASET = "old"  # "old" or "new"
+
+OLD_DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_final")
+OLD_LABEL_MAP = {"N": 0, "NS": 1, "OT": 2, "P": 3, "UT": 4}
+
+NEW_DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_preprocessed")
+NEW_LABEL_MAP = {"Normal": 0, "Under": 1}
+
 OUTPUT_DIR = Path(r"C:\github\VT2\Feature_engineering")
-LABEL_MAP = {"Normal": 0, "Under": 1}
 
 
-def load_csv_timeseries(filepath, sample_id):
-    """Load a CSV file into tsfresh long format."""
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+def _csv_to_long(filepath, sample_id):
+    """Load a CSV into tsfresh long format. All columns except Time are used as features."""
     df = pd.read_csv(filepath)
-    time_col = "Time (ms)"
-    value_cols = [c for c in df.columns if c != time_col]
-    df = df.rename(columns={time_col: "time"})
+    cols = [c for c in df.columns if c != "Time (ms)"]
+    df = df.rename(columns={"Time (ms)": "time"})
     df["id"] = sample_id
-    return df[["id", "time"] + value_cols]
+    return df[["id", "time"] + cols]
 
 
-def load_json_timeseries(filepath, sample_id):
-    """Load a JSON file into tsfresh long format."""
+def _json_to_long(filepath, sample_id):
+    """Load a JSON (WSK3 format) into tsfresh long format. All channels are used as features."""
     with open(filepath, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     vectors = data["XML_Data"]["Wsk3Vectors"]
-    x_vals = [float(v) for v in vectors["X_Axis"]["Values"]["float"]]
-    axes = vectors["Y_AxesList"]["AxisData"]
+    time_values = [float(v) for v in vectors["X_Axis"]["Values"]["float"]]
+    rows = {"time": time_values}
 
-    rows = {"id": [sample_id] * len(x_vals), "time": x_vals}
-    for axis in axes:
+    for axis in vectors["Y_AxesList"]["AxisData"]:
         name = axis["Header"]["Name"]
-        vals = [float(v) for v in axis["Values"]["float"]]
-        rows[name] = vals
+        rows[name] = [float(v) for v in axis["Values"]["float"]]
 
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    df["id"] = sample_id
+    cols = [c for c in df.columns if c not in ("id", "time")]
+    return df[["id", "time"] + cols]
 
 
-def build_dataset():
-    """Build combined long-format DataFrames for CSV and JSON, plus labels."""
-    csv_frames = []
-    json_frames = []
-    labels = {}
+# ── Dataset builders ─────────────────────────────────────────────────────────
+
+def build_old_dataset():
+    """
+    Old data: pair t*.csv / i*.csv by matching ID after prefix letter.
+    Returns (task_long, intr_long, labels).
+    """
+    task_frames, intr_frames, labels = [], [], {}
     sample_id = 0
 
-    for subfolder, label in LABEL_MAP.items():
-        folder = DATA_ROOT / subfolder
+    for subfolder, label in OLD_LABEL_MAP.items():
+        folder = OLD_DATA_ROOT / subfolder
         if not folder.exists():
-            print(f"WARNING: {folder} not found, skipping")
+            print(f"  WARNING: {folder} not found, skipping")
             continue
 
-        csv_files = sorted(folder.glob("*.csv"))
-        json_files = sorted(folder.glob("*.json"))
+        task_files = {f.stem[1:]: f for f in sorted(folder.glob("t*.csv"))}
+        intr_files = {f.stem[1:]: f for f in sorted(folder.glob("i*.csv"))}
+        paired = sorted(task_files.keys() & intr_files.keys())
 
-        # Pair CSV and JSON by matching stem (e.g. 120320261A1.csv + .json)
-        csv_stems = {f.stem: f for f in csv_files}
-        json_stems = {f.stem: f for f in json_files}
-        common_stems = sorted(set(csv_stems) & set(json_stems))
-
-        if not common_stems:
-            print(f"WARNING: No matching CSV/JSON pairs in {subfolder}")
+        if not paired:
+            print(f"  WARNING: no pairs in {subfolder}")
             continue
 
-        print(f"{subfolder} (label={label}): {len(common_stems)} paired samples")
-
-        for stem in common_stems:
-            csv_df = load_csv_timeseries(csv_stems[stem], sample_id)
-            json_df = load_json_timeseries(json_stems[stem], sample_id)
-            csv_frames.append(csv_df)
-            json_frames.append(json_df)
+        print(f"  {subfolder} (label={label}): {len(paired)} samples")
+        for base_id in paired:
+            task_frames.append(_csv_to_long(task_files[base_id], sample_id))
+            intr_frames.append(_csv_to_long(intr_files[base_id], sample_id))
             labels[sample_id] = label
             sample_id += 1
 
-    csv_long = pd.concat(csv_frames, ignore_index=True)
-    json_long = pd.concat(json_frames, ignore_index=True)
-    y = pd.Series(labels, name="label")
-
-    return csv_long, json_long, y
+    return (pd.concat(task_frames, ignore_index=True),
+            pd.concat(intr_frames, ignore_index=True),
+            pd.Series(labels, name="label"))
 
 
-def main():
-    do_select = "--no-select" not in sys.argv
+def build_new_dataset():
+    """
+    New data: pair *.csv / *.json by matching filename stem.
+    Returns (task_long, intr_long, labels).
+    """
+    task_frames, intr_frames, labels = [], [], {}
+    sample_id = 0
 
-    print("Building dataset...")
-    csv_long, json_long, y = build_dataset()
-    print(f"Total samples: {len(y)}  (Normal: {(y == 0).sum()}, Under: {(y == 1).sum()})")
-    print(f"CSV long shape:  {csv_long.shape}")
-    print(f"JSON long shape: {json_long.shape}")
+    for subfolder, label in NEW_LABEL_MAP.items():
+        folder = NEW_DATA_ROOT / subfolder
+        if not folder.exists():
+            print(f"  WARNING: {folder} not found, skipping")
+            continue
 
-    fc_params = EfficientFCParameters()
+        csv_files = {f.stem: f for f in sorted(folder.glob("*.csv"))}
+        json_files = {f.stem: f for f in sorted(folder.glob("*.json"))}
+        paired = sorted(csv_files.keys() & json_files.keys())
 
-    # Extract features from CSV (robot) data
-    print("\nExtracting CSV (robot) features...")
-    csv_features = extract_features(
-        csv_long,
+        if not paired:
+            print(f"  WARNING: no pairs in {subfolder}")
+            continue
+
+        print(f"  {subfolder} (label={label}): {len(paired)} samples")
+        for stem in paired:
+            task_frames.append(_csv_to_long(csv_files[stem], sample_id))
+            intr_frames.append(_json_to_long(json_files[stem], sample_id))
+            labels[sample_id] = label
+            sample_id += 1
+
+    return (pd.concat(task_frames, ignore_index=True),
+            pd.concat(intr_frames, ignore_index=True),
+            pd.Series(labels, name="label"))
+
+
+# ── Feature extraction ───────────────────────────────────────────────────────
+
+def extract_from_long(df, name):
+    """Run tsfresh feature extraction on a long-format DataFrame."""
+    print(f"  Extracting {name} features...")
+    features = extract_features(
+        df,
         column_id="id",
         column_sort="time",
-        default_fc_parameters=fc_params,
-        n_jobs=0,  # single-process to avoid Windows multiprocessing issues
-        show_warnings=False,
-        disable_progressbar=True,
-    )
-    impute(csv_features)
-    print(f"  CSV features: {csv_features.shape}")
-
-    # Extract features from JSON (screwing) data
-    print("Extracting JSON (screwing) features...")
-    json_features = extract_features(
-        json_long,
-        column_id="id",
-        column_sort="time",
-        default_fc_parameters=fc_params,
+        default_fc_parameters=EfficientFCParameters(),
         n_jobs=0,
         show_warnings=False,
         disable_progressbar=True,
     )
-    impute(json_features)
-    print(f"  JSON features: {json_features.shape}")
+    impute(features)
+    print(f"  {name} features: {features.shape}")
+    return features
 
-    # Prefix to avoid column name collisions
-    csv_features = csv_features.add_prefix("robot_")
-    json_features = json_features.add_prefix("screw_")
 
-    # Merge into one feature matrix
-    all_features = pd.concat([csv_features, json_features], axis=1)
+# ── Main ─────────────────────────────────────────────────────────────────────
+
+def main():
+    do_select = "--no-select" not in sys.argv
+    label_map = OLD_LABEL_MAP if DATASET == "old" else NEW_LABEL_MAP
+
+    # Build dataset
+    print(f"Building dataset (DATASET={DATASET})...")
+    if DATASET == "old":
+        task_long, intr_long, y = build_old_dataset()
+    else:
+        task_long, intr_long, y = build_new_dataset()
+
+    for name, val in label_map.items():
+        print(f"  {name}: {(y == val).sum()}")
+    print(f"  Total: {len(y)} samples")
+    print(f"  Task shape:      {task_long.shape}")
+    print(f"  Intrinsic shape: {intr_long.shape}")
+
+    # Extract features
+    print("\nExtracting features...")
+    task_features = extract_from_long(task_long, "Task").add_prefix("task_")
+    intr_features = extract_from_long(intr_long, "Intrinsic").add_prefix("intr_")
+
+    # Combine
+    all_features = pd.concat([task_features, intr_features], axis=1)
     all_features.index.name = "id"
-    print(f"\nCombined features: {all_features.shape}")
+    print(f"\nCombined: {all_features.shape}")
 
-    # Save all extracted features
-    out_all = OUTPUT_DIR / "features_extracted.csv"
-    all_features.to_csv(out_all)
-    print(f"Saved all features to {out_all}")
+    # Save extracted features
+    all_features.to_csv(OUTPUT_DIR / "features_extracted.csv")
+    print(f"Saved → features_extracted.csv")
 
     # Feature selection
     if do_select:
         print("\nSelecting relevant features...")
         selected = select_features(all_features, y)
-        print(f"Selected features: {selected.shape[1]} / {all_features.shape[1]}")
+        print(f"Selected: {selected.shape[1]} / {all_features.shape[1]}")
+        selected.to_csv(OUTPUT_DIR / "features_selected.csv")
+        print(f"Saved → features_selected.csv")
 
-        out_sel = OUTPUT_DIR / "features_selected.csv"
-        selected.to_csv(out_sel)
-        print(f"Saved selected features to {out_sel}")
-
-        # Save labels alongside
-        out_labels = OUTPUT_DIR / "labels.csv"
-        y.to_csv(out_labels, header=True)
-        print(f"Saved labels to {out_labels}")
-    else:
-        # Still save labels
-        out_labels = OUTPUT_DIR / "labels.csv"
-        y.to_csv(out_labels, header=True)
-        print(f"Saved labels to {out_labels}")
+    # Save labels
+    y.to_csv(OUTPUT_DIR / "labels.csv", header=True)
+    print(f"Saved → labels.csv")
 
     print("\nDone!")
 
