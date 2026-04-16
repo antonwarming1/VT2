@@ -31,7 +31,7 @@ class Config:
     SUBFOLDERS = [
         # r"Dataset\Extrinsic data (clean)",  # Contains .wav files
         r"Dataset\Intrinsic data",          # Contains .csv files
-       #  r"Dataset\Task data"                # Contains .csv files
+         r"Dataset\Task data"                # Contains .csv files
     ]
     CLASS_FOLDERS = {
         0: "N",
