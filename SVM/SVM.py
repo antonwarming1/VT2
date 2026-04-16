@@ -11,6 +11,7 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 
 
 def load_csv(filepath):
+    print(f"Loading CSV file: {filepath}")
     return pd.read_csv(filepath)
 
 def feature_extraction(df):
@@ -73,7 +74,21 @@ def visualize_features(all_features, labels):
     plt.show(block=False)
 
 
+def display_confusion_matrix(cm, title='Confusion Matrix'):
+    """
+    Display the confusion matrix using a heatmap.
+    """
+    labels = ['N', 'NS', 'OT', 'P', 'UT']
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+    fig, ax = plt.subplots(figsize=(7, 6))
+    disp.plot(ax=ax, cmap='Blues', colorbar=True)
+    ax.set_title(title)
+    plt.tight_layout()
+    plt.show()
+
+
 def main():
+    
     start_time = time.time()
 
     new_features = False # Set to True to extract features from CSV files, False to load from JSON
@@ -118,7 +133,7 @@ def main():
         labels = np.array(data['labels'])
 
     # Visualize features
-    visualize_features(all_features, labels)
+    #visualize_features(all_features, labels)
 
     print(f"labels: {labels}")
     print(f"Total samples: {len(all_features)}")
@@ -153,13 +168,7 @@ def main():
 
 
     # Display confusion matrix
-    labels = ['N', 'NS', 'OT', 'P', 'UT']
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-    fig, ax = plt.subplots(figsize=(7, 6))
-    disp.plot(ax=ax, cmap='Blues', colorbar=True)
-    ax.set_title('SVM Confusion Matrix')
-    plt.tight_layout()
-    plt.show()
+    display_confusion_matrix(cm, 'SVM Confusion Matrix')
 
     
 
