@@ -42,7 +42,9 @@ IDLE_WINDOW    = 50      # Rolling window size (ms) for smoothing the depth rate
 IDLE_MARGIN_MS = 0       # Keep this many ms before detected screwing start
 
 SMOOTH_CSV     = True            # Apply Savitzky-Golay smoothing to CSV columns
-SMOOTH_COLS    = ["Robot_I (A)"] # Which columns to smooth
+SMOOTH_COLS    = ["Robot_I (A)"] # Which Task/CSV columns to smooth
+SMOOTH_INTR    = True            # Apply Savitzky-Golay smoothing to Intrinsic/JSON columns
+SMOOTH_COLS_INTR = ["Torque (Nm)", "Current (V)"]  # Which Intrinsic/JSON columns to smooth
 SAVGOL_WINDOW  = 11              # Must be odd
 SAVGOL_POLY    = 3
 
@@ -111,7 +113,27 @@ def df_to_json(df, original_json):
 
 # ── Step 1: Detect and remove idle phase ─────────────────────────────────────
 
-def detect_active_start(json_df):
+def _smooth_depth_rate(df, depth_col="Depth"):
+    """Compute smoothed depth change rate.
+    Works for both new data (depth_col='Depth') and old data (depth_col='Depth (mm)').
+    Returns (time, smoothed_rate, above_threshold) or None if not enough data."""
+    if depth_col not in df.columns:
+        return None
+    depth = df[depth_col].values
+    time = df["Time (ms)"].values
+    depth_change = np.abs(np.diff(depth))
+    if len(depth_change) < IDLE_WINDOW:
+        return None
+    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
+    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
+    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
+    if len(above_threshold) == 0:
+        print("  SKIPPED (depth rate never exceeds threshold — no active screwing)")
+        return None
+    return time, smoothed_rate, above_threshold
+
+
+def detect_active_start(df, depth_col="Depth"):
     """
     Find the time (ms) when the screw starts engaging.
 
@@ -123,69 +145,49 @@ def detect_active_start(json_df):
 
     Returns None if no active screwing is detected (file should be skipped).
     """
-    if "Depth" not in json_df.columns:
+    result = _smooth_depth_rate(df, depth_col)
+    if result is None:
         return None
+    time, _, above_threshold = result
+    return max(0.0, time[above_threshold[0]] - IDLE_MARGIN_MS)
 
-    depth = json_df["Depth"].values
-    time = json_df["Time (ms)"].values
 
-    # Absolute change in depth between consecutive samples
-    depth_change = np.abs(np.diff(depth))
-
-    if len(depth_change) < IDLE_WINDOW:
-        return None
-
-    # Smooth the depth change with a rolling average
-    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
-    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
-
-    # Find where the smoothed rate first exceeds the threshold
-    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
-
-    if len(above_threshold) == 0:
-        return None  # Depth never changes enough — no real screwing happened
-
-    first_active_time = time[above_threshold[0]]
-
-    # Keep a margin before the detected start
-    return max(0.0, first_active_time - IDLE_MARGIN_MS)
-
-def detect_plateau(json_df):
+def detect_plateau(df, depth_col="Depth"):
     """
     Find the time (ms) when the depth plateaus after rising.
 
-    This can be used to trim the end of the screwing process, keeping only
-    the active screwing phase before it plateaus.
+    Requires the depth rate to stay above threshold for at least
+    MIN_ACTIVE_SAMPLES consecutive samples before looking for the
+    plateau drop-off.
 
     Returns None if no plateau is detected.
     """
-    if "Depth" not in json_df.columns:
+    result = _smooth_depth_rate(df, depth_col)
+    if result is None:
+        return None
+    time, smoothed_rate, above_threshold = result
+
+    # Find the end of the first sustained active region
+    MIN_ACTIVE_SAMPLES = 10
+    run_start = above_threshold[0]
+    run_end = run_start
+    for i in range(1, len(above_threshold)):
+        if above_threshold[i] == above_threshold[i - 1] + 1:
+            run_end = above_threshold[i]
+        else:
+            if run_end - run_start >= MIN_ACTIVE_SAMPLES:
+                break
+            run_start = above_threshold[i]
+            run_end = run_start
+
+    if run_end - run_start < MIN_ACTIVE_SAMPLES:
         return None
 
-    depth = json_df["Depth"].values
-    time = json_df["Time (ms)"].values
-
-    depth_change = np.abs(np.diff(depth))
-
-    if len(depth_change) < IDLE_WINDOW:
+    search_from = run_end
+    below_after = np.where(smoothed_rate[search_from:] <= IDLE_DEPTH_RATE)[0]
+    if len(below_after) == 0:
         return None
-
-    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
-    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
-
-    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
-
-    if len(above_threshold) == 0:
-        return None  # No active screwing detected
-
-    # Find where it drops back below threshold after being above (plateau)
-    below_after_active = np.where(smoothed_rate[above_threshold[0]:] <= IDLE_DEPTH_RATE)[0]
-
-    if len(below_after_active) == 0:
-        return None  # Never plateaus — depth keeps changing until the end
-
-    plateau_time = time[above_threshold[0] + below_after_active[0]]
-    return plateau_time
+    return time[search_from + below_after[0]]
 
 def trim_to_start(df, start_time_ms):
     """
@@ -198,7 +200,7 @@ def trim_to_start(df, start_time_ms):
 
 # ── Step 2: Resample to uniform time steps ───────────────────────────────────
 
-def resample_uniform(df, smooth=False):
+def resample_uniform(df, smooth=False, smooth_cols=None):
     """
     Resample a DataFrame to uniform RESAMPLE_MS intervals using linear interpolation.
 
@@ -206,8 +208,10 @@ def resample_uniform(df, smooth=False):
     JSON data comes at 1 ms (gets downsampled to RESAMPLE_MS).
     After this, both have the same uniform time grid.
 
-    If smooth=True, applies Savitzky-Golay smoothing to the columns in SMOOTH_COLS.
+    If smooth=True, applies Savitzky-Golay smoothing to the columns in smooth_cols.
     """
+    if smooth_cols is None:
+        smooth_cols = SMOOTH_COLS
     time_original = df["Time (ms)"].values
 
     if len(time_original) < 2:
@@ -234,7 +238,7 @@ def resample_uniform(df, smooth=False):
         values = interpolator(time_uniform)
 
         # Optionally smooth (only for columns like Robot_I, not step-like TCP positions)
-        if smooth and col in SMOOTH_COLS and len(values) >= SAVGOL_WINDOW:
+        if smooth and col in smooth_cols and len(values) >= SAVGOL_WINDOW:
             values = savgol_filter(values, SAVGOL_WINDOW, SAVGOL_POLY)
 
         resampled[col] = values
@@ -270,7 +274,7 @@ def preprocess_pair(csv_path, json_path, out_csv, out_json):
 
     # Step 2: Resample both to uniform time steps
     csv_df = resample_uniform(csv_df, smooth=SMOOTH_CSV)
-    json_df = resample_uniform(json_df, smooth=False)
+    json_df = resample_uniform(json_df, smooth=SMOOTH_INTR, smooth_cols=SMOOTH_COLS_INTR)
 
     # Save
     csv_df.to_csv(out_csv, index=False)
@@ -284,83 +288,7 @@ def preprocess_pair(csv_path, json_path, out_csv, out_json):
     return True
 
 
-def _smooth_depth_rate_csv(df):
-    """Compute smoothed depth change rate for old Intrinsic CSVs.
-    Returns (time, smoothed_rate, above_threshold) or None if not enough data."""
-    if "Depth (mm)" not in df.columns:
-        return None
-    depth = df["Depth (mm)"].values
-    time = df["Time (ms)"].values
-    depth_change = np.diff(depth)
-    if len(depth_change) < IDLE_WINDOW:
-        return None
-    kernel = np.ones(IDLE_WINDOW) / IDLE_WINDOW
-    smoothed_rate = np.convolve(depth_change, kernel, mode="valid")
-    above_threshold = np.where(smoothed_rate > IDLE_DEPTH_RATE)[0]
-    if len(above_threshold) == 0:
-        print("  SKIPPED (depth rate never exceeds threshold — no active screwing)")
-        #delete this instance 
 
-        return None
-
-    # Show above_threshold indices with their time and rate values
-    print(f"\n  above_threshold: {len(above_threshold)} indices where smoothed_rate > {IDLE_DEPTH_RATE}")
-    print(f"  First 10: index -> time (ms) | smoothed_rate")
-    for idx in above_threshold[:10]:
-        print(f"    [{idx}] -> {time[idx]:.0f} ms | {smoothed_rate[idx]:.6f}")
-    if len(above_threshold) > 10:
-        print(f"    ... ({len(above_threshold) - 10} more)")
-    print(f"  Last:  [{above_threshold[-1]}] -> {time[above_threshold[-1]]:.0f} ms | {smoothed_rate[above_threshold[-1]]:.6f}")
-
-    return time, smoothed_rate, above_threshold
-
-
-def detect_active_start_csv(df):
-    """detect_active_start but for old Intrinsic CSVs (column is 'Depth (mm)' not 'Depth')."""
-    result = _smooth_depth_rate_csv(df)
-
-    if result is None:
-        return None
-    time, _, above_threshold = result
-    return max(0.0, time[above_threshold[0]] - IDLE_MARGIN_MS)
-
-
-def detect_plateau_csv(df, smooth_result=None):
-    """detect_plateau but for old Intrinsic CSVs (column is 'Depth (mm)' not 'Depth').
-    
-    Requires the depth rate to stay above threshold for at least MIN_ACTIVE_SAMPLES
-    before looking for the plateau drop-off.
-    T
-    """
-    # Reuse the smoothed depth rate and above_threshold indices from detect_active_start_csv
-    result = _smooth_depth_rate_csv(df)
-    if result is None:
-        return None
-    #gets the values 
-    time, smoothed_rate, above_threshold = result
-
-    # Find the end of the first sustained active region
-    MIN_ACTIVE_SAMPLES = 10
-    run_start = above_threshold[0]
-    print (f" active smaples {above_threshold[0]} to {above_threshold[-1]} with length {len(above_threshold)}")
-    run_end = run_start
-    for i in range(1, len(above_threshold)):
-        if above_threshold[i] == above_threshold[i - 1] + 1:
-            run_end = above_threshold[i]
-        else:
-            if run_end - run_start >= MIN_ACTIVE_SAMPLES:
-                break
-            run_start = above_threshold[i]
-            run_end = run_start
-    # the active region must be at least MIN_ACTIVE_SAMPLES long to be considered valid
-    if run_end - run_start < MIN_ACTIVE_SAMPLES:
-        return None
-
-    search_from = run_end
-    below_after = np.where(smoothed_rate[search_from:] <= IDLE_DEPTH_RATE)[0]
-    if len(below_after) == 0:
-        return None
-    return time[search_from + below_after[0]]
 
 
 def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrinsic):
@@ -374,16 +302,11 @@ def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrins
     task_df = pd.read_csv(task_csv_path)
     intr_df = pd.read_csv(intrinsic_csv_path)
 
-    # Check for depth activity — skip if depth never changes
-    smooth_result = _smooth_depth_rate_csv(intr_df)
-    if smooth_result is None:
-        print("  SKIPPED (no depth change recorded)")
-        return False
-
-    plateau_time = detect_plateau_csv(intr_df, smooth_result=smooth_result)
+    # Detect plateau from Intrinsic Depth (mm)
+    plateau_time = detect_plateau(intr_df, depth_col="Depth (mm)")
 
     if plateau_time is None:
-        print("  SKIPPED (no depth plateau detected)")
+        print("  SKIPPED (no depth activity or plateau detected)")
         return False
 
     # Step 1: Trim everything before the depth plateau, keep the tail
@@ -392,7 +315,7 @@ def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrins
     print(f"  Trimmed at depth plateau: first {plateau_time:.0f} ms removed")
 
     task_df = resample_uniform(task_df, smooth=SMOOTH_CSV)
-    intr_df = resample_uniform(intr_df, smooth=False)
+    intr_df = resample_uniform(intr_df, smooth=SMOOTH_INTR, smooth_cols=SMOOTH_COLS_INTR)
 
     task_df.to_csv(out_task, index=False)
     intr_df.to_csv(out_intrinsic, index=False)

@@ -22,22 +22,33 @@ OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_final")
 
 PROCESS_SUBFOLDERS = ["--all"]   # ["Normal"], ["Normal","Under"], or ["--all"]
 
-# Columns to remove from CSV files (robot data)
-# Available: TCP_x (mm), TCP_y (mm), TCP_z (mm), TCP_rx (mm), TCP_ry (mm), TCP_rz (mm), Robot_I (A)
+# Columns to remove from CSV files (task + intrinsic)
+# Covers both new data (mm units) and old data (rad units).
+# Intrinsic columns are included here because old data stores everything as CSV.
+
 EXCLUDE_CSV = [
+    # Task CSV — new data (mm)
     "TCP_x (mm)",
     "TCP_y (mm)",
     "TCP_z (mm)",
     "TCP_rx (mm)",
     "TCP_ry (mm)",
     "TCP_rz (mm)",
+    # Task CSV — old data (rad)
+    "TCP_rx (rad)",
+    "TCP_ry (rad)",
+    "TCP_rz (rad)",
+    # Intrinsic CSV — old data
+    "Nset (1/min)",
+    "Angle (deg)",
+    "Depth (mm)",
 ]
 
-# Columns to remove from JSON files (screwing cell data)
-# Available: Nset, Torque, Current, Angle, Depth
+# Columns to remove from JSON files (new dataset screwing cell data)
 EXCLUDE_JSON = [
     "Nset",
-    
+    "Angle",
+    "Depth",
 ]
 
 
