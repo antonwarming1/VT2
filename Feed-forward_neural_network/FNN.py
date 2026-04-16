@@ -482,7 +482,7 @@ def main():
     
     # Step 9: Save model
     nn.save_model()
-    
+    print("\nModel training and evaluation completed successfully!")
     print("\n" + "="*70)
     print("PIPELINE COMPLETED SUCCESSFULLY")
     print("="*70)
