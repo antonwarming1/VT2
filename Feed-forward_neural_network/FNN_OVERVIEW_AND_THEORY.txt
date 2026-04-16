@@ -1,0 +1,677 @@
+================================================================================
+FEED-FORWARD NEURAL NETWORK FOR MULTI-CLASS CLASSIFICATION
+Script Overview & Theoretical Foundation
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+
+This script implements a complete machine learning pipeline for multi-class 
+classification using a feed-forward neural network. The system classifies data 
+into 5 classes (N, NS, OT, P, UT) by learning patterns from three data sources:
+
+1. EXTRINSIC DATA: Audio features extracted from WAV files (acoustic signals)
+2. INTRINSIC DATA: Robot sensor measurements stored as CSV files
+3. TASK DATA: Task-related parameters stored as CSV files
+
+The pipeline automatically loads all data, preprocesses it, trains a neural 
+network, and evaluates performance using multiple metrics.
+
+
+DATA SOURCES & FEATURE EXTRACTION
+================================================================================
+
+1. WAV FILE PROCESSING (Extrinsic Data - Sound/Acoustics)
+   Files: .wav audio files from acoustic sensors
+   
+   Features Extracted (42 total per file):
+   
+   Time-Domain Features (4 features):
+   - Mean amplitude: Average signal value
+   - Standard deviation: Variation in signal
+   - Maximum amplitude: Highest peak value
+   - Minimum amplitude: Lowest trough value
+   
+   Zero-Crossing Rate (2 features):
+   - Mean ZCR: How often signal crosses zero (indicates frequency content)
+   - Std ZCR: Variation in zero-crossing rate
+   
+   Spectral Features (4 features):
+   - Spectral Centroid (mean & std): Center of mass of the spectrum
+   - Spectral Rolloff (mean & std): Frequency below which 85% of energy
+   
+   MFCC - Mel-Frequency Cepstral Coefficients (32 features):
+   - 13 MFCCs × 2 (mean & std each) = 26 features
+   - MFCCs mimic human hearing, capturing perceptual features of audio
+   - Used extensively in speech recognition and acoustic analysis
+   
+   Why: These features capture both temporal and spectral characteristics
+   of sound, making them highly effective for acoustic classification tasks.
+
+
+2. CSV FILE PROCESSING (Intrinsic & Task Data)
+   
+   Intrinsic Data Features: Variable size per file
+   - Robot position, velocity, acceleration (TCP coordinates)
+   - Joint angles and velocities
+   - Electrical current measurements
+   - Configurable columns to exclude: IGNORE_COLUMNS_INTRINSIC = [2, 5, 6]
+   
+   Task Data Features: Variable size per file
+   - Task parameters and states
+   - Force/torque measurements
+   - Timing information
+   - Configurable columns to exclude: IGNORE_COLUMNS_TASK = []
+   
+   Processing:
+   - All columns converted to numeric values
+   - Non-numeric columns automatically excluded
+   - Specified columns excluded based on data source (Intrinsic/Task)
+   - Values flattened into single feature vector
+   
+   Feature Padding:
+   - Different file types produce different feature dimensions
+   - All features dynamically padded to maximum size found across all files
+   - Padding uses zeros (constant_values=0)
+   - Example: If max features found = 11,502, all feature vectors padded to 11,502
+
+
+================================================================================
+FEED-FORWARD NEURAL NETWORK THEORY
+================================================================================
+
+ARCHITECTURE
+============
+
+A feed-forward neural network is a layered structure where data flows in one
+direction: from input → hidden layers → output. The network has NO cycles or
+feedback loops, making it straightforward and efficient to train.
+
+Your Network Structure:
+┌─────────────────────────────────────────────────────┐
+│ INPUT LAYER: 11,502 neurons (data features)         │
+│ (one neuron per input feature)                       │
+└─────────────────────────────────────────────────────┘
+                        ↓
+                    W₁, b₁
+                        ↓
+┌─────────────────────────────────────────────────────┐
+│ HIDDEN LAYER 1: 128 neurons                          │
+│ Activation: Sigmoid                                  │
+│ Regularization: Dropout (20%)                        │
+└─────────────────────────────────────────────────────┘
+                        ↓
+                    W₂, b₂
+                        ↓
+┌─────────────────────────────────────────────────────┐
+│ HIDDEN LAYER 2: 64 neurons                           │
+│ Activation: Sigmoid                                  │
+│ Regularization: Dropout (20%)                        │
+└─────────────────────────────────────────────────────┘
+                        ↓
+                    W₃, b₃
+                        ↓
+┌─────────────────────────────────────────────────────┐
+│ HIDDEN LAYER 3: 32 neurons                           │
+│ Activation: Sigmoid                                  │
+│ Regularization: Dropout (20%)                        │
+└─────────────────────────────────────────────────────┘
+                        ↓
+                    W₄, b₄
+                        ↓
+┌─────────────────────────────────────────────────────┐
+│ OUTPUT LAYER: 5 neurons (one per class)              │
+│ Activation: Softmax                                  │
+│ Outputs: Probability distribution over classes      │
+└─────────────────────────────────────────────────────┘
+
+
+NEURONS & ACTIVATION FUNCTIONS
+==============================
+
+Each neuron performs a mathematical operation:
+
+1. Linear Combination:
+   z = w₁x₁ + w₂x₂ + ... + wₙxₙ + b
+   
+   Where:
+   - w = weights (learned parameters)
+   - x = inputs from previous layer
+   - b = bias (allows shifting activation threshold)
+
+2. Activation Function: Introduces non-linearity, allowing network to learn
+   complex patterns. Without activation, stacking layers would be equivalent
+   to one large linear transformation.
+
+Sigmoid Activation (Hidden Layers):
+   σ(z) = 1 / (1 + e^(-z))
+   
+   Properties:
+   - Output range: 0 to 1 (squashes values to probability-like range)
+   - Shape: S-curve (smooth transition between 0 and 1)
+   - Interpretable as "how much this neuron fires"
+   - Why chosen: Smooth gradients prevent vanishing gradient problems
+   - Limitation: Computationally more expensive than ReLU (your alternative)
+
+Softmax Activation (Output Layer):
+   P(class_i) = e^(z_i) / Σ(e^(z_j) for all j)
+   
+   Properties:
+   - Converts network outputs to probability distribution
+   - Sum of outputs always equals 1
+   - Each output ≥ 0
+   - Selection criterion: class with highest probability wins
+   - Required for multi-class classification with categorical cross-entropy
+
+
+WEIGHTS & BIASES
+================
+
+These are the "learnable parameters" that the network adjusts during training:
+
+- Weights (W): Control the importance and strength of connections between neurons
+- Biases (b): Allow neurons to shift their activation thresholds
+- Total parameters in your network: (11,502×128 + 128×64 + 64×32 + 32×5) 
+                                    + (128 + 64 + 32 + 5)
+                                    ≈ 1.5 million parameters
+
+Training = Finding optimal weight/bias values that minimize prediction error
+Learning = Process of updating these parameters using gradient descent
+
+
+FORWARD PROPAGATION
+===================
+
+How data flows through the network:
+
+1. Input: Raw features (11,502 values, normalized to mean=0, std=1)
+
+2. Hidden Layer 1 Computation:
+   h₁ = σ(W₁ · x + b₁)
+   - Multiply inputs by 11,502×128 weight matrix
+   - Add bias
+   - Apply sigmoid activation
+   - Result: 128 values
+
+3. Hidden Layer 2 Computation:
+   h₂ = σ(W₂ · h₁ + b₂)
+   - Multiply h₁ by 128×64 weight matrix
+   - Result: 64 values
+
+4. Hidden Layer 3 Computation:
+   h₃ = σ(W₃ · h₂ + b₃)
+   - Multiply h₂ by 64×32 weight matrix
+   - Result: 32 values
+
+5. Output Layer Computation:
+   outputs = softmax(W₄ · h₃ + b₄)
+   - Multiply h₃ by 32×5 weight matrix
+   - Apply softmax
+   - Result: 5 probabilities (sum = 1.0)
+
+6. Prediction: argmax(outputs) = class with highest probability
+
+
+BACKPROPAGATION & TRAINING
+==========================
+
+Training the network means finding weights that minimize error. This uses
+backpropagation algorithm:
+
+1. Forward Pass: Compute predictions (as above)
+
+2. Calculate Loss (Error):
+   L = -Σ yᵢ log(ŷᵢ)  [Categorical Cross-Entropy]
+   
+   Where:
+   - y = true class (one-hot encoded: [0,1,0,0,0] for class 1)
+   - ŷ = predicted probability for each class
+   - Lower loss = better predictions
+
+3. Backward Pass: Compute gradients (partial derivatives)
+   
+   For each weight/bias:
+   ∂L/∂w = how much loss changes if we change this weight
+   
+   Chain rule: ∂L/∂w = ∂L/∂outputs · ∂outputs/∂h₃ · ... · ∂h₁/∂w
+   
+   Error "flows backward" through layers, starting from output
+
+4. Gradient Descent: Update weights to reduce loss
+   
+   w_new = w_old - learning_rate × ∂L/∂w
+   
+   The network "walks downhill" on the loss landscape toward better solutions
+
+
+================================================================================
+TRAINING CONFIGURATION & TRICKS
+================================================================================
+
+DATA SPLITTING (Train / Validation / Test)
+==========================================
+
+Why Split Data?
+- Training Set (64%): Used to train network (adjust weights)
+- Validation Set (16%): Used to tune hyperparameters & check for overfitting
+- Test Set (20%): Final evaluation on unseen data
+
+Prevents Overfitting (memorizing training data) vs Underfitting (not learning).
+
+Your Implementation:
+1. Split: 80% train+val, 20% test
+2. From 80%: Further split 80% train, 20% validation
+   Final: ~51% train, 13% val, 20% test (~3,000 samples total)
+
+
+NORMALIZATION (Standardization)
+================================
+
+Problem: Features have different scales
+- Audio features: -1 to 1 (normalized waveforms)
+- Sensor data: 0 to 1000+ (position/current values)
+- Large differences in scale confuse the network
+
+Solution: StandardScaler (Z-score normalization)
+
+For each feature:
+x_normalized = (x - mean) / std_deviation
+
+Result:
+- Mean = 0
+- Standard deviation = 1
+- All features on same "scale"
+
+Benefits:
+- Faster convergence during training
+- Prevents feature dominance based on scale
+- Improves numerical stability
+- Applied independently to train/val/test to prevent data leakage
+
+
+BATCH PROCESSING
+================
+
+Instead of updating weights after each sample (too noisy), group samples:
+
+Batch Size = 32 samples
+- Process 32 samples simultaneously (matrix operations on GPU)
+- Compute average loss over batch
+- Update weights once per batch
+- Epoch = full pass through all training data
+
+Why:
+- Stable gradient estimates (averaging reduces noise)
+- GPU efficiency (processes multiple samples in parallel)
+- Faster training (fewer weight updates needed)
+- Better generalization (stochasticity prevents local minima)
+
+
+DROPOUT REGULARIZATION (20%)
+=============================
+
+Problem: Network can "memorize" training data patterns (overfitting)
+
+Solution: Dropout - Randomly disable neurons during training
+
+How It Works:
+- During each training iteration, randomly "drop" 20% of hidden layer neurons
+- Those neurons contribute nothing forward or backward that iteration
+- Remaining 80% learn to handle missing information
+- At test time, all neurons are active (but weights scaled by 0.8)
+
+Why:
+- Forces network to learn redundant representations
+- No single neuron can become overly important
+- Prevents co-adaptation (neurons relying too heavily on specific neighbors)
+- Cheap way to train implicit ensemble of models
+- Dramatically reduces overfitting
+
+Mathematical Effect:
+- Without dropout: Each sample update can cause different behaviors
+- With dropout: Network learns robust features that work despite noise
+
+
+EARLY STOPPING
+==============
+
+Problem: Train longer = better training error, but worse validation error
+(overfitting: memorizing training details, not learning general patterns)
+
+Solution: Monitor validation loss, stop training when it increases
+
+Implementation (Your Code):
+- Monitor: Validation loss
+- Patience: 10 epochs without improvement
+- Action: Stop training, restore best weights
+- Benefit: Automatic optimal stopping point
+
+Example:
+Epoch  Train Loss  Val Loss    Action
+1      1.200       0.950       ← Continue (improving)
+2      0.950       0.850       ← Continue (improving)
+...
+25     0.450       0.650       ← Continue (this might be best)
+26     0.400       0.655       ← Patience: 1
+27     0.385       0.665       ← Patience: 2
+...
+36     0.350       0.700       ← Patience: 11 → STOP & restore epoch 25 weights
+
+
+OPTIMIZATION ALGORITHM: ADAM
+=============================
+
+Problem: Simple gradient descent can get stuck in local minima or oscillate
+
+Solution: Adam (Adaptive Moment Estimation)
+
+How Adam Works:
+1. Maintains moving averages of gradients (momentum)
+2. Maintains moving averages of squared gradients (adaptive learning rate)
+3. Combines both for each parameter's update
+
+m_t = β₁ · m_{t-1} + (1 - β₁) · g_t        [momentum]
+v_t = β₂ · v_{t-1} + (1 - β₂) · g_t²       [variance]
+w_t = w_{t-1} - α · m_t / (√v_t + ε)
+
+Where:
+- β₁ ≈ 0.9 (momentum coefficient, smooths gradient direction)
+- β₂ ≈ 0.999 (variance coefficient, adaptive learning rate)
+- α = learning_rate = 0.001
+
+Benefits:
+- Converges faster than gradient descent
+- Handles sparse and dense features well
+- Individual adaptive learning rates per parameter
+- Momentum helps escape local minima
+- Less sensitive to learning rate hyperparameter choice
+
+Your Configuration:
+- learning_rate = 0.001 (balance between convergence speed & stability)
+
+
+LOSS FUNCTION: CATEGORICAL CROSS-ENTROPY
+=========================================
+
+Purpose: Measures how "wrong" predictions are
+
+Mathematical Formulation:
+L = -Σ yᵢ · log(ŷᵢ)
+
+Where:
+- y = true label (one-hot: [0, 0, 1, 0, 0] for class 2)
+- ŷ = predicted probability for each class
+- Sum over all 5 classes
+
+Interpretation:
+- Perfect prediction: y=[0,1,0,0,0], ŷ=[0.01, 0.97, 0.01, 0.005, 0.005]
+  Loss = -1·log(0.97) ≈ 0.03 (very small, good)
+
+- Wrong prediction: y=[0,1,0,0,0], ŷ=[0.2, 0.1, 0.6, 0.08, 0.02]
+  Loss = -1·log(0.1) ≈ 2.3 (large, bad)
+
+Why Cross-Entropy:
+- Penalizes confident wrong answers heavily
+- Rewards high probability on correct class
+- Natural for probability distributions (softmax output)
+- Standard in classification tasks
+
+
+================================================================================
+EVALUATION METRICS
+================================================================================
+
+ACCURACY
+========
+Accuracy = (Correct Predictions) / (Total Predictions)
+
+Example: 180 correct out of 200 test samples = 90% accuracy
+
+Limitation: 
+- Doesn't show per-class performance
+- Misleading if classes are imbalanced
+- Doesn't distinguish between different types of errors
+
+
+CLASSIFICATION REPORT (Precision, Recall, F1-Score)
+==================================================
+
+For each class:
+
+Precision = True Positives / (True Positives + False Positives)
+- "Of all samples predicted as this class, how many were correct?"
+- Important when false positives are costly
+
+Recall = True Positives / (True Positives + False Negatives)
+- "Of all actual samples of this class, how many did we find?"
+- Important when false negatives are costly
+
+F1-Score = 2 · (Precision · Recall) / (Precision + Recall)
+- Harmonic mean of precision and recall
+- Balanced metric when both matter equally
+
+Support = Number of samples in each class
+
+
+CONFUSION MATRIX
+================
+
+Visual grid showing:
+         Predicted Class
+         N    NS   OT   P    UT
+Actual N [45]  2    1    0    2     Row sum = 50 samples of class N
+       NS 1   [48]  0    1    0     46 correctly classified as NS
+       OT 0    0   [50]  0    0     50 perfectly classified as OT
+       P  2    0    0   [47]  1     47 correctly classified as P
+       UT 1    1    0    1   [47]   47 correctly classified as UT
+
+Diagonal = Correct predictions
+Off-diagonal = Misclassifications
+
+Reveals:
+- Which classes confuse the network
+- Systematic miss-classification patterns
+- Per-class performance details
+
+
+================================================================================
+PRACTICAL USAGE & WORKFLOW
+================================================================================
+
+CONFIGURATION (Easy Customization)
+===================================
+
+All settings in Config class at top of script:
+
+DATA PATHS:
+  DATA_ROOT_FOLDER: Root folder containing all data
+  SUBFOLDERS: List of data type folders (Extrinsic data, Intrinsic data, Task data)
+  CLASS_FOLDERS: Mapping of class IDs to folder names [N, NS, OT, P, UT]
+
+FILE LOADING:
+  LOAD_CSV: True/False to include CSV files from Intrinsic/Task data
+  LOAD_WAV: True/False to include WAV files from Extrinsic data
+  IGNORE_COLUMNS_INTRINSIC: Column indices to exclude from Intrinsic data
+  IGNORE_COLUMNS_TASK: Column indices to exclude from Task data
+
+NEURAL NETWORK:
+  HIDDEN_LAYERS: Network architecture (neurons per layer)
+    [128, 64, 32] = 3 hidden layers with 128, 64, 32 neurons
+    Can adjust to [256, 128] for bigger network or [64, 32] for smaller
+  ACTIVATION_FUNCTION: Activation for hidden layers (default: sigmoid)
+  OPTIMIZER: Learning optimizer (default: Adam with lr=0.001)
+  LOSS_FUNCTION: Loss function (default: categorical_crossentropy)
+
+TRAINING:
+  BATCH_SIZE: How many samples per training iteration (default: 32)
+  EPOCHS: Maximum training iterations (default: 100)
+  VALIDATION_SPLIT: Fraction of training data for validation (default: 0.2)
+  EARLY_STOPPING_PATIENCE: Epochs to wait for improvement before stopping (default: 10)
+  TEST_SIZE: Fraction of data for testing (default: 0.2)
+  VALIDATION_SIZE: Fraction of training+val data for validation (default: 0.2)
+
+DATA PREPROCESSING:
+  RANDOM_STATE: Random seed for reproducibility (default: 42)
+  NORMALIZATION: True/False to apply StandardScaler normalization (default: True)
+
+MODEL SAVING:
+  MODEL_SAVE_PATH: Where to save trained model (default: trained_model.keras)
+  SCALER_SAVE_PATH: Where to save data scaler (default: scaler.pkl)
+
+OUTPUT:
+  PLOT_HISTORY: True/False to save training history plot
+  PLOT_CONFUSION_MATRIX: True/False to save confusion matrix plot
+  VERBOSE: 0=silent, 1=progress bar, 2=one line per epoch
+
+
+RUNNING THE SCRIPT
+==================
+
+Data Folder Structure (Required):
+The script expects data organized as:
+  C:\...\ Data fra tidligere project\
+    ├── Dataset\Extrinsic data (clean)\
+    │   ├── N\        (WAV and/or CSV files for class N)
+    │   ├── NS\
+    │   ├── OT\
+    │   ├── P\
+    │   └── UT\
+    ├── Dataset\Intrinsic data\
+    │   ├── N\        (CSV files)
+    │   ├── NS\
+    │   ├── OT\
+    │   ├── P\
+    │   └── UT\
+    └── Dataset\Task data\
+        ├── N\        (CSV files)
+        ├── NS\
+        ├── OT\
+        ├── P\
+        └── UT\
+
+Running Steps:
+Step 1: Update paths in Config class if your data folder structure differs
+Step 2: Adjust column ignoring (IGNORE_COLUMNS_INTRINSIC, IGNORE_COLUMNS_TASK) if needed
+Step 3: Run from terminal:
+        python FNN.py
+
+Step 4: Monitor output:
+        - Data loading progress (files per class, feature dimensions)
+        - Feature padding information (max feature size across all files)
+        - Model architecture summary
+        - Training progress (loss and accuracy per epoch)
+        - Early stopping notification if applicable
+        - Final evaluation metrics and classification report
+        - Confusion matrix display
+        - Plot save notifications
+
+
+OUTPUT FILES
+============
+
+trained_model.keras: Trained neural network weights
+  - Saved to: Feed-forward_neural_network/trained_model.keras
+  - Can load later to make predictions on new data
+  - Portable format, can use in other projects
+  - Load with: keras.models.load_model()
+
+scaler.pkl: StandardScaler object for data normalization
+  - Saved to: Feed-forward_neural_network/scaler.pkl
+  - Stores mean and standard deviation of training data
+  - Must be used to normalize new data identically
+  - Load with: pickle.load()
+
+training_history.png: Plots of loss and accuracy over epochs
+  - Saved to: Feed-forward_neural_network/training_history.png
+  - Shows if model is learning
+  - Reveals overfitting (train improving, validation declining)
+  - Two subplots: Loss curve and Accuracy curve
+
+confusion_matrix.png: Visual of per-class performance
+  - Saved to: Feed-forward_neural_network/confusion_matrix.png
+  - Identifies which classes confuse the network
+  - Easy to spot patterns in misclassifications
+  - Color intensity shows frequency of each prediction
+
+
+================================================================================
+LIMITATIONS & CONSIDERATIONS
+================================================================================
+
+CURRENT APPROACH CHALLENGES
+===========================
+
+Feature Imbalance:
+- CSV features (7,000-11,500) dominate WAV features (42)
+- Network may underutilize audio features
+- Possible solution: Feature scaling or separate processing streams
+
+Large Feature Dimension (11,502):
+- Increases computational cost
+- May lead to high variance with limited samples
+- Possible solution: Dimensionality reduction (PCA, feature selection)
+
+Training Time:
+- ~3,000 samples + audio processing can take 30-60 minutes
+- Possible solution: Subset data initially, parallelize audio loading
+
+Imbalanced Classes:
+- If class distribution is uneven, need stratified splitting (already implemented)
+- Consider class weights in loss function for severe imbalance
+
+
+ASSUMPTIONS MADE
+================
+
+- All classes are equally important in loss function
+- Features are numeric or extractable as numeric from audio
+- Feature padding with zeros is acceptable (no negative side effects)
+- 11,502 features is reasonable (no automated reduction)
+- Sigmoid activation in hidden layers is suitable for this data
+- Train/validation/test split of 51%/13%/20% is optimal
+
+
+POTENTIAL IMPROVEMENTS
+======================
+
+1. Dimensionality Reduction: Reduce 11,502 features to 100-500 most important
+   Benefit: Faster training, less overfitting
+   Method: PCA or feature importance analysis
+
+2. Class Weights: If classes are imbalanced, weight loss by class frequency
+   Benefit: Better minority class performance
+
+3. Hyperparameter Tuning: Test different architectures, learning rates, batch sizes
+   Benefit: Potentially better model performance
+
+4. Data Augmentation: Artificially expand training data
+   Benefit: Better generalization, especially for limited data
+
+5. Ensemble Methods: Train multiple models, average predictions
+   Benefit: More robust, reduced variance
+
+6. Cross-Validation: K-fold cross-validation instead of single train/val/test split
+   Benefit: Better estimate of true generalization performance
+
+7. Different Architectures: Convolutional networks for spatial audio patterns
+   Benefit: Better feature extraction for sequential/spatial data
+
+
+================================================================================
+CONCLUSION
+================================================================================
+
+This feed-forward neural network script provides a complete pipeline for
+multi-class classification combining acoustic (WAV), robot intrinsic, and
+task data. It employs modern deep learning techniques including:
+
+- Proper data handling and preprocessing
+- Robust neural network architecture with regularization
+- Advanced optimization and training strategies
+- Comprehensive evaluation metrics
+
+The flexibility of the configuration allows easy experimentation with different
+architectures, data sources, and hyperparameters for your specific robot 
+classification task.
+
+================================================================================
