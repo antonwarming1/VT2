@@ -95,8 +95,6 @@ def main():
     if not os.path.exists(os.path.join(os.path.dirname(__file__), "features_and_labels.json")):
         new_features = True
 
-    print(f"{new_features}")
-
     if new_features == True:
         base_path = os.path.join(os.path.dirname(__file__), "..", "Data fra tidligere project", "Dataset", "Intrinsic data")
         # Load features for each label group
