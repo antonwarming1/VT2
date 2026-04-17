@@ -8,13 +8,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold, cross_val_score, train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import seaborn as sns
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
+from scikeras.wrappers import KerasClassifier
 
 
 # =====================================================================
@@ -28,9 +29,10 @@ class Config:
     FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
     LABELS_PATH = r"C:\github\VT2\Feature_engineering\labels.csv"
     
-    # DATA PREPROCESSING
-    TEST_SIZE = 0.2
+    # DATA PREPROCESSING (Total split: 70% train, 20% validation, 10% test)
+    TRAIN_SIZE = 0.7
     VALIDATION_SIZE = 0.2
+    TEST_SIZE = 0.1
     RANDOM_STATE = 42
     NORMALIZATION = True
     
@@ -44,6 +46,9 @@ class Config:
     BATCH_SIZE = 32
     EPOCHS = 100
     EARLY_STOPPING_PATIENCE = 10
+    
+    # GRID SEARCH (Set to True to perform hyperparameter tuning)
+    USE_GRID_SEARCH = False  # Change to True to enable grid search
     
     # MODEL SAVING
     MODEL_SAVE_PATH = r"Feed-forward_neural_network\trained_model.keras"
@@ -97,14 +102,18 @@ class FeedForwardNN:
         self.scaler = None
         self.history = None
     
-    def build_model(self):
+    def build_model(self, hidden_layers=None, activation=None):
         """Build the neural network architecture"""
+        # Use provided parameters or fall back to config
+        hidden_layers = hidden_layers or self.config.HIDDEN_LAYERS
+        activation = activation or self.config.ACTIVATION_FUNCTION
+        
         self.model = Sequential()
         
         self.model.add(layers.Input(shape=(self.input_dim,)))
         
-        for neurons in self.config.HIDDEN_LAYERS:
-            self.model.add(layers.Dense(neurons, activation=self.config.ACTIVATION_FUNCTION))
+        for neurons in hidden_layers:
+            self.model.add(layers.Dense(neurons, activation=activation))
             self.model.add(layers.Dropout(0.2))
         
         self.model.add(layers.Dense(self.num_classes, activation='softmax'))
@@ -118,6 +127,129 @@ class FeedForwardNN:
         print("\nModel Architecture:")
         self.model.summary()
         return self.model
+    
+    def random_search_cv(self, X_train, y_train_labels):
+        """Perform Randomized Search CV using KerasClassifier"""
+        print("\nPerforming Randomized Search CV with KerasClassifier...")
+        param={
+            'model__hidden_layers': [[64], [128, 64], [256, 128, 64]],
+            'model__activation': ['relu', 'tanh'],
+            'batch_size': [16, 32, 64],
+            'model__dropout_rate': [0.1, 0.2, 0.3],
+            'model__optimizer': [Adam(learning_rate=0.001), Adam(learning_rate=0.0001)]
+        }
+        # Create KerasClassifier wrapper using build_model
+        keras_clf = KerasClassifier(
+            model=self.build_model,
+            loss=self.config.LOSS_FUNCTION,
+            optimizer=Adam(learning_rate=0.001),
+            metrics=['accuracy'],
+            batch_size=16,
+            epochs=self.config.EPOCHS,
+            verbose=0
+        )
+        
+        # Perform randomized search
+        random_search = RandomizedSearchCV(
+            estimator=keras_clf,
+            param_distributions=param,
+            n_iter=10,  # Number of parameter settings sampled
+            cv=5,  # Number of folds for cross-validation
+            n_jobs=1,  # Set to 1 for TensorFlow compatibility
+            verbose=1
+        )
+        
+        random_search.fit(X_train, y_train_labels)
+        
+        print(f"✓ Best params: {random_search.best_params_}")
+        print(f"✓ Best score: {random_search.best_score_:.4f}")
+        print(f"\nTop 5 Results:")
+        results_df = pd.DataFrame(random_search.cv_results_)
+        print(results_df[['param_model__hidden_layers', 'param_model__activation', 'param_batch_size', 'mean_test_score']].head())
+        
+        return random_search
+    def objective(self, X_train, y_train_labels):
+        """Perform Bayesian Search CV using KerasClassifier"""
+        print("\nPerforming Bayesian Search CV with KerasClassifier...")
+        param={
+            'model__hidden_layers': [[64], [128, 64], [256, 128, 64]],
+            'model__activation': ['relu', 'tanh'],
+            'batch_size': [16, 32, 64],
+            'model__dropout_rate': [0.1, 0.2, 0.3],
+            'model__optimizer': [Adam(learning_rate=0.001), Adam(learning_rate=0.0001)],
+        }
+        # Create KerasClassifier wrapper using build_model
+        keras_clf = KerasClassifier(
+            model=self.build_model,
+            loss=self.config.LOSS_FUNCTION,
+            optimizer=Adam(learning_rate=0.001),
+            metrics=['accuracy'],
+            batch_size=16,
+            epochs=self.config.EPOCHS,
+            verbose=0
+        )
+        StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
+
+        score=cross_val_score(keras_clf, X_train, y_train_labels, cv=5, scoring='accuracy')
+        print(f"✓ Cross-validation score: {score.mean():.4f}")
+        return score.mean()
+    
+    def bayesian_optimization(self, X_train, y_train_labels):
+        """Perform Bayesian Optimization for hyperparameter tuning using Optuna"""
+        import optuna
+        
+        study = optuna.create_study(direction='maximize')
+        study.optimize(lambda trial: self.objective(X_train, y_train_labels), n_trials=50)
+        
+        print(f"✓ Best params: {study.best_params}")
+        print(f"✓ Best score: {study.best_value:.4f}")
+        
+        return study.best_params, study.best_value
+    
+
+
+    def grid_search_cv(self, X_train, y_train_labels):
+        """Perform Grid Search CV using KerasClassifier"""
+        print("\nPerforming Grid Search CV with KerasClassifier...")
+        
+        # Create KerasClassifier wrapper using build_model
+        keras_clf = KerasClassifier(
+            model=self.build_model,
+            loss=self.config.LOSS_FUNCTION,
+            optimizer=Adam(learning_rate=0.001),
+            metrics=['accuracy'],
+            batch_size=16,
+            epochs=self.config.EPOCHS,
+            verbose=0
+        )
+        
+        # Define parameter grid
+        param_grid = {
+            'model__hidden_layers': [[64], [128, 64], [256, 128, 64]],
+            'model__activation': ['relu', 'tanh'],
+            'batch_size': [16, 32, 64],
+            'model__dropout_rate': [0.1, 0.2, 0.3],
+            'model__optimizer': [Adam(learning_rate=0.001), Adam(learning_rate=0.0001)]
+        
+        }
+        
+        # Use StratifiedKFold for imbalanced data
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=self.config.RANDOM_STATE)
+        
+        # Perform grid search
+        grid_search = GridSearchCV(
+            estimator=keras_clf,
+            param_grid=param_grid,
+            cv=skf,
+            n_jobs=1,  # Set to 1 for TensorFlow compatibility
+            verbose=1
+        )
+        
+        grid_search.fit(X_train, y_train_labels)
+        
+        
+        
+        return grid_search.best_params_, grid_search.best_score_
     
     def train(self, X_train, y_train, X_val, y_val):
         """Train the neural network"""
@@ -141,6 +273,8 @@ class FeedForwardNN:
         print("✓ Training completed!")
         return self.history
     
+       
+
     def evaluate(self, X_test, y_test):
         """Evaluate model on test set"""
         print("\nEvaluating model on test set...")
@@ -170,12 +304,20 @@ class FeedForwardNN:
             self.model.save(self.config.MODEL_SAVE_PATH)
             print(f"✓ Model saved to: {self.config.MODEL_SAVE_PATH}")
 
+    def evaluate_models(self, X_train, y_train_labels, X_test, y_test):
+        #train and evaluate grid search, bayesian optimization models and randoom search model
+        best_params_grid, best_score_grid = self.grid_search_cv(X_train, y_train_labels)
+        best_params_bayesian, best_score_bayesian = self.bayesian_optimization(X_train, y_train_labels)
+
 
 
 
 # =====================================================================
 # UTILITIES
 # =====================================================================
+
+
+
 
 def normalize_data(X_train, X_val, X_test, config):
     """Normalize data using StandardScaler"""
@@ -266,7 +408,7 @@ def main():
     # Step 2: Encode labels to one-hot
     y_encoded = keras.utils.to_categorical(y, num_classes=5)
     
-    # Step 3: Split data - train+val vs test
+    # Step 3: Split data - Separate test set first (10%)
     X_temp, X_test, y_temp, y_test = train_test_split(
         X, y_encoded,
         test_size=Config.TEST_SIZE,
@@ -274,10 +416,13 @@ def main():
         stratify=np.argmax(y_encoded, axis=1)
     )
     
-    # Step 4: Split temp into train and validation
+    # Step 4: Split remaining into train and validation
+    # Calculate validation split size from remaining 90%
+    # (20% of total) / (90% of total) = validation_ratio
+    validation_ratio = Config.VALIDATION_SIZE / (Config.TRAIN_SIZE + Config.VALIDATION_SIZE)
     X_train, X_val, y_train, y_val = train_test_split(
         X_temp, y_temp,
-        test_size=Config.VALIDATION_SIZE,
+        test_size=validation_ratio,
         random_state=Config.RANDOM_STATE,
         stratify=np.argmax(y_temp, axis=1)
     )
@@ -290,20 +435,43 @@ def main():
     # Step 5: Normalize data
     X_train, X_val, X_test, scaler = normalize_data(X_train, X_val, X_test, Config)
     
-    # Step 6: Build and train model
+    # Step 6: Optional - Perform Grid Search for hyperparameter tuning
+    if Config.USE_GRID_SEARCH:
+        print("\n" + "="*70)
+        print("STARTING GRID SEARCH FOR HYPERPARAMETER TUNING")
+        print("="*70)
+        nn = FeedForwardNN(Config, input_dim=X_train.shape[1], num_classes=5)
+        y_train_labels = np.argmax(y_train, axis=1)  # Convert one-hot to class labels
+        grid_search = nn.grid_search_cv(X_train, y_train, y_train_labels)
+        
+        # Extract best parameters
+        best_params = grid_search.best_params_
+        Config.HIDDEN_LAYERS = best_params['model__hidden_layers']
+        Config.ACTIVATION_FUNCTION = best_params['model__activation']
+        Config.BATCH_SIZE = best_params['batch_size']
+        
+        print(f"\nApplied best params from grid search:")
+        print(f"  Hidden Layers: {Config.HIDDEN_LAYERS}")
+        print(f"  Activation: {Config.ACTIVATION_FUNCTION}")
+        print(f"  Batch Size: {Config.BATCH_SIZE}\n")
+    
+    # Step 7: Build and train model (with best params if grid search was used)
+    print("="*70)
+    print("BUILDING AND TRAINING FINAL MODEL")
+    print("="*70)
     nn = FeedForwardNN(Config, input_dim=X_train.shape[1], num_classes=5)
     nn.build_model()
     nn.train(X_train, y_train, X_val, y_val)
     
-    # Step 7: Evaluate model
+    # Step 8: Evaluate model
     results = nn.evaluate(X_test, y_test)
     
-    # Step 8: Visualize results
+    # Step 9: Visualize results
     plot_training_history(nn.history, Config)
     plot_confusion_matrix(results['confusion_matrix'], Config, 
                          class_names=list(Config.CLASS_LABELS.values()))
     
-    # Step 9: Save model
+    # Step 10: Save model
     nn.save_model()
     print("\n" + "="*70)
     print("TRAINING COMPLETED SUCCESSFULLY!")
