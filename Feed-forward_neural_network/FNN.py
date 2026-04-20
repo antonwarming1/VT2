@@ -3,6 +3,7 @@ Feed-Forward Neural Network for Multi-Class Classification
 Supports JSON and CSV data from class-specific folders
 """
 
+import sys
 import os
 import numpy as np
 import pandas as pd
@@ -17,6 +18,10 @@ from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
 import librosa
+
+# Add CrossValidation directory to path to import CS module
+sys.path.insert(0, str(Path(__file__).parent.parent / "CrossValidation"))
+
 
 
 # =====================================================================
@@ -56,6 +61,7 @@ class Config:
     NORMALIZATION = True  # StandardScaler normalization
     
     # NEURAL NETWORK ARCHITECTURE
+    NUM_CLASSES = 5  # Number of output classes
     HIDDEN_LAYERS = [128, 64, 32]  # MODIFY: Number of neurons in each hidden layer
     ACTIVATION_FUNCTION = 'sigmoid'  # Output activation for multi-class
     OPTIMIZER = Adam(learning_rate=0.001)
@@ -382,7 +388,7 @@ def plot_training_history(history, config):
     
     plt.tight_layout()
     plt.savefig(r"Feed-forward_neural_network\training_history.png", dpi=300)
-    plt.show()
+    #plt.show()
     print("Training history plot saved")
 
 
@@ -402,7 +408,7 @@ def plot_confusion_matrix(cm, config, class_names=None):
     plt.xlabel('Predicted Label')
     plt.tight_layout()
     plt.savefig(r"Feed-forward_neural_network\confusion_matrix.png", dpi=300)
-    plt.show()
+    #plt.show()
     print("Confusion matrix plot saved")
 
 
@@ -487,9 +493,13 @@ def main():
     # Step 10: Optional grid search with lazy import to avoid circular dependency
     print("\nWould you like to run Grid Search with Cross-Validation? (y/n): ", end='', flush=True)
     user_input = input().strip().lower()
-    if user_input == 'y':
+    print(f"DEBUG: User input = '{user_input}' (length: {len(user_input)})")
+    
+    if user_input == 'y' or user_input == 'yes':
+        print("DEBUG: Starting grid search import...")
         try:
             from CS import GridSearchCV
+            print("DEBUG: GridSearchCV imported successfully")
             
             print("\n" + "="*70)
             print("STARTING GRID SEARCH WITH CROSS-VALIDATION")
@@ -529,6 +539,12 @@ def main():
         except ImportError as e:
             print(f"ERROR: Could not import GridSearchCV from CS.py: {e}")
             print("Make sure CS.py is in the CrossValidation directory.")
+        except Exception as e:
+            print(f"ERROR: Grid search failed: {e}")
+            import traceback
+            traceback.print_exc()
+    else:
+        print(f"DEBUG: Input was '{user_input}', not running grid search")
     
     print("\n" + "="*70)
     print("PIPELINE COMPLETED SUCCESSFULLY")
