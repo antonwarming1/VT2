@@ -2,7 +2,7 @@
 Feed-Forward Neural Network — Multi-Class Classification
 """
 
-import os
+from functools import partial
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,7 +15,10 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
-import librosa
+from tensorflow.keras.regularizers import l2 as l2_reg
+from scikeras.wrappers import KerasClassifier
+
+optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
 # ── Configuration ────────────────────────────────────────────────────────────
@@ -30,15 +33,14 @@ class Config:
     VALIDATION_SIZE = 0.2
     TEST_SIZE = 0.1
     RANDOM_STATE = 42
-    NORMALIZATION = True  # StandardScaler normalization
-    
-    # NEURAL NETWORK ARCHITECTURE
-    HIDDEN_LAYERS = [128, 64, 32]  # MODIFY: Number of neurons in each hidden layer
-    ACTIVATION_FUNCTION = 'sigmoid'  # Output activation for multi-class
-    OPTIMIZER = Adam(learning_rate=0.001)
-    LOSS_FUNCTION = 'categorical_crossentropy'
-    
-    # TRAINING CONFIGURATION
+
+    # Architecture defaults (updated by best search result before final training)
+    HIDDEN_LAYERS = [128, 64, 32]
+    ACTIVATION_FUNCTION = 'relu'
+    DROPOUT_RATE = 0.2
+    LEARNING_RATE = 0.001
+    L2_REGULARIZATION = 0.01
+
     BATCH_SIZE = 32
     EPOCHS = 100
     SEARCH_EPOCHS = 20   # fewer epochs during hyperparameter search
@@ -304,7 +306,6 @@ def plot_training_history(history):
     plt.tight_layout()
     plt.savefig(r"Feed-forward_neural_network\training_history.png", dpi=300)
     plt.show()
-    print("Training history plot saved")
 
 
 def plot_confusion_matrix(cm, class_names):
@@ -316,7 +317,6 @@ def plot_confusion_matrix(cm, class_names):
     plt.tight_layout()
     plt.savefig(r"Feed-forward_neural_network\confusion_matrix.png", dpi=300)
     plt.show()
-    print("Confusion matrix plot saved")
 
 
 def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
@@ -329,68 +329,67 @@ def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
-    """Main pipeline: Load data, train model, evaluate"""
-    
-    print("="*70)
-    print("FEED-FORWARD NEURAL NETWORK - MULTI-CLASS CLASSIFICATION")
-    print("="*70)
-    
-    # Step 1: Load data
-    loader = DataLoader(Config)
-    X, y = loader.load_from_folders()
-    
-    if len(X) == 0:
-        print("ERROR: No data loaded. Please check your data folder paths.")
-        return
-    
-    # Step 2: Encode labels to one-hot
-    y_encoded = keras.utils.to_categorical(y, num_classes=5)
-    
-    # Step 3: Split data - First split: train+val vs test
-    X_temp, X_test, y_temp, y_test = train_test_split(
-        X, y_encoded,
-        test_size=Config.TEST_SIZE,
-        random_state=Config.RANDOM_STATE,
-        stratify=np.argmax(y_encoded, axis=1)
-    )
-    
-    # Step 4: Split temp into train and validation
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_temp, y_temp,
-        test_size=Config.VALIDATION_SIZE,
-        random_state=Config.RANDOM_STATE,
-        stratify=np.argmax(y_temp, axis=1)
-    )
-    
-    print(f"\nData split:")
-    print(f"  Training set: {X_train.shape[0]} samples")
-    print(f"  Validation set: {X_val.shape[0]} samples")
-    print(f"  Test set: {X_test.shape[0]} samples")
-    
-    # Step 5: Normalize data
-    if Config.NORMALIZATION:
-        X_train, X_val, X_test, scaler = normalize_data(X_train, X_val, X_test, Config)
-    
-    # Step 6: Build and train model
-    nn = FeedForwardNN(Config, input_dim=X_train.shape[1], num_classes=5)
-    nn.build_model()
-    nn.train(X_train, y_train, X_val, y_val)
-    
-    # Step 7: Evaluate model
-    results = nn.evaluate(X_test, y_test)
-    
-    # Step 8: Visualize results
-    plot_training_history(nn.history, Config)
-    plot_confusion_matrix(results['confusion_matrix'], Config, 
-                         class_names=list(Config.CLASS_FOLDERS.values()))
-    
-    # Step 9: Save model
-    nn.save_model()
-    print("\nModel training and evaluation completed successfully!")
-    print("\n" + "="*70)
-    print("PIPELINE COMPLETED SUCCESSFULLY")
-    print("="*70)
+    """
+    print("Feed-Forward Neural Network — Multi-Class Classification\n")
 
+    # Load and prepare data
+    X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
+
+    # Run all four search methods
+    print("\n--- Hyperparameter Search ---")
+    base_score, _ = base_model_cv(X_train, y_train, Config)
+    grid_score, grid_params = grid_search(X_train, y_train, Config)
+    random_score, random_params = random_search(X_train, y_train, Config)
+    bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
+
+    # Compare and pick the best
+    results = {
+        'Base Model': (base_score, None),
+        'Grid Search': (grid_score, grid_params),
+        'Rand Search': (random_score, random_params),
+        'Bayesian': (bayes_score, bayes_params),
+    }
+    plot_search_comparison({name: score for name, (score, _) in results.items()})
+
+    best_name, (best_score, best_params) = max(results.items(), key=lambda x: x[1][0])
+    print(f"\nBest method: {best_name}  (CV acc {best_score:.4f})")
+    print(f"Params: {best_params}")
+
+    # Apply best params to Config before final training
+    if best_params:
+        param_map = {
+            'model__hidden_layers': 'HIDDEN_LAYERS',
+            'model__activation': 'ACTIVATION_FUNCTION',
+            'model__dropout_rate': 'DROPOUT_RATE',
+            'model__l2': 'L2_REGULARIZATION',
+            'batch_size': 'BATCH_SIZE',
+            'optimizer__learning_rate': 'LEARNING_RATE',
+        }
+        for search_key, config_attr in param_map.items():
+            if search_key in best_params:
+                setattr(Config, config_attr, best_params[search_key])
+
+    # Train final model on train/val splits (no cross-validation)
+    print(f"\n--- Final Training [{best_name} params] ---")
+    model = build_final_model(Config, X_train.shape[1], len(Config.CLASS_LABELS))
+    history = train_model(model, X_train, y_train, X_val, y_val, Config)
+
+    # Evaluate and plot
+    _, _, cm = evaluate_model(model, X_test, y_test, Config)
+    plot_training_history(history)
+    plot_confusion_matrix(cm, list(Config.CLASS_LABELS.values()))
+
+    # Save
+    model.save(Config.MODEL_SAVE_PATH)
+    print(f"Model saved to {Config.MODEL_SAVE_PATH}")
+    
+    # For quick testing without running the full search, you can comment out the search methods and directly train with default Config params:
+    """
+    X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
+    solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
+   
 
 if __name__ == "__main__":
     main()
