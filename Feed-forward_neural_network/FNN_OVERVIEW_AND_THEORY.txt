@@ -8,11 +8,12 @@ PROJECT OVERVIEW
 
 This script implements a complete machine learning pipeline for multi-class 
 classification using a feed-forward neural network. The system classifies data 
-into 5 classes (N, NS, OT, P, UT) by learning patterns from three data sources:
+into 5 classes (N, NS, OT, P, UT) by learning patterns from two data sources:
 
-1. EXTRINSIC DATA: Audio features extracted from WAV files (acoustic signals)
-2. INTRINSIC DATA: Robot sensor measurements stored as CSV files
-3. TASK DATA: Task-related parameters stored as CSV files
+1. WAV FILES: Spectrogram-based features extracted from audio files 
+   (from Soundcleaning folder with labeled subfolders)
+2. CSV DATA: Robot sensor measurements and task parameters
+   (from Data fra tidligere project folder)
 
 The pipeline automatically loads all data, preprocesses it, trains a neural 
 network, and evaluates performance using multiple metrics.
@@ -21,32 +22,40 @@ network, and evaluates performance using multiple metrics.
 DATA SOURCES & FEATURE EXTRACTION
 ================================================================================
 
-1. WAV FILE PROCESSING (Extrinsic Data - Sound/Acoustics)
-   Files: .wav audio files from acoustic sensors
+1. WAV FILE PROCESSING (Spectrogram Analysis)
+   Location: C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Soundcleaning
+   Structure: Subfolders named by class (N, NS, OT, P, UT) contain WAV files
+   Frequency Range: 0-1000 Hz (limited to 1kHz)
    
-   Features Extracted (42 total per file):
+   Features Extracted (up to 14 total per file):
    
-   Time-Domain Features (4 features):
-   - Mean amplitude: Average signal value
-   - Standard deviation: Variation in signal
-   - Maximum amplitude: Highest peak value
-   - Minimum amplitude: Lowest trough value
+   Temporal Statistics (4 features):
+   - Mean power: Average power across all frequencies and time
+   - Standard deviation: Variation in power
+   - Maximum power: Highest power value in spectrogram
+   - Minimum power: Lowest power value in spectrogram
    
-   Zero-Crossing Rate (2 features):
-   - Mean ZCR: How often signal crosses zero (indicates frequency content)
-   - Std ZCR: Variation in zero-crossing rate
+   Spectral Statistics (4 features):
+   - Mean spectrum: Average power at each frequency
+   - Spectral std: Variation across frequencies
+   - Spectral centroid (mean): Weighted center of frequency distribution
+   - Spectral centroid (std): Variation in spectral center over time
    
-   Spectral Features (4 features):
-   - Spectral Centroid (mean & std): Center of mass of the spectrum
-   - Spectral Rolloff (mean & std): Frequency below which 85% of energy
+   Frequency Band Energy (4 features):
+   - Low frequency energy (0-250 Hz): Energy in low frequencies
+   - Low-mid frequency energy (250-500 Hz): Energy in low-mid range
+   - Mid frequency energy (500-750 Hz): Energy in mid range
+   - High frequency energy (750-1000 Hz): Energy in high range
    
-   MFCC - Mel-Frequency Cepstral Coefficients (32 features):
-   - 13 MFCCs × 2 (mean & std each) = 26 features
-   - MFCCs mimic human hearing, capturing perceptual features of audio
-   - Used extensively in speech recognition and acoustic analysis
+   Processing:
+   - WAV files loaded using librosa
+   - Spectrogram computed using scipy.signal.spectrogram()
+   - Power converted to dB scale: 10 * log10(power)
+   - Features extracted from dB spectrogram
    
-   Why: These features capture both temporal and spectral characteristics
-   of sound, making them highly effective for acoustic classification tasks.
+   Why: Spectrograms capture time-varying frequency content, allowing the
+   network to learn patterns in how acoustic energy changes over time and
+   across different frequencies.
 
 
 2. CSV FILE PROCESSING (Intrinsic & Task Data)
@@ -87,43 +96,47 @@ A feed-forward neural network is a layered structure where data flows in one
 direction: from input → hidden layers → output. The network has NO cycles or
 feedback loops, making it straightforward and efficient to train.
 
-Your Network Structure:
-┌─────────────────────────────────────────────────────┐
-│ INPUT LAYER: 11,502 neurons (data features)         │
-│ (one neuron per input feature)                       │
-└─────────────────────────────────────────────────────┘
+Your Network Structure (Architecture):
+┌──────────────────────────────────────────────────────┐
+│ INPUT LAYER: N neurons (dynamic based on data)        │
+│ - Spectrograms + CSV features                         │
+│ - All features padded to same maximum size            │
+│ - Total N = max feature dimension from all files      │
+└──────────────────────────────────────────────────────┘
                         ↓
                     W₁, b₁
                         ↓
-┌─────────────────────────────────────────────────────┐
-│ HIDDEN LAYER 1: 128 neurons                          │
-│ Activation: Sigmoid                                  │
-│ Regularization: Dropout (20%)                        │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ HIDDEN LAYER 1: 128 neurons                           │
+│ Activation: Sigmoid                                   │
+└──────────────────────────────────────────────────────┘
                         ↓
                     W₂, b₂
                         ↓
-┌─────────────────────────────────────────────────────┐
-│ HIDDEN LAYER 2: 64 neurons                           │
-│ Activation: Sigmoid                                  │
-│ Regularization: Dropout (20%)                        │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ HIDDEN LAYER 2: 64 neurons                            │
+│ Activation: Sigmoid                                   │
+└──────────────────────────────────────────────────────┘
                         ↓
                     W₃, b₃
                         ↓
-┌─────────────────────────────────────────────────────┐
-│ HIDDEN LAYER 3: 32 neurons                           │
-│ Activation: Sigmoid                                  │
-│ Regularization: Dropout (20%)                        │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ HIDDEN LAYER 3: 32 neurons                            │
+│ Activation: Sigmoid                                   │
+└──────────────────────────────────────────────────────┘
                         ↓
                     W₄, b₄
                         ↓
-┌─────────────────────────────────────────────────────┐
-│ OUTPUT LAYER: 5 neurons (one per class)              │
-│ Activation: Softmax                                  │
-│ Outputs: Probability distribution over classes      │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ OUTPUT LAYER: 5 neurons (one per class)               │
+│ Activation: Softmax                                   │
+│ Outputs: Probability distribution over classes       │
+└──────────────────────────────────────────────────────┘
+
+Configurable Parameters:
+- HIDDEN_LAYERS = [128, 64, 32]: Can be modified to change architecture
+- ACTIVATION_FUNCTION = 'sigmoid': Used for hidden layers
+- NUM_CLASSES = 5: Output neurons (N, NS, OT, P, UT)
 
 
 NEURONS & ACTIVATION FUNCTIONS
@@ -171,12 +184,14 @@ These are the "learnable parameters" that the network adjusts during training:
 
 - Weights (W): Control the importance and strength of connections between neurons
 - Biases (b): Allow neurons to shift their activation thresholds
-- Total parameters in your network: (11,502×128 + 128×64 + 64×32 + 32×5) 
-                                    + (128 + 64 + 32 + 5)
-                                    ≈ 1.5 million parameters
+- Total parameters: N×128 + 128×64 + 64×32 + 32×5 + (128 + 64 + 32 + 5)
+  where N = total input features (dynamically determined from data)
 
 Training = Finding optimal weight/bias values that minimize prediction error
 Learning = Process of updating these parameters using gradient descent
+
+Example: If N = 1,000, then approximately:
+(1,000×128) + (128×64) + (64×32) + (32×5) + 229 ≈ 136,000 parameters
 
 
 FORWARD PROPAGATION
@@ -184,11 +199,15 @@ FORWARD PROPAGATION
 
 How data flows through the network:
 
-1. Input: Raw features (11,502 values, normalized to mean=0, std=1)
+1. Input: Combined features from spectrograms and CSV data
+   - Spectrograms: ~14 features per WAV file (temporal, spectral, band energy)
+   - CSV data: Variable features from sensor/task data
+   - All features normalized: mean=0, std=1
+   - All padded to same maximum size
 
 2. Hidden Layer 1 Computation:
    h₁ = σ(W₁ · x + b₁)
-   - Multiply inputs by 11,502×128 weight matrix
+   - Multiply inputs by N×128 weight matrix (N = input features)
    - Add bias
    - Apply sigmoid activation
    - Result: 128 values
@@ -252,24 +271,27 @@ DATA SPLITTING (Train / Validation / Test)
 ==========================================
 
 Why Split Data?
-- Training Set (64%): Used to train network (adjust weights)
-- Validation Set (16%): Used to tune hyperparameters & check for overfitting
+- Training Set (~64%): Used to train network (adjust weights)
+- Validation Set (~16%): Used to tune hyperparameters & check for overfitting
 - Test Set (20%): Final evaluation on unseen data
 
 Prevents Overfitting (memorizing training data) vs Underfitting (not learning).
 
 Your Implementation:
-1. Split: 80% train+val, 20% test
-2. From 80%: Further split 80% train, 20% validation
-   Final: ~51% train, 13% val, 20% test (~3,000 samples total)
+- Config: TEST_SIZE = 0.2, VALIDATION_SIZE = 0.2
+- Step 1: Split 80% train+val, 20% test (TEST_SIZE = 0.2)
+- Step 2: From 80%: Further split 80% train, 20% validation (VALIDATION_SIZE = 0.2)
+- Final: Train (~51-64%), Validation (~13-16%), Test (20%)
+- Total depends on data from both Soundcleaning (WAV) and "Data fra tidligere project" (CSV)
 
 
 NORMALIZATION (Standardization)
 ================================
 
 Problem: Features have different scales
-- Audio features: -1 to 1 (normalized waveforms)
-- Sensor data: 0 to 1000+ (position/current values)
+- Spectrogram features: Vary widely (dB scale)
+- Sensor data: May be 0 to 1000+ (position/current values)
+- CSV data: Different units and ranges
 - Large differences in scale confuse the network
 
 Solution: StandardScaler (Z-score normalization)
@@ -294,42 +316,17 @@ BATCH PROCESSING
 
 Instead of updating weights after each sample (too noisy), group samples:
 
-Batch Size = 32 samples
+Batch Size = 32 samples (Config: BATCH_SIZE = 32)
 - Process 32 samples simultaneously (matrix operations on GPU)
 - Compute average loss over batch
 - Update weights once per batch
-- Epoch = full pass through all training data
+- Epoch = full pass through all training data (EPOCHS = 100)
 
 Why:
 - Stable gradient estimates (averaging reduces noise)
 - GPU efficiency (processes multiple samples in parallel)
 - Faster training (fewer weight updates needed)
 - Better generalization (stochasticity prevents local minima)
-
-
-DROPOUT REGULARIZATION (20%)
-=============================
-
-Problem: Network can "memorize" training data patterns (overfitting)
-
-Solution: Dropout - Randomly disable neurons during training
-
-How It Works:
-- During each training iteration, randomly "drop" 20% of hidden layer neurons
-- Those neurons contribute nothing forward or backward that iteration
-- Remaining 80% learn to handle missing information
-- At test time, all neurons are active (but weights scaled by 0.8)
-
-Why:
-- Forces network to learn redundant representations
-- No single neuron can become overly important
-- Prevents co-adaptation (neurons relying too heavily on specific neighbors)
-- Cheap way to train implicit ensemble of models
-- Dramatically reduces overfitting
-
-Mathematical Effect:
-- Without dropout: Each sample update can cause different behaviors
-- With dropout: Network learns robust features that work despite noise
 
 
 EARLY STOPPING
@@ -341,21 +338,22 @@ Problem: Train longer = better training error, but worse validation error
 Solution: Monitor validation loss, stop training when it increases
 
 Implementation (Your Code):
+- Config: EARLY_STOPPING_PATIENCE = 10
 - Monitor: Validation loss
 - Patience: 10 epochs without improvement
 - Action: Stop training, restore best weights
-- Benefit: Automatic optimal stopping point
+- Benefit: Automatic optimal stopping point, saves computation time
 
 Example:
-Epoch  Train Loss  Val Loss    Action
-1      1.200       0.950       ← Continue (improving)
-2      0.950       0.850       ← Continue (improving)
+Epoch  Train Loss  Val Loss    Patience  Action
+1      1.200       0.950       0         ← Continue (improving)
+2      0.950       0.850       0         ← Continue (improving)
 ...
-25     0.450       0.650       ← Continue (this might be best)
-26     0.400       0.655       ← Patience: 1
-27     0.385       0.665       ← Patience: 2
+25     0.450       0.650       0         ← Continue (this is best so far)
+26     0.400       0.655       1         ← Patience: 1 (val loss increased)
+27     0.385       0.665       2         ← Patience: 2
 ...
-36     0.350       0.700       ← Patience: 11 → STOP & restore epoch 25 weights
+36     0.350       0.700       11        ← Patience: 11 → STOP & restore epoch 25 weights
 
 
 OPTIMIZATION ALGORITHM: ADAM
@@ -364,6 +362,7 @@ OPTIMIZATION ALGORITHM: ADAM
 Problem: Simple gradient descent can get stuck in local minima or oscillate
 
 Solution: Adam (Adaptive Moment Estimation)
+Config in your code: OPTIMIZER = Adam(learning_rate=0.001)
 
 How Adam Works:
 1. Maintains moving averages of gradients (momentum)
@@ -377,7 +376,7 @@ w_t = w_{t-1} - α · m_t / (√v_t + ε)
 Where:
 - β₁ ≈ 0.9 (momentum coefficient, smooths gradient direction)
 - β₂ ≈ 0.999 (variance coefficient, adaptive learning rate)
-- α = learning_rate = 0.001
+- α = learning_rate = 0.001 (your config)
 
 Benefits:
 - Converges faster than gradient descent
@@ -483,14 +482,18 @@ CONFIGURATION (Easy Customization)
 
 All settings in Config class at top of script:
 
-DATA PATHS:
-  DATA_ROOT_FOLDER: Root folder containing all data
-  SUBFOLDERS: List of data type folders (Extrinsic data, Intrinsic data, Task data)
-  CLASS_FOLDERS: Mapping of class IDs to folder names [N, NS, OT, P, UT]
+DATA PATHS - CSV DATA (Intrinsic & Task):
+  DATA_ROOT_FOLDER: C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Data fra tidligere project
+  SUBFOLDERS: [Dataset\Intrinsic data, Dataset\Task data]
+  CLASS_FOLDERS: {0: N, 1: NS, 2: OT, 3: P, 4: UT}
+
+DATA PATHS - WAV DATA (Audio/Spectrograms):
+  WAV_DATA_ROOT_FOLDER: C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Soundcleaning
+  WAV_CLASS_FOLDERS: [N, NS, OT, P, UT]  (subfolder names = class labels)
 
 FILE LOADING:
   LOAD_CSV: True/False to include CSV files from Intrinsic/Task data
-  LOAD_WAV: True/False to include WAV files from Extrinsic data
+  LOAD_WAV: True/False to include WAV files from Soundcleaning folder
   IGNORE_COLUMNS_INTRINSIC: Column indices to exclude from Intrinsic data
   IGNORE_COLUMNS_TASK: Column indices to exclude from Task data
 
@@ -501,6 +504,7 @@ NEURAL NETWORK:
   ACTIVATION_FUNCTION: Activation for hidden layers (default: sigmoid)
   OPTIMIZER: Learning optimizer (default: Adam with lr=0.001)
   LOSS_FUNCTION: Loss function (default: categorical_crossentropy)
+  NUM_CLASSES: Number of output classes (default: 5)
 
 TRAINING:
   BATCH_SIZE: How many samples per training iteration (default: 32)
@@ -528,26 +532,29 @@ RUNNING THE SCRIPT
 ==================
 
 Data Folder Structure (Required):
-The script expects data organized as:
-  C:\...\ Data fra tidligere project\
-    ├── Dataset\Extrinsic data (clean)\
-    │   ├── N\        (WAV and/or CSV files for class N)
-    │   ├── NS\
-    │   ├── OT\
-    │   ├── P\
-    │   └── UT\
+
+CSV Data (from Data fra tidligere project):
+  C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Data fra tidligere project\
     ├── Dataset\Intrinsic data\
-    │   ├── N\        (CSV files)
+    │   ├── N\        (CSV files for class N)
     │   ├── NS\
     │   ├── OT\
     │   ├── P\
     │   └── UT\
     └── Dataset\Task data\
-        ├── N\        (CSV files)
+        ├── N\        (CSV files for class N)
         ├── NS\
         ├── OT\
         ├── P\
         └── UT\
+
+WAV Data (from Soundcleaning):
+  C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Soundcleaning\
+    ├── N\           (WAV files for class N)
+    ├── NS\          (WAV files for class NS)
+    ├── OT\          (WAV files for class OT)
+    ├── P\           (WAV files for class P)
+    └── UT\          (WAV files for class UT)
 
 Running Steps:
 Step 1: Update paths in Config class if your data folder structure differs
@@ -602,59 +609,89 @@ CURRENT APPROACH CHALLENGES
 ===========================
 
 Feature Imbalance:
-- CSV features (7,000-11,500) dominate WAV features (42)
-- Network may underutilize audio features
-- Possible solution: Feature scaling or separate processing streams
+- WAV features (14 per file): Spectrogram-based features
+- CSV features (7,000-11,500): Sensor and task data
+- CSV features heavily dominate WAV features by sheer count
+- Network may underutilize audio information relative to sensor data
+- Possible solution: Feature scaling per modality or separate processing streams
 
-Large Feature Dimension (11,502):
-- Increases computational cost
+Audio Frequency Limitation:
+- WAV files limited to 0-1000 Hz range
+- May miss important information above 1kHz for some tasks
+- Spectrograms may have reduced effectiveness compared to full bandwidth
+- Possible solution: Check if higher frequency data is available
+
+Large Feature Dimension:
+- Total features can reach 11,500+ after padding
+- Increases computational cost significantly
 - May lead to high variance with limited samples
 - Possible solution: Dimensionality reduction (PCA, feature selection)
 
 Training Time:
-- ~3,000 samples + audio processing can take 30-60 minutes
-- Possible solution: Subset data initially, parallelize audio loading
+- ~3,000+ samples with audio spectrogram processing can take 30-60+ minutes
+- Loading and processing all WAV files adds overhead
+- Possible solution: Subset data initially, parallelize audio loading, use GPU
 
 Imbalanced Classes:
 - If class distribution is uneven, need stratified splitting (already implemented)
 - Consider class weights in loss function for severe imbalance
+- Possible solution: Check class distribution with np.bincount(y)
 
 
 ASSUMPTIONS MADE
 ================
 
-- All classes are equally important in loss function
-- Features are numeric or extractable as numeric from audio
+- All classes are equally important in loss function (unless weighted)
+- Spectrogram features (temporal and spectral) effectively represent audio patterns
+- CSV numeric features are relevant for classification
 - Feature padding with zeros is acceptable (no negative side effects)
-- 11,502 features is reasonable (no automated reduction)
-- Sigmoid activation in hidden layers is suitable for this data
-- Train/validation/test split of 51%/13%/20% is optimal
+- Combined feature set (WAV + CSV) provides complementary information
+- Sigmoid activation in hidden layers is suitable for this mixed data
+- Train/validation/test split is stratified across classes
+- StandardScaler normalization works well across different feature modalities
 
 
 POTENTIAL IMPROVEMENTS
 ======================
 
-1. Dimensionality Reduction: Reduce 11,502 features to 100-500 most important
-   Benefit: Faster training, less overfitting
-   Method: PCA or feature importance analysis
+1. Enhanced Audio Features: Add more sophisticated spectrogram features
+   Current: Temporal, spectral, and frequency band energy
+   Ideas: Spectral flux, spectral slope, onset detection, MFCCs
+   Benefit: Better capture of acoustic patterns
 
-2. Class Weights: If classes are imbalanced, weight loss by class frequency
+2. Multi-Modal Architecture: Separate processing streams for WAV and CSV
+   Current: All features concatenated and normalized together
+   Idea: Process WAV through small CNN, CSV through dense layers, then merge
+   Benefit: Each modality optimized for its characteristics
+
+3. Dimensionality Reduction: Reduce high-dimension CSV features
+   Benefit: Faster training, less overfitting
+   Method: PCA, feature selection, or automated pruning
+
+4. Class Weights: If classes are imbalanced, weight loss by class frequency
+   Current: Equal weight for all classes
    Benefit: Better minority class performance
 
-3. Hyperparameter Tuning: Test different architectures, learning rates, batch sizes
+5. Frequency Analysis: Investigate full frequency spectrum instead of 0-1kHz
+   Current: Limited to 1kHz due to WAV file bandwidth
+   Idea: Check if higher frequencies contain important information
+   Benefit: More complete audio representation
+
+6. Hyperparameter Tuning: Test different architectures and parameters
+   Ideas: [256, 128, 64], [64, 32], different learning rates
    Benefit: Potentially better model performance
 
-4. Data Augmentation: Artificially expand training data
-   Benefit: Better generalization, especially for limited data
+7. Data Augmentation for Audio: Time-stretching, pitch shifting
+   Benefit: More training data, better generalization
 
-5. Ensemble Methods: Train multiple models, average predictions
+8. Ensemble Methods: Train multiple models, average predictions
    Benefit: More robust, reduced variance
 
-6. Cross-Validation: K-fold cross-validation instead of single train/val/test split
+9. Cross-Validation: K-fold cross-validation instead of single train/val/test split
    Benefit: Better estimate of true generalization performance
 
-7. Different Architectures: Convolutional networks for spatial audio patterns
-   Benefit: Better feature extraction for sequential/spatial data
+10. Advanced Architectures: Convolutional or attention-based networks
+    Benefit: Better feature extraction for sequential/temporal data
 
 
 ================================================================================

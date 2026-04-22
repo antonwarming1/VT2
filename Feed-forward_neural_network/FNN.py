@@ -18,6 +18,7 @@ from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
 import librosa
+from scipy import signal
 
 # Add CrossValidation directory to path to import CS module
 sys.path.insert(0, str(Path(__file__).parent.parent / "CrossValidation"))
@@ -34,9 +35,9 @@ class Config:
     # DATA CONFIGURATION
     DATA_ROOT_FOLDER = r"C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Data fra tidligere project"  # Root folder
     SUBFOLDERS = [
-        # r"Dataset\Extrinsic data (clean)",  # Contains .wav files
-        r"Dataset\Intrinsic data",          # Contains .csv files
-         r"Dataset\Task data"                # Contains .csv files
+         # r"Dataset\Extrinsic data (clean)",  # Contains .wav files
+        #r"Dataset\Intrinsic data",          # Contains .csv files
+        # r"Dataset\Task data"                # Contains .csv files
     ]
     CLASS_FOLDERS = {
         0: "N",
@@ -45,6 +46,10 @@ class Config:
         3: "P",
         4: "UT"
     }
+    
+    # WAV FILE CONFIGURATION
+    WAV_DATA_ROOT_FOLDER = r"C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Soundcleaning"  # WAV files folder
+    WAV_CLASS_FOLDERS = ["N", "NS", "OT", "P", "UT"]  # Subfolder names (labels)
     
     # FILE EXTENSIONS TO LOAD
     LOAD_CSV = True
@@ -121,45 +126,55 @@ class DataLoader:
         return features
     
     def load_wav(self, file_path):
-        """Load WAV file and extract audio features using librosa"""
+        """Load WAV file, create spectrogram, and extract features"""
         try:
             # Load audio file
             y, sr = librosa.load(file_path, sr=None)
             
-            # Extract features
+            # Create spectrogram
+            frequencies, times, spec_data = signal.spectrogram(y, sr)
+            
+            # Convert to dB scale
+            spec_db = 10 * np.log10(spec_data + 1e-10)
+            
+            # Extract features from spectrogram
             features = []
             
-            # Time-domain features
-            features.append(np.mean(y))  # Mean amplitude
-            features.append(np.std(y))   # Std amplitude
-            features.append(np.max(y))   # Max amplitude
-            features.append(np.min(y))   # Min amplitude
+            # Temporal features (statistics across time)
+            features.append(np.mean(spec_db))        # Mean power
+            features.append(np.std(spec_db))         # Std deviation
+            features.append(np.max(spec_db))         # Max power
+            features.append(np.min(spec_db))         # Min power
             
-            # Zero crossing rate
-            zcr = librosa.feature.zero_crossing_rate(y)[0]
-            features.extend([np.mean(zcr), np.std(zcr)])
+            # Spectral features (statistics across frequency)
+            mean_spectrum = np.mean(spec_db, axis=1)  # Mean across time
+            features.append(np.mean(mean_spectrum))   # Overall spectral mean
+            features.append(np.std(mean_spectrum))    # Spectral std
             
-            # Spectral features (using original magnitude spectrogram)
-            S = np.abs(librosa.stft(y))
+            # Spectral centroid (weighted average of frequencies)
+            spectral_mean = np.sum(frequencies[:, np.newaxis] * spec_db, axis=0) / (np.sum(spec_db, axis=0) + 1e-10)
+            features.append(np.mean(spectral_mean))
+            features.append(np.std(spectral_mean))
             
-            # Spectral centroid
-            centroid = librosa.feature.spectral_centroid(S=S)[0]
-            features.extend([np.mean(centroid), np.std(centroid)])
+            # Energy in different frequency bands (up to 1kHz max)
+            very_low_freq_idx = np.where(frequencies < 250)[0]
+            low_mid_freq_idx = np.where((frequencies >= 250) & (frequencies < 500))[0]
+            mid_freq_idx = np.where((frequencies >= 500) & (frequencies < 750))[0]
+            high_freq_idx = np.where((frequencies >= 750) & (frequencies <= 1000))[0]
             
-            # Spectral rolloff
-            rolloff = librosa.feature.spectral_rolloff(S=S)[0]
-            features.extend([np.mean(rolloff), np.std(rolloff)])
-            
-            # MFCC (Mel-frequency cepstral coefficients) - first 13
-            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
-            for i in range(13):
-                features.append(np.mean(mfcc[i]))
-                features.append(np.std(mfcc[i]))
+            if len(very_low_freq_idx) > 0:
+                features.append(np.mean(spec_db[very_low_freq_idx]))  # Very low freq energy (0-250 Hz)
+            if len(low_mid_freq_idx) > 0:
+                features.append(np.mean(spec_db[low_mid_freq_idx]))   # Low-mid freq energy (250-500 Hz)
+            if len(mid_freq_idx) > 0:
+                features.append(np.mean(spec_db[mid_freq_idx]))       # Mid freq energy (500-750 Hz)
+            if len(high_freq_idx) > 0:
+                features.append(np.mean(spec_db[high_freq_idx]))      # High freq energy (750-1000 Hz)
             
             return np.array(features, dtype=float)
         
         except Exception as e:
-            print(f"    WARNING: Could not extract features from {Path(file_path).name}: {str(e)}")
+            print(f"    WARNING: Could not extract spectrogram from {Path(file_path).name}: {str(e)}")
             return None
     
     
@@ -177,51 +192,79 @@ class DataLoader:
             print(f"ERROR: Root folder not found: {root_path}")
             return self.X, self.y
         
-        # Loop through each subfolder
-        for subfolder_name in self.config.SUBFOLDERS:
-            subfolder_path = root_path / subfolder_name
-            
-            if not subfolder_path.exists():
-                print(f"WARNING: Subfolder not found: {subfolder_path}\n")
-                continue
-            
-            print(f"Loading from subfolder: '{subfolder_name}'")
-            
-            # Loop through each class folder within the subfolder
-            for class_id, class_name in self.config.CLASS_FOLDERS.items():
-                class_folder = subfolder_path / class_name
+        # Load CSV files from standard folders
+        if self.config.LOAD_CSV:
+            # Loop through each subfolder
+            for subfolder_name in self.config.SUBFOLDERS:
+                subfolder_path = root_path / subfolder_name
                 
-                if not class_folder.exists():
-                    print(f"  WARNING: Class folder not found: {class_folder}")
+                if not subfolder_path.exists():
+                    print(f"WARNING: Subfolder not found: {subfolder_path}\n")
                     continue
                 
-                file_count = 0
-                for csv_file in class_folder.glob("*.csv"):
-                    try:
-                        features = self.load_csv(str(csv_file), folder_name=subfolder_name)
-                        self.X.append(features)
-                        self.y.append(class_id)
-                        file_count += 1
-                            
-                    except Exception as e:
-                        print(f"    ERROR loading {csv_file.name}: {str(e)}")
+                print(f"Loading CSV from subfolder: '{subfolder_name}'")
                 
-                # Load WAV files if available
-                for wav_file in class_folder.glob("*.wav"):
-                    try:
-                        features = self.load_wav(str(wav_file))
-                        if features is not None:  # Skip if feature extraction failed
+                # Loop through each class folder within the subfolder
+                for class_id, class_name in self.config.CLASS_FOLDERS.items():
+                    class_folder = subfolder_path / class_name
+                    
+                    if not class_folder.exists():
+                        print(f"  WARNING: Class folder not found: {class_folder}")
+                        continue
+                    
+                    file_count = 0
+                    for csv_file in class_folder.glob("*.csv"):
+                        try:
+                            features = self.load_csv(str(csv_file), folder_name=subfolder_name)
                             self.X.append(features)
                             self.y.append(class_id)
                             file_count += 1
-                            
-                    except Exception as e:
-                        print(f"    ERROR loading {wav_file.name}: {str(e)}")
+                                
+                        except Exception as e:
+                            print(f"    ERROR loading {csv_file.name}: {str(e)}")
+                    
+                    if file_count > 0:
+                        print(f"    Class '{class_name}' (ID: {class_id}): {file_count} files loaded")
                 
-                if file_count > 0:
-                    print(f"    Class '{class_name}' (ID: {class_id}): {file_count} files loaded")
+                print()  # Blank line between subfolders
+        
+        # Load WAV files from Soundcleaning folder
+        if self.config.LOAD_WAV:
+            print(f"Loading WAV files from: {self.config.WAV_DATA_ROOT_FOLDER}")
+            wav_root_path = Path(self.config.WAV_DATA_ROOT_FOLDER)
             
-            print()  # Blank line between subfolders
+            if not wav_root_path.exists():
+                print(f"ERROR: WAV folder not found: {wav_root_path}\n")
+            else:
+                # Create class mapping from subfolder names
+                class_name_to_id = {name: idx for idx, name in enumerate(self.config.WAV_CLASS_FOLDERS)}
+                
+                # Load WAV files from each class subfolder
+                for class_name in self.config.WAV_CLASS_FOLDERS:
+                    class_folder = wav_root_path / class_name
+                    
+                    if not class_folder.exists():
+                        print(f"  WARNING: Class folder not found: {class_folder}")
+                        continue
+                    
+                    class_id = class_name_to_id[class_name]
+                    file_count = 0
+                    
+                    for wav_file in class_folder.glob("*.wav"):
+                        try:
+                            features = self.load_wav(str(wav_file))
+                            if features is not None:  # Skip if feature extraction failed
+                                self.X.append(features)
+                                self.y.append(class_id)
+                                file_count += 1
+                                
+                        except Exception as e:
+                            print(f"    ERROR loading {wav_file.name}: {str(e)}")
+                    
+                    if file_count > 0:
+                        print(f"  Class '{class_name}' (ID: {class_id}): {file_count} WAV files loaded")
+                
+                print()  # Blank line after WAV loading
         
         # Convert lists to numpy arrays, padding features to same size
         if len(self.X) > 0:
