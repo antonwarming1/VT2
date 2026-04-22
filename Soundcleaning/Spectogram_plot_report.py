@@ -128,8 +128,8 @@ def plot_spectrogram(audio, sr, title, fig_num, ymax=None):
     )
 
     ax.set_title(title, fontsize=18)
-    ax.set_xlabel("Tid [s]", fontsize=14)
-    ax.set_ylabel("Frekvens [Hz]", fontsize=14)
+    ax.set_xlabel("Time [s]", fontsize=14)
+    ax.set_ylabel("Frequency [Hz]", fontsize=14)
 
     if ymax is None:
         ax.set_ylim(0, sr / 2)
@@ -171,7 +171,7 @@ def process_single_file():
     plot_spectrogram(
         y_old,
         sr_old,
-        "1. Original inputlyd",
+        "Original sounddata",
         fig_num=1,
         ymax=YMAX_INPUT
     )
@@ -193,7 +193,7 @@ def process_single_file():
     plot_spectrogram(
         y_noise,
         sr_old,
-        "2. Reference-støj",
+        "Reference-noise",
         fig_num=2,
         ymax=YMAX_NOISE
     )
@@ -214,7 +214,7 @@ def process_single_file():
     plot_spectrogram(
         y_clean,
         sr_old,
-        "3. Efter støjreduktion",
+        "Noise reduction",
         fig_num=3,
         ymax=YMAX_DENOISED
     )
@@ -229,7 +229,7 @@ def process_single_file():
     plot_spectrogram(
         y_filtered,
         sr_old,
-        f"4. Efter frekvens-cut ({LOWCUT}-{HIGHCUT} Hz)",
+        f"Frequency-isolation ({LOWCUT}-{HIGHCUT} Hz)",
         fig_num=4,
         ymax=YMAX_FILTERED
     )
@@ -245,7 +245,7 @@ def process_single_file():
     plot_spectrogram(
         y_final,
         sr_old,
-        f"5. Efter gain (+{GAIN_DB:.1f} dB)",
+        f"Gain (+{GAIN_DB:.1f} dB)",
         fig_num=5,
         ymax=YMAX_GAINED
     )
