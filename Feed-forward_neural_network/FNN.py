@@ -1,598 +1,397 @@
 """
-Feed-Forward Neural Network for Multi-Class Classification
-Supports JSON and CSV data from class-specific folders
+Feed-Forward Neural Network — Multi-Class Classification
 """
 
-import sys
-import os
+from functools import partial
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import seaborn as sns
-import tensorflow as tf
+import optuna
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import (GridSearchCV, RandomizedSearchCV,
+                                      StratifiedKFold, cross_val_score, train_test_split)
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
 import librosa
 from scipy import signal
+from tensorflow.keras.regularizers import l2 as l2_reg
+from scikeras.wrappers import KerasClassifier
 
-# Add CrossValidation directory to path to import CS module
-sys.path.insert(0, str(Path(__file__).parent.parent / "CrossValidation"))
+optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-
-# =====================================================================
-# CONFIGURATION - Modify these parameters for your use case
-# =====================================================================
+# ── Configuration ────────────────────────────────────────────────────────────
 
 class Config:
-    """Configuration class for easy customization"""
-    
-    # DATA CONFIGURATION
-    DATA_ROOT_FOLDER = r"C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Data fra tidligere project"  # Root folder
-    SUBFOLDERS = [
-         # r"Dataset\Extrinsic data (clean)",  # Contains .wav files
-        #r"Dataset\Intrinsic data",          # Contains .csv files
-        # r"Dataset\Task data"                # Contains .csv files
-    ]
-    CLASS_FOLDERS = {
-        0: "N",
-        1: "NS",
-        2: "OT",
-        3: "P",
-        4: "UT"
-    }
-    
-    # WAV FILE CONFIGURATION
-    WAV_DATA_ROOT_FOLDER = r"C:\Users\emil_\OneDrive - Aalborg Universitet\VT2\VT2\Soundcleaning"  # WAV files folder
-    WAV_CLASS_FOLDERS = ["N", "NS", "OT", "P", "UT"]  # Subfolder names (labels)
-    
-    # FILE EXTENSIONS TO LOAD
-    LOAD_CSV = True
-    LOAD_WAV = True  # Enable WAV audio file loading
-    
-    # COLUMNS TO IGNORE (1-indexed: column 1 = index 0)
-    IGNORE_COLUMNS_INTRINSIC = [2, 5, 6]  # From Intrinsic data only
-    IGNORE_COLUMNS_TASK = []  # Leave empty to keep all Task columns
-    
-    # DATA PREPROCESSING
-    TEST_SIZE = 0.2
+    FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
+    LABELS_PATH = r"C:\github\VT2\Feature_engineering\labels.csv"
+    MODEL_SAVE_PATH = r"Feed-forward_neural_network\trained_model.keras"
+
+    # Data split: 70% train / 20% val / 10% test
+    TRAIN_SIZE = 0.7
     VALIDATION_SIZE = 0.2
+    TEST_SIZE = 0.1
     RANDOM_STATE = 42
-    NORMALIZATION = True  # StandardScaler normalization
-    
-    # NEURAL NETWORK ARCHITECTURE
-    NUM_CLASSES = 5  # Number of output classes
-    HIDDEN_LAYERS = [128, 64, 32]  # MODIFY: Number of neurons in each hidden layer
-    ACTIVATION_FUNCTION = 'sigmoid'  # Output activation for multi-class
-    OPTIMIZER = Adam(learning_rate=0.001)
-    LOSS_FUNCTION = 'categorical_crossentropy'
-    
-    # TRAINING CONFIGURATION
+
+    # Architecture defaults (updated by best search result before final training)
+    HIDDEN_LAYERS = [128, 64, 32]
+    ACTIVATION_FUNCTION = 'relu'
+    DROPOUT_RATE = 0.2
+    LEARNING_RATE = 0.001
+    L2_REGULARIZATION = 0.01
+
     BATCH_SIZE = 32
     EPOCHS = 100
-    VALIDATION_SPLIT = 0.2
+    SEARCH_EPOCHS = 20   # fewer epochs during hyperparameter search
     EARLY_STOPPING_PATIENCE = 10
-    
-    # MODEL SAVING/LOADING
-    MODEL_SAVE_PATH = r"Feed-forward_neural_network\trained_model.keras"
-    SCALER_SAVE_PATH = r"Feed-forward_neural_network\scaler.pkl"
-    
-    # OUTPUT
-    PLOT_HISTORY = True
-    PLOT_CONFUSION_MATRIX = True
-    VERBOSE = 1  # 0=silent, 1=progress bar, 2=one line per epoch
+
+    CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "P", 4: "UT"}
 
 
-# =====================================================================
-# DATA LOADING
-# =====================================================================
+# ── Model factory ────────────────────────────────────────────────────────────
+# Defined at module level so functools.partial produces a picklable object,
+# which sklearn needs to clone estimators during cross-validation.
 
-class DataLoader:
-    """Load and process data from class folders containing CSV/JSON files"""
-    
-    def __init__(self, config):
-        self.config = config
-        self.X = []
-        self.y = []
-        
-    def load_csv(self, file_path, folder_name=None):
-        """Load and flatten CSV file to feature vector
-        
-        Args:
-            file_path: Path to CSV file
-            folder_name: Name of subfolder (to determine which columns to ignore)
-        """
-        df = pd.read_csv(file_path)
-        
-        # Drop ignored columns based on data source
-        if folder_name and "Intrinsic" in folder_name:
-            ignore_cols = [col - 1 for col in self.config.IGNORE_COLUMNS_INTRINSIC]
-            cols_to_drop = [df.columns[i] for i in ignore_cols if i < len(df.columns)]
-            df = df.drop(columns=cols_to_drop, errors='ignore')
-        elif folder_name and "Task" in folder_name:
-            ignore_cols = [col - 1 for col in self.config.IGNORE_COLUMNS_TASK]
-            cols_to_drop = [df.columns[i] for i in ignore_cols if i < len(df.columns)]
-            df = df.drop(columns=cols_to_drop, errors='ignore')
-        
-        # Convert all columns to numeric, skip non-numeric columns
-        numeric_df = df.apply(pd.to_numeric, errors='coerce')
-        numeric_df = numeric_df.dropna(axis=1)  # Remove columns with NaN
-        features = numeric_df.values.flatten()
-        return features
-    
-    def load_wav(self, file_path):
-        """Load WAV file, create spectrogram, and extract features"""
-        try:
-            # Load audio file
-            y, sr = librosa.load(file_path, sr=None)
-            
-            # Create spectrogram
-            frequencies, times, spec_data = signal.spectrogram(y, sr)
-            
-            # Convert to dB scale
-            spec_db = 10 * np.log10(spec_data + 1e-10)
-            
-            # Extract features from spectrogram
-            features = []
-            
-            # Temporal features (statistics across time)
-            features.append(np.mean(spec_db))        # Mean power
-            features.append(np.std(spec_db))         # Std deviation
-            features.append(np.max(spec_db))         # Max power
-            features.append(np.min(spec_db))         # Min power
-            
-            # Spectral features (statistics across frequency)
-            mean_spectrum = np.mean(spec_db, axis=1)  # Mean across time
-            features.append(np.mean(mean_spectrum))   # Overall spectral mean
-            features.append(np.std(mean_spectrum))    # Spectral std
-            
-            # Spectral centroid (weighted average of frequencies)
-            spectral_mean = np.sum(frequencies[:, np.newaxis] * spec_db, axis=0) / (np.sum(spec_db, axis=0) + 1e-10)
-            features.append(np.mean(spectral_mean))
-            features.append(np.std(spectral_mean))
-            
-            # Energy in different frequency bands (up to 1kHz max)
-            very_low_freq_idx = np.where(frequencies < 250)[0]
-            low_mid_freq_idx = np.where((frequencies >= 250) & (frequencies < 500))[0]
-            mid_freq_idx = np.where((frequencies >= 500) & (frequencies < 750))[0]
-            high_freq_idx = np.where((frequencies >= 750) & (frequencies <= 1000))[0]
-            
-            if len(very_low_freq_idx) > 0:
-                features.append(np.mean(spec_db[very_low_freq_idx]))  # Very low freq energy (0-250 Hz)
-            if len(low_mid_freq_idx) > 0:
-                features.append(np.mean(spec_db[low_mid_freq_idx]))   # Low-mid freq energy (250-500 Hz)
-            if len(mid_freq_idx) > 0:
-                features.append(np.mean(spec_db[mid_freq_idx]))       # Mid freq energy (500-750 Hz)
-            if len(high_freq_idx) > 0:
-                features.append(np.mean(spec_db[high_freq_idx]))      # High freq energy (750-1000 Hz)
-            
-            return np.array(features, dtype=float)
-        
-        except Exception as e:
-            print(f"    WARNING: Could not extract spectrogram from {Path(file_path).name}: {str(e)}")
-            return None
-    
-    
-    def load_from_folders(self):
-        """Load all data from multiple subfolders with class-specific folders"""
-        print("Loading data from folders...")
-        print(f"Root folder: {self.config.DATA_ROOT_FOLDER}")
-        print(f"Subfolders: {self.config.SUBFOLDERS}")
-        print(f"Classes: {list(self.config.CLASS_FOLDERS.values())}\n")
-        
-        # Use Path for robust path handling
-        root_path = Path(self.config.DATA_ROOT_FOLDER)
-        
-        if not root_path.exists():
-            print(f"ERROR: Root folder not found: {root_path}")
-            return self.X, self.y
-        
-        # Load CSV files from standard folders
-        if self.config.LOAD_CSV:
-            # Loop through each subfolder
-            for subfolder_name in self.config.SUBFOLDERS:
-                subfolder_path = root_path / subfolder_name
-                
-                if not subfolder_path.exists():
-                    print(f"WARNING: Subfolder not found: {subfolder_path}\n")
-                    continue
-                
-                print(f"Loading CSV from subfolder: '{subfolder_name}'")
-                
-                # Loop through each class folder within the subfolder
-                for class_id, class_name in self.config.CLASS_FOLDERS.items():
-                    class_folder = subfolder_path / class_name
-                    
-                    if not class_folder.exists():
-                        print(f"  WARNING: Class folder not found: {class_folder}")
-                        continue
-                    
-                    file_count = 0
-                    for csv_file in class_folder.glob("*.csv"):
-                        try:
-                            features = self.load_csv(str(csv_file), folder_name=subfolder_name)
-                            self.X.append(features)
-                            self.y.append(class_id)
-                            file_count += 1
-                                
-                        except Exception as e:
-                            print(f"    ERROR loading {csv_file.name}: {str(e)}")
-                    
-                    if file_count > 0:
-                        print(f"    Class '{class_name}' (ID: {class_id}): {file_count} files loaded")
-                
-                print()  # Blank line between subfolders
-        
-        # Load WAV files from Soundcleaning folder
-        if self.config.LOAD_WAV:
-            print(f"Loading WAV files from: {self.config.WAV_DATA_ROOT_FOLDER}")
-            wav_root_path = Path(self.config.WAV_DATA_ROOT_FOLDER)
-            
-            if not wav_root_path.exists():
-                print(f"ERROR: WAV folder not found: {wav_root_path}\n")
-            else:
-                # Create class mapping from subfolder names
-                class_name_to_id = {name: idx for idx, name in enumerate(self.config.WAV_CLASS_FOLDERS)}
-                
-                # Load WAV files from each class subfolder
-                for class_name in self.config.WAV_CLASS_FOLDERS:
-                    class_folder = wav_root_path / class_name
-                    
-                    if not class_folder.exists():
-                        print(f"  WARNING: Class folder not found: {class_folder}")
-                        continue
-                    
-                    class_id = class_name_to_id[class_name]
-                    file_count = 0
-                    
-                    for wav_file in class_folder.glob("*.wav"):
-                        try:
-                            features = self.load_wav(str(wav_file))
-                            if features is not None:  # Skip if feature extraction failed
-                                self.X.append(features)
-                                self.y.append(class_id)
-                                file_count += 1
-                                
-                        except Exception as e:
-                            print(f"    ERROR loading {wav_file.name}: {str(e)}")
-                    
-                    if file_count > 0:
-                        print(f"  Class '{class_name}' (ID: {class_id}): {file_count} WAV files loaded")
-                
-                print()  # Blank line after WAV loading
-        
-        # Convert lists to numpy arrays, padding features to same size
-        if len(self.X) > 0:
-            # Find maximum feature size
-            max_features = max(len(x) for x in self.X)
-            print(f"Max feature size across all files: {max_features}")
-            
-            # Pad all features to the same size
-            X_padded = []
-            for features in self.X:
-                padded = np.pad(features, (0, max_features - len(features)), mode='constant', constant_values=0)
-                X_padded.append(padded)
-            
-            self.X = np.array(X_padded)
-            self.y = np.array(self.y)
-            
-            print(f"Total samples loaded: {len(self.X)}")
-            print(f"Feature vector shape: {self.X.shape}")
-            print(f"Class distribution: {np.bincount(self.y)}")
-        else:
-            print("ERROR: No data was loaded!")
-        
-        return self.X, self.y
+def build_keras_model(input_dim, num_classes=5,
+                       hidden_layers=None, activation='relu', dropout_rate=0.2, l2=0.0):
+    if hidden_layers is None:
+        hidden_layers = [128, 64, 32]
+    model = Sequential()
+    model.add(layers.Input(shape=(input_dim,)))
+    for neurons in hidden_layers:
+        model.add(layers.Dense(neurons, activation=activation, kernel_regularizer=l2_reg(l2)))
+        model.add(layers.Dropout(dropout_rate))
+    model.add(layers.Dense(num_classes, activation='softmax'))
+    return model  # uncompiled — scikeras handles compilation
 
 
-# =====================================================================
-# NEURAL NETWORK MODEL
-# =====================================================================
+# ── Data ─────────────────────────────────────────────────────────────────────
 
-class FeedForwardNN:
-    """Feed-Forward Neural Network for multi-class classification"""
-    
-    def __init__(self, config, input_dim, num_classes=5):
-        self.config = config
-        self.input_dim = input_dim
-        self.num_classes = num_classes
-        self.model = None
-        self.scaler = None
-        self.history = None
-        
-    def build_model(self):
-        """Build the neural network architecture"""
-        self.model = Sequential()
-        
-        # Input layer
-        self.model.add(layers.Input(shape=(self.input_dim,)))
-        
-        # Hidden layers with sigmoid activation
-        for neurons in self.config.HIDDEN_LAYERS:
-            self.model.add(layers.Dense(neurons, activation=self.config.ACTIVATION_FUNCTION))
-            self.model.add(layers.Dropout(0.2))  # Dropout for regularization
-        
-        # Output layer - softmax for multi-class classification
-        self.model.add(layers.Dense(self.num_classes, activation='softmax'))
-        
-        # Compile model
-        self.model.compile(
-            optimizer=self.config.OPTIMIZER,
-            loss=self.config.LOSS_FUNCTION,
-            metrics=['accuracy']
-        )
-        
-        print("Model Architecture:")
-        self.model.summary()
-        
-        return self.model
-    
-    def train(self, X_train, y_train, X_val, y_val):
-        """Train the neural network"""
-        print("\nTraining the model...")
-        
-        # Early stopping callback
-        early_stop = keras.callbacks.EarlyStopping(
-            monitor='val_loss',
-            patience=self.config.EARLY_STOPPING_PATIENCE,
-            restore_best_weights=True
-        )
-        
-        # Train the model
-        self.history = self.model.fit(
-            X_train, y_train,
-            batch_size=self.config.BATCH_SIZE,
-            epochs=self.config.EPOCHS,
-            validation_data=(X_val, y_val),
-            callbacks=[early_stop],
-            verbose=self.config.VERBOSE
-        )
-        
-        print("Training completed!")
-        return self.history
-    
-    def evaluate(self, X_test, y_test):
-        """Evaluate model performance"""
-        print("\nEvaluating model on test set...")
-        
-        # Get predictions
-        y_pred_prob = self.model.predict(X_test, verbose=0)
-        y_pred = np.argmax(y_pred_prob, axis=1)
-        y_test_labels = np.argmax(y_test, axis=1)
-        
-        # Calculate metrics
-        accuracy = accuracy_score(y_test_labels, y_pred)
-        print(f"Test Accuracy: {accuracy:.4f}")
-        
-        # Classification report
-        print("\nClassification Report:")
-        print(classification_report(y_test_labels, y_pred))
-        
-        # Confusion matrix
-        cm = confusion_matrix(y_test_labels, y_pred)
-        
-        return {
-            'accuracy': accuracy,
-            'y_pred': y_pred,
-            'y_test': y_test_labels,
-            'confusion_matrix': cm
-        }
-    
-    def save_model(self):
-        """Save trained model"""
-        if self.model is not None:
-            self.model.save(self.config.MODEL_SAVE_PATH)
-            print(f"Model saved to: {self.config.MODEL_SAVE_PATH}")
-    
-    def load_model(self):
-        """Load trained model"""
-        if os.path.exists(self.config.MODEL_SAVE_PATH):
-            self.model = keras.models.load_model(self.config.MODEL_SAVE_PATH)
-            print(f"Model loaded from: {self.config.MODEL_SAVE_PATH}")
-            return self.model
-        else:
-            print(f"Model file not found: {self.config.MODEL_SAVE_PATH}")
-            return None
+def load_data(features_path, labels_path):
+    print("Loading data...")
+    class_names = list(Config.CLASS_LABELS.values())
+    X = pd.read_csv(features_path, index_col=0).values
+    labels_df = pd.read_csv(labels_path, index_col=0)
+    y = labels_df.values.flatten()
+    print(f"  X: {X.shape},  y: {y.shape}")
+
+    # Visualize the distribution of fault types
+    label_col = labels_df.columns[0]
+    target_counts = [(t, (labels_df[label_col] == t).sum()) for t in sorted(labels_df[label_col].unique())]
+
+    plt.figure(figsize=(10, 7))
+    sns.countplot(x=label_col, data=labels_df)
+    plt.title('Multiclass Fault Distribution')
+    plt.xticks(ticks=range(len(class_names)), labels=class_names, rotation=45)
+    for i, (target, count) in enumerate(target_counts):
+        plt.text(i, count + 5, str(count), ha='center', fontsize=12)
+    plt.show()
+
+    return X, y
 
 
-# =====================================================================
-# VISUALIZATION AND UTILITIES
-# =====================================================================
-
-def plot_training_history(history, config):
-    """Plot training and validation loss/accuracy"""
-    if not config.PLOT_HISTORY:
-        return
-    
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
-    # Loss plot
-    axes[0].plot(history.history['loss'], label='Training Loss')
-    axes[0].plot(history.history['val_loss'], label='Validation Loss')
-    axes[0].set_title('Model Loss')
-    axes[0].set_xlabel('Epoch')
-    axes[0].set_ylabel('Loss')
-    axes[0].legend()
-    axes[0].grid(True)
-    
-    # Accuracy plot
-    axes[1].plot(history.history['accuracy'], label='Training Accuracy')
-    axes[1].plot(history.history['val_accuracy'], label='Validation Accuracy')
-    axes[1].set_title('Model Accuracy')
-    axes[1].set_xlabel('Epoch')
-    axes[1].set_ylabel('Accuracy')
-    axes[1].legend()
-    axes[1].grid(True)
-    
-    plt.tight_layout()
-    plt.savefig(r"Feed-forward_neural_network\training_history.png", dpi=300)
-    #plt.show()
-    print("Training history plot saved")
-
-
-def plot_confusion_matrix(cm, config, class_names=None):
-    """Plot confusion matrix"""
-    if not config.PLOT_CONFUSION_MATRIX:
-        return
-    
-    if class_names is None:
-        class_names = [f"Class {i}" for i in range(len(cm))]
-    
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=class_names, yticklabels=class_names)
-    plt.title('Confusion Matrix')
-    plt.ylabel('True Label')
-    plt.xlabel('Predicted Label')
-    plt.tight_layout()
-    plt.savefig(r"Feed-forward_neural_network\confusion_matrix.png", dpi=300)
-    #plt.show()
-    print("Confusion matrix plot saved")
-
-
-def normalize_data(X_train, X_val, X_test, config):
-    """Normalize data using StandardScaler"""
-    if not config.NORMALIZATION:
-        return X_train, X_val, X_test
-    
+def split_and_normalize(X, y, config):
+    # Hold out test set
+    X_rest, X_test, y_rest, y_test = train_test_split(
+        X, y,
+        test_size=config.TEST_SIZE,
+        random_state=config.RANDOM_STATE,
+        stratify=y
+    )
+    # Split remaining into train / val
+    val_ratio = config.VALIDATION_SIZE / (config.TRAIN_SIZE + config.VALIDATION_SIZE)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_rest, y_rest,
+        test_size=val_ratio,
+        random_state=config.RANDOM_STATE,
+        stratify=y_rest
+    )
+    # Normalize using only training statistics
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)
     X_test = scaler.transform(X_test)
-    
-    print("Data normalized using StandardScaler")
-    return X_train, X_val, X_test, scaler
+
+    print(f"  Train: {len(X_train)}  Val: {len(X_val)}  Test: {len(X_test)}")
+    return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-# =====================================================================
-# MAIN PIPELINE
-# =====================================================================
+# ── Hyperparameter search ─────────────────────────────────────────────────────
+
+PARAM_SPACE = {
+    'model__hidden_layers': [[64], [128, 64]],
+    'model__activation': ['relu', 'tanh'],
+    'model__dropout_rate': [ 0.2],
+    'batch_size': [16],
+    'optimizer__learning_rate': [0.001, 0.0001],
+    'model__l2': [0.0, 0.01],
+}
+
+def make_clf(input_dim, num_classes, search_epochs, **kwargs):
+    """Build a KerasClassifier ready for sklearn CV."""
+    model_fn = partial(build_keras_model, input_dim=input_dim, num_classes=num_classes)
+    return KerasClassifier(
+        model=model_fn,
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy'],
+        epochs=search_epochs,
+        model__l2=Config.L2_REGULARIZATION,
+        verbose=0,
+        **kwargs
+    )
+
+
+def base_model_cv(X_train, y_labels, config):
+    print("\nBase model cross-validation...")
+    clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
+    scores = cross_val_score(clf, X_train, y_labels, cv=cv, scoring='accuracy')
+    print(f"  CV accuracy: {scores.mean():.4f} (+/- {scores.std():.4f})")
+    return scores.mean(), None
+
+
+def grid_search(X_train, y_labels, config):
+    print("\nGrid Search CV...")
+    clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
+
+    # 3×2×2×2×2 = 48 combos × 5 folds — keeps runtime manageable
+    param_grid = {k: v for k, v in PARAM_SPACE.items() if k != 'model__dropout_rate'}
+    param_grid['model__dropout_rate'] = [0.1, 0.3]
+    param_grid['batch_size'] = [16, 32]
+
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
+    search = GridSearchCV(clf, param_grid, cv=skf, n_jobs=1, verbose=1)
+    search.fit(X_train, y_labels)
+
+    print(f"  Best score:  {search.best_score_:.4f}")
+    print(f"  Best params: {search.best_params_}")
+    return search.best_score_, search.best_params_
+
+
+def random_search(X_train, y_labels, config):
+    print("\nRandom Search CV...")
+    clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
+    search = RandomizedSearchCV(clf, PARAM_SPACE, n_iter=10, cv=5,
+                                 n_jobs=1, verbose=1, random_state=config.RANDOM_STATE)
+    search.fit(X_train, y_labels)
+
+    print(f"  Best score:  {search.best_score_:.4f}")
+    print(f"  Best params: {search.best_params_}")
+    return search.best_score_, search.best_params_
+
+
+def objective(trial, X_train, y_labels, config):
+    # Select hyperparameters to tune
+    hidden_dim = trial.suggest_int('hidden_dim', 32, 256)
+    num_layers = trial.suggest_int('num_layers', 1, 4)
+    activation = trial.suggest_categorical('activation', ['relu', 'tanh'])
+    dropout_rate = trial.suggest_float('dropout_rate', 0.1, 0.3, step=0.1)
+    lr = trial.suggest_float('lr', 1e-4, 1e-2, log=True)
+    batch_size = trial.suggest_categorical('batch_size', [16, 32, 64])
+
+    # Build and evaluate model via cross-validation
+    clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS,
+                   model__hidden_layers=[hidden_dim] * num_layers,
+                   model__activation=activation,
+                   model__dropout_rate=dropout_rate,
+                   optimizer__learning_rate=lr,
+                   batch_size=batch_size)
+
+    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=config.RANDOM_STATE)
+    scores = cross_val_score(clf, X_train, y_labels, cv=cv, scoring='f1_macro')
+    return scores.mean()
+
+
+def bayesian_search(X_train, y_labels, config, n_trials=20):
+    print(f"\n=== RUNNING BAYESIAN OPTIMIZATION ({n_trials} trials) ===")
+
+    sampler = optuna.samplers.TPESampler(seed=config.RANDOM_STATE)
+    study = optuna.create_study(direction='maximize', sampler=sampler)
+    study.optimize(lambda trial: objective(trial, X_train, y_labels, config),
+                   n_trials=n_trials, show_progress_bar=True)
+
+    print(f"\n=== OPTIMIZATION COMPLETE ===")
+    print(f"Best trial: {study.best_trial.number}")
+    print(f"Best validation F1 score (macro): {study.best_value:.4f}")
+    print("\nBest hyperparameters:")
+    for key, value in study.best_params.items():
+        print(f"  {key}: {value}")
+
+    best = study.best_params
+    best_params = {
+        'model__hidden_layers': [best['hidden_dim']] * best['num_layers'],
+        'model__activation': best['activation'],
+        'model__dropout_rate': best['dropout_rate'],
+        'batch_size': best['batch_size'],
+        'optimizer__learning_rate': best['lr'],
+    }
+    return study.best_value, best_params
+
+
+# ── Final model ───────────────────────────────────────────────────────────────
+
+def build_final_model(config, input_dim, num_classes):
+    model = build_keras_model(input_dim, num_classes,
+                               config.HIDDEN_LAYERS,
+                               config.ACTIVATION_FUNCTION,
+                               config.DROPOUT_RATE,
+                           config.L2_REGULARIZATION)
+    model.compile(
+        optimizer=Adam(learning_rate=config.LEARNING_RATE),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    model.summary()
+    return model
+
+
+def train_model(model, X_train, y_train, X_val, y_val, config):
+    print("\nTraining final model...")
+    early_stop = keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=config.EARLY_STOPPING_PATIENCE,
+        restore_best_weights=True
+    )
+    history = model.fit(
+        X_train, y_train,
+        batch_size=config.BATCH_SIZE,
+        epochs=config.EPOCHS,
+        validation_data=(X_val, y_val),
+        callbacks=[early_stop],
+        verbose=1
+    )
+    return history
+
+
+def evaluate_model(model, X_test, y_test, config):
+    y_pred = np.argmax(model.predict(X_test, verbose=0), axis=1)
+    class_names = list(config.CLASS_LABELS.values())
+
+    print(f"\nTest Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+    print(classification_report(y_test, y_pred, target_names=class_names))
+    return y_test, y_pred, confusion_matrix(y_test, y_pred)
+
+
+# ── Plots ─────────────────────────────────────────────────────────────────────
+
+def plot_search_comparison(scores_by_method):
+    methods = list(scores_by_method.keys())
+    scores = [scores_by_method[m] for m in methods]
+
+    plt.figure(figsize=(8, 5))
+    sns.barplot(x=methods, y=scores, palette='Blues_d')
+    plt.ylim(0, 1.1)
+    plt.ylabel('CV Accuracy')
+    plt.title('Hyperparameter Search Comparison')
+    for i, s in enumerate(scores):
+        plt.text(i, s + 0.01, f"{s:.4f}", ha='center', fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(r"Feed-forward_neural_network\cv_comparison.png", dpi=300)
+    plt.show()
+
+
+def plot_training_history(history):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    ax1.plot(history.history['loss'], label='Train')
+    ax1.plot(history.history['val_loss'], label='Val')
+    ax1.set_title('Loss'); ax1.set_xlabel('Epoch'); ax1.legend(); ax1.grid(True)
+
+    ax2.plot(history.history['accuracy'], label='Train')
+    ax2.plot(history.history['val_accuracy'], label='Val')
+    ax2.set_title('Accuracy'); ax2.set_xlabel('Epoch'); ax2.legend(); ax2.grid(True)
+
+    plt.tight_layout()
+    plt.savefig(r"Feed-forward_neural_network\training_history.png", dpi=300)
+    plt.show()
+
+
+def plot_confusion_matrix(cm, class_names):
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=class_names, yticklabels=class_names)
+    plt.title('Confusion Matrix')
+    plt.ylabel('True'); plt.xlabel('Predicted')
+    plt.tight_layout()
+    plt.savefig(r"Feed-forward_neural_network\confusion_matrix.png", dpi=300)
+    plt.show()
+
+
+def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
+    print("\nTraining solo model with default Config params...")
+    model = build_final_model(config, X_train.shape[1], len(config.CLASS_LABELS))
+    history = train_model(model, X_train, y_train, X_val, y_val, config)
+    cm = evaluate_model(model, X_test, y_test, config)[2]
+    plot_confusion_matrix(cm, list(config.CLASS_LABELS.values()))
+    return model, history
+# ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
-    """Main pipeline: Load data, train model, evaluate"""
-    
-    print("="*70)
-    print("FEED-FORWARD NEURAL NETWORK - MULTI-CLASS CLASSIFICATION")
-    print("="*70)
-    
-    # Step 1: Load data
-    loader = DataLoader(Config)
-    X, y = loader.load_from_folders()
-    
-    if len(X) == 0:
-        print("ERROR: No data loaded. Please check your data folder paths.")
-        return
-    
-    # Step 2: Encode labels to one-hot
-    y_encoded = keras.utils.to_categorical(y, num_classes=5)
-    
-    # Step 3: Split data - First split: train+val vs test
-    X_temp, X_test, y_temp, y_test = train_test_split(
-        X, y_encoded,
-        test_size=Config.TEST_SIZE,
-        random_state=Config.RANDOM_STATE,
-        stratify=np.argmax(y_encoded, axis=1)
-    )
-    
-    # Step 4: Split temp into train and validation
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_temp, y_temp,
-        test_size=Config.VALIDATION_SIZE,
-        random_state=Config.RANDOM_STATE,
-        stratify=np.argmax(y_temp, axis=1)
-    )
-    
-    print(f"\nData split:")
-    print(f"  Training set: {X_train.shape[0]} samples")
-    print(f"  Validation set: {X_val.shape[0]} samples")
-    print(f"  Test set: {X_test.shape[0]} samples")
-    
-    # Step 5: Normalize data
-    if Config.NORMALIZATION:
-        X_train, X_val, X_test, scaler = normalize_data(X_train, X_val, X_test, Config)
-    
-    # Step 6: Build and train model
-    nn = FeedForwardNN(Config, input_dim=X_train.shape[1], num_classes=5)
-    nn.build_model()
-    nn.train(X_train, y_train, X_val, y_val)
-    
-    # Step 7: Evaluate model
-    results = nn.evaluate(X_test, y_test)
-    
-    # Step 8: Visualize results
-    plot_training_history(nn.history, Config)
-    plot_confusion_matrix(results['confusion_matrix'], Config, 
-                         class_names=list(Config.CLASS_FOLDERS.values()))
-    
-    # Step 9: Save model
-    nn.save_model()
-    print("\nModel training and evaluation completed successfully!")
-    
-    # Step 10: Optional grid search with lazy import to avoid circular dependency
-    print("\nWould you like to run Grid Search with Cross-Validation? (y/n): ", end='', flush=True)
-    user_input = input().strip().lower()
-    print(f"DEBUG: User input = '{user_input}' (length: {len(user_input)})")
-    
-    if user_input == 'y' or user_input == 'yes':
-        print("DEBUG: Starting grid search import...")
-        try:
-            from CS import GridSearchCV
-            print("DEBUG: GridSearchCV imported successfully")
-            
-            print("\n" + "="*70)
-            print("STARTING GRID SEARCH WITH CROSS-VALIDATION")
-            print("="*70)
-            
-            # Run grid search using the loaded data
-            param_grid = {
-                'hidden_layers': [
-                    [128, 64],
-                    [128, 64, 32],
-                    [256, 128],
-                    [256, 128, 64],
-                    [64, 32, 16]
-                ],
-                'learning_rate': [0.0001, 0.001, 0.01],
-                'batch_size': [16, 32, 64]
-            }
-            
-            grid_search = GridSearchCV(param_grid, Config, n_splits=5)
-            results = grid_search.fit(X, y)  # Pass original y, not encoded
-            
-            # Display and save results
-            results_df = grid_search.get_results_dataframe()
-            if len(results_df) > 0:
-                print("\nGrid Search Results (Top 10 by F1 Score):")
-                print("="*70)
-                print(results_df.sort_values('Mean F1 (weighted)', ascending=False).head(10).to_string(index=False))
-                print("="*70)
-                
-                # Save results
-                results_df.to_csv(r"CrossValidation\grid_search_results.csv", index=False)
-                print("\nGrid search results saved to: CrossValidation\\grid_search_results.csv")
-            else:
-                print("\nNo valid results to display. Grid search evaluation failed.")
-                print("Check the error messages above for details.")
-            
-        except ImportError as e:
-            print(f"ERROR: Could not import GridSearchCV from CS.py: {e}")
-            print("Make sure CS.py is in the CrossValidation directory.")
-        except Exception as e:
-            print(f"ERROR: Grid search failed: {e}")
-            import traceback
-            traceback.print_exc()
-    else:
-        print(f"DEBUG: Input was '{user_input}', not running grid search")
-    
-    print("\n" + "="*70)
-    print("PIPELINE COMPLETED SUCCESSFULLY")
-    print("="*70)
+    """
+    print("Feed-Forward Neural Network — Multi-Class Classification\n")
 
+    # Load and prepare data
+    X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
+
+    # Run all four search methods
+    print("\n--- Hyperparameter Search ---")
+    base_score, _ = base_model_cv(X_train, y_train, Config)
+    grid_score, grid_params = grid_search(X_train, y_train, Config)
+    random_score, random_params = random_search(X_train, y_train, Config)
+    bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
+
+    # Compare and pick the best
+    results = {
+        'Base Model': (base_score, None),
+        'Grid Search': (grid_score, grid_params),
+        'Rand Search': (random_score, random_params),
+        'Bayesian': (bayes_score, bayes_params),
+    }
+    plot_search_comparison({name: score for name, (score, _) in results.items()})
+
+    best_name, (best_score, best_params) = max(results.items(), key=lambda x: x[1][0])
+    print(f"\nBest method: {best_name}  (CV acc {best_score:.4f})")
+    print(f"Params: {best_params}")
+
+    # Apply best params to Config before final training
+    if best_params:
+        param_map = {
+            'model__hidden_layers': 'HIDDEN_LAYERS',
+            'model__activation': 'ACTIVATION_FUNCTION',
+            'model__dropout_rate': 'DROPOUT_RATE',
+            'model__l2': 'L2_REGULARIZATION',
+            'batch_size': 'BATCH_SIZE',
+            'optimizer__learning_rate': 'LEARNING_RATE',
+        }
+        for search_key, config_attr in param_map.items():
+            if search_key in best_params:
+                setattr(Config, config_attr, best_params[search_key])
+
+    # Train final model on train/val splits (no cross-validation)
+    print(f"\n--- Final Training [{best_name} params] ---")
+    model = build_final_model(Config, X_train.shape[1], len(Config.CLASS_LABELS))
+    history = train_model(model, X_train, y_train, X_val, y_val, Config)
+
+    # Evaluate and plot
+    _, _, cm = evaluate_model(model, X_test, y_test, Config)
+    plot_training_history(history)
+    plot_confusion_matrix(cm, list(Config.CLASS_LABELS.values()))
+
+    # Save
+    model.save(Config.MODEL_SAVE_PATH)
+    print(f"Model saved to {Config.MODEL_SAVE_PATH}")
+    
+    # For quick testing without running the full search, you can comment out the search methods and directly train with default Config params:
+    """
+    X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
+    X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
+    solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
+   
 
 if __name__ == "__main__":
     main()
