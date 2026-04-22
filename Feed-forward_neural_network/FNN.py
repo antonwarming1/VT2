@@ -15,6 +15,8 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from tensorflow import keras
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
+import librosa
+from scipy import signal
 from tensorflow.keras.regularizers import l2 as l2_reg
 from scikeras.wrappers import KerasClassifier
 
