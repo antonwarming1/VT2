@@ -5,6 +5,7 @@ Feed-Forward Neural Network — Multi-Class Classification
 from functools import partial
 import numpy as np
 import pandas as pd
+from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
 import optuna
@@ -25,10 +26,14 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
+
 class Config:
-    FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
-    LABELS_PATH = r"C:\github\VT2\Feature_engineering\labels.csv"
-    MODEL_SAVE_PATH = r"Feed-forward_neural_network\trained_model.keras"
+    BASE_DIR = Path(__file__).resolve().parents[1]
+
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
+    MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
+
 
     # Data split: 70% train / 20% val / 10% test
     TRAIN_SIZE = 0.7
