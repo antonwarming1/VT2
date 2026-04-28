@@ -12,28 +12,23 @@ import matplotlib.pyplot as plt
 # INDSTILLINGER
 # ============================================================
 
+BASE_PATH = Path(r"C:\Users\Nicok\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2")
+
 # Kun én inputfil
-INPUT_AUDIO_FILE = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Data fra tidligere project\Dataset\Extrinsic data\N\e030520236057.wav"
-    
-)
+INPUT_AUDIO_FILE = BASE_PATH / r"Data fra tidligere project\Dataset\Extrinsic data\N\e030520236057.wav"
 
 # Støjreference
-NOISE_AUDIO_FILE = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning\Optaget_støj.wav"
-)
+NOISE_AUDIO_FILE = BASE_PATH / r"Soundcleaning\Optaget_støj.wav"
 
 # Hvor outputfilen skal gemmes
-OUTPUT_ROOT = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning"
-)
+OUTPUT_ROOT = BASE_PATH / "Soundcleaning"
 
 # Filnavnssuffix, så fx fil.wav bliver til fil_P.wav
 OUTPUT_SUFFIX = "_P"
 
 # Noise reduction
 PROP_DECREASE = 0.8
-STATIONARY = False
+STATIONARY = True
 
 # Frekvensfilter
 LOWCUT = 1

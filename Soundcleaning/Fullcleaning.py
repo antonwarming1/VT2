@@ -9,20 +9,16 @@ from pathlib import Path
 # INDSTILLINGER - REDIGÉR KUN DET HER
 # ============================================================
 
+BASE_PATH = Path(r"C:\Users\Nicok\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2")
+
 # Mappe med de originale lydfiler
-INPUT_FOLDER = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Data fra tidligere project\Dataset\Extrinsic data\UT"
-)
+INPUT_FOLDER = BASE_PATH / r"Data fra tidligere project\Dataset\Extrinsic data\UT"
 
 # Rodmappe, hvor den nye cleaned mappe skal oprettes
-OUTPUT_ROOT = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning"
-)
+OUTPUT_ROOT = BASE_PATH / "Soundcleaning"
 
 # Støjreference
-NOISE_FILE = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning\Optaget_støj.wav"
-)
+NOISE_FILE = BASE_PATH / r"Soundcleaning\Optaget_støj.wav"
 
 # Filnavnssuffix, så fx fil.wav bliver til fil_C.wav
 OUTPUT_SUFFIX = "_C"
