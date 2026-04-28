@@ -1,4 +1,9 @@
-import json
+"""
+SVM classification using all features from feature engineering. 
+This script loads the selected features and labels, trains an SVM classifier, 
+evaluates its performance, and visualizes the confusion matrix.
+"""
+
 import os
 import pandas as pd
 import numpy as np
@@ -63,16 +68,16 @@ def main():
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred, target_names=['N', 'NS', 'OT', 'P', 'UT']))
 
-    # Print confusion matrix
+    # Print confusion matrix to terminal
     print("\nConfusion Matrix:")
     cm = confusion_matrix(y_test, y_pred)
     print(cm)
 
     elapsed_time = time.time() - start_time
-    print(f"\nExecution time: {elapsed_time:.2f} seconds")
+    print(f"\nExecution time: {elapsed_time:.4f} seconds")
 
 
-    # Display confusion matrix
+    # Display confusion matrix as heatmap
     display_confusion_matrix(cm, 'SVM Confusion Matrix')
 
     
