@@ -327,6 +327,24 @@ def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrins
     return True
 
 
+def preprocess_old_pair_df(task_df, intr_df):
+    """
+    In-memory version of preprocess_old_pair. Returns (task_df, intr_df) or None
+    if no depth plateau detected (instance should be skipped).
+    """
+    plateau_time = detect_plateau(intr_df, depth_col="Depth (mm)")
+    if plateau_time is None:
+        return None
+
+    task_df = trim_to_start(task_df, plateau_time)
+    intr_df = trim_to_start(intr_df, plateau_time)
+
+    task_df = resample_uniform(task_df, smooth=SMOOTH_CSV)
+    intr_df = resample_uniform(intr_df, smooth=SMOOTH_INTR, smooth_cols=SMOOTH_COLS_INTR)
+
+    return task_df, intr_df
+
+
 def main():
     """Find all CSV/JSON pairs in the configured subfolders and preprocess them."""
 
