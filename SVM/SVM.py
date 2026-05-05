@@ -1,3 +1,4 @@
+from copyreg import pickle
 import json
 import os
 import pandas as pd
@@ -8,7 +9,7 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
-
+import pickle
 
 def load_csv(filepath):
     print(f"Loading CSV file: {filepath}")
@@ -148,6 +149,20 @@ def main():
     # Train SVM classifier
     clf = svm.SVC(kernel='rbf', random_state=42, decision_function_shape='ovr')
     clf.fit(X_train_scaled, y_train)
+
+    model_save_path = "Saved_SVM_model.pkl"
+
+    model_data = {
+    "model": clf,
+    "scaler": scaler,
+    "class_names": ['N', 'NS', 'OT', 'P', 'UT'],
+    "feature_columns": list(all_features.columns)
+    }
+
+    with open(model_save_path, "wb") as f:
+        pickle.dump(model_data, f)
+
+    print(f"Model saved to {model_save_path}")
 
     # Predict on test set
     y_pred = clf.predict(X_test_scaled)
