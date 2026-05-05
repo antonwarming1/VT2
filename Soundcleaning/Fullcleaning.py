@@ -12,7 +12,7 @@ from pathlib import Path
 BASE_PATH = Path(r"C:\Users\Nicok\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2")
 
 # Mappe med de originale lydfiler
-INPUT_FOLDER = BASE_PATH / r"Data fra tidligere project\Dataset\Extrinsic data\UT"
+INPUT_FOLDER = BASE_PATH / r"Data fra tidligere project\Dataset\Extrinsic data\OT"
 
 # Rodmappe, hvor den nye cleaned mappe skal oprettes
 OUTPUT_ROOT = BASE_PATH / "Soundcleaning"
@@ -62,12 +62,11 @@ def validate_cutoffs(lowcut, highcut, samplerate):
             f"HIGHCUT skal være mindre end Nyquist-frekvensen ({nyquist:.2f} Hz)."
         )
 
-def bandpass_filter(data, samplerate, lowcut, highcut, order=6):
+def lowpass_filter(data, samplerate, highcut, order=6):
     nyquist = samplerate / 2
-    low = lowcut / nyquist
     high = highcut / nyquist
 
-    sos = butter(order, [low, high], btype="bandpass", output="sos")
+    sos = butter(order, high, btype="lowpass", output="sos")
     filtered = sosfiltfilt(sos, data, axis=0)
     return filtered
 
@@ -123,13 +122,13 @@ def process_file(input_file: Path, output_file: Path, noise_cache: dict):
     )
 
     # Frekvensfilter
-    y_filtered = bandpass_filter(y_clean, sr_old, LOWCUT, HIGHCUT, FILTER_ORDER)
+    y_filtered = lowpass_filter(y_clean, sr_old, HIGHCUT, FILTER_ORDER)
 
     # Gain
-    y_gained = apply_gain_db(y_filtered, GAIN_DB)
+    # y_gained = apply_gain_db(y_filtered, GAIN_DB)
 
     # Clipping check
-    y_final = handle_clipping(y_gained, AUTO_NORMALIZE_IF_CLIPPING)
+    y_final = handle_clipping(y_filtered, AUTO_NORMALIZE_IF_CLIPPING)
 
     # Gem
     output_file.parent.mkdir(parents=True, exist_ok=True)
