@@ -45,10 +45,7 @@ def main():
     y, sr = librosa.load(str(wav_files[0]), sr=None, mono=True)
     audio_df = pd.DataFrame({"Time (ms)": np.arange(len(y)) / sr * 1000, "Amplitude": y})
     # gain y by 30 dB
-    audio_df["Amplitude"] *= 10 ** (30 / 20)
-    print(audio_df.head(10))
-    sf.write(Path(__file__).parent / "test_output.wav", audio_df["Amplitude"].values, sr)
-
+    
     plt.figure(figsize=(10, 4), num=1)
     plt.plot(audio_df["Time (ms)"], audio_df["Amplitude"], color="tab:blue")
     plt.title(f"Waveform for {wav_files[0].name}")
@@ -56,22 +53,6 @@ def main():
     plt.ylabel("Amplitude")
     plt.grid(True, linestyle="--", alpha=0.4)
     plt.tight_layout()
-
-    y500, sr = librosa.load(str(wav_files[0]), sr=500, mono=True)
-    audio_df500 = pd.DataFrame({"Time (ms)": np.arange(len(y500)) / sr * 1000, "Amplitude": y500})
-    # gain y by 30 dB
-    audio_df500["Amplitude"] *= 10 ** (30 / 20)
-    print(audio_df500.head(10))
-    sf.write(Path(__file__).parent / "test_output500.wav", audio_df500["Amplitude"].values, sr)
-    
-    plt.figure(figsize=(10, 4), num=2)
-    plt.plot(audio_df500["Time (ms)"], audio_df500["Amplitude"], color="tab:blue")
-    plt.title(f"Waveform for {wav_files[0].name}")
-    plt.xlabel("Time (ms)")
-    plt.ylabel("Amplitude")
-    plt.grid(True, linestyle="--", alpha=0.4)
-    plt.tight_layout()
-    plt.show()
     
     """for wav_file in wav_files:
         y, sr = librosa.load(str(wav_file), sr=None, mono=True)
