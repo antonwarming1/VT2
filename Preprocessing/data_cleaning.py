@@ -46,6 +46,31 @@ def save_json(data, filepath):
         json.dump(data, f)
 
 
+def clean_task_df(df):
+    """In-memory clean for a Task CSV DataFrame: drop NaN rows, shift time to start at 0."""
+    if df.isnull().sum().sum() > 0:
+        df = df.dropna()
+    time_col = "Time (ms)"
+    if time_col in df.columns:
+        t0 = df[time_col].iloc[0]
+        if t0 != 0.0:
+            df = df.copy()
+            df[time_col] = df[time_col] - t0
+    return df.reset_index(drop=True)
+
+
+def clean_intrinsic_df(df):
+    """In-memory clean for an Intrinsic CSV DataFrame: drop NaN, clip negative Torque/Current."""
+    if df.isnull().sum().sum() > 0:
+        df = df.dropna()
+    df = df.copy()
+    if "Torque (Nm)" in df.columns:
+        df["Torque (Nm)"] = df["Torque (Nm)"].clip(lower=0)
+    if "Current (V)" in df.columns:
+        df["Current (V)"] = df["Current (V)"].clip(lower=0)
+    return df.reset_index(drop=True)
+
+
 def clean_csv(filepath, output_path):
     """Clean a single CSV file. Returns list of actions taken."""
     actions = []

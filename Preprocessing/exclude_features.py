@@ -64,6 +64,12 @@ def save_json(data, path):
         json.dump(data, f)
 
 
+def drop_csv_columns_df(df):
+    """In-memory version of drop_csv_columns: drop EXCLUDE_CSV columns from a DataFrame."""
+    to_drop = [col for col in EXCLUDE_CSV if col in df.columns]
+    return df.drop(columns=to_drop)
+
+
 def drop_csv_columns(input_path, output_path):
     """Load a CSV, drop excluded columns, and save."""
     df = pd.read_csv(input_path)

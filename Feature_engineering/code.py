@@ -58,13 +58,17 @@ OUTPUT_DIR = Path(r"C:\github\VT2\Feature_engineering")
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
-def _csv_to_long(filepath, sample_id):
-    """Load a CSV into tsfresh long format. All columns except Time are used as features."""
-    df = pd.read_csv(filepath)
+def _csv_df_to_long(df, sample_id):
+    """Convert an already-loaded DataFrame into tsfresh long format."""
     cols = [c for c in df.columns if c != "Time (ms)"]
-    df = df.rename(columns={"Time (ms)": "time"})
+    df = df.rename(columns={"Time (ms)": "time"}).copy()
     df["id"] = sample_id
     return df[["id", "time"] + cols]
+
+
+def _csv_to_long(filepath, sample_id):
+    """Load a CSV into tsfresh long format. All columns except Time are used as features."""
+    return _csv_df_to_long(pd.read_csv(filepath), sample_id)
 
 
 def _json_to_long(filepath, sample_id):
