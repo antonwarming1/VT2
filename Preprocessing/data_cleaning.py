@@ -22,6 +22,8 @@ import json
 import shutil
 import sys
 from pathlib import Path
+import librosa
+import numpy as np
 
 DATA_ROOT = Path(__file__).parent.parent / "data_opsamling"
 OUTPUT_ROOT = Path(__file__).parent.parent / "data_opsamling_cleaned"
@@ -44,6 +46,11 @@ def load_json(filepath):
 def save_json(data, filepath):
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f)
+
+def load_wav(filepath, sr=None):
+    """Load a WAV file with librosa, returning the audio time series and sample rate."""
+    y, sr = librosa.load(filepath, sr=sr, mono=True)
+    return y, sr
 
 
 def clean_task_df(df):
@@ -220,6 +227,24 @@ def clean_subfolder(data_dir, output_dir):
 
     return total_actions
 
+def clean_wav(filepath, output_path, sr=None):
+    """Clean a single WAV file. Returns list of actions taken."""
+    Actions = []
+    y, sr = load_wav(filepath, sr=sr)
+    df = pd.DataFrame({"Time (ms)": np.arange(len(y)) / sr * 1000, "Amplitude": y})
+       
+    # Check for NaN
+    nan_count = df["Amplitude"].isnull().sum()
+    if nan_count > 0:
+        Actions.append(f"  WARNING: {nan_count} NaN values found in audio — replaced with 0")
+        df["Amplitude"] = df["Amplitude"].fillna(0)
+
+    df.to_csv(output_path, index=False)
+    outpath = output_path.relative_to(OLD_OUTPUT_ROOT.parent.parent) 
+    Actions.append(f"  Audio saved to {outpath}")
+
+    return Actions
+
 
 def main():
     # Resolve subfolders from config
@@ -277,8 +302,15 @@ def main():
                     else:
                         print(f"{f.name}: OK")
                 for f in wav_files:
-                    print(f"{f.name}: copied (no changes needed)")
-                    shutil.copy2(f, out_dir / f.name)
+                    out = out_dir / f.name.replace(".wav", ".csv")
+                    actions = clean_wav(f, out, sr=4000)
+                    if actions:
+                        print(f"{f.name}:")
+                        for a in actions:
+                            print(a)
+                        grand_total += len(actions)
+                    else:
+                        print(f"{f.name}: OK")
 
     print(f"\nDone! {grand_total} total fixes applied.")
 
