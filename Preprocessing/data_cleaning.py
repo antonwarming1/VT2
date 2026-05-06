@@ -23,17 +23,17 @@ import shutil
 import sys
 from pathlib import Path
 
-DATA_ROOT = Path(r"C:\github\VT2\data_opsamling")
-OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
+DATA_ROOT = Path(__file__).parent.parent / "data_opsamling"
+OUTPUT_ROOT = Path(__file__).parent.parent / "data_opsamling_cleaned"
 
 # Old dataset (from earlier project)
-OLD_DATA_ROOT = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
-OLD_OUTPUT_ROOT = Path(r"C:\github\VT2\data_old_cleaned")
+OLD_DATA_ROOT = Path(__file__).parent.parent / "Data fra tidligere project" / "Dataset"
+OLD_OUTPUT_ROOT = Path(__file__).parent.parent / "data_old_cleaned"
 
 # ── Config ───────────────────────────────────────────────────────────────────
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"] Old data is from earlier project, different structure and signals than new data
 PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
-FOLDERS_OLD = ["Intrinsic data", "Task data"]  # For old data: which subfolders to include
+FOLDERS_OLD = ["Extrinsic data"]  # For old data: which subfolders to include "Intrinsic data", "Task data", "Extrinsic data"
 
 
 def load_json(filepath):
@@ -277,6 +277,7 @@ def main():
                     else:
                         print(f"{f.name}: OK")
                 for f in wav_files:
+                    print(f"{f.name}: copied (no changes needed)")
                     shutil.copy2(f, out_dir / f.name)
 
     print(f"\nDone! {grand_total} total fixes applied.")

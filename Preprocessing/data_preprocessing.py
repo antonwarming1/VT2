@@ -20,21 +20,21 @@ from scipy.signal import savgol_filter
 
 # ── Config ───────────────────────────────────────────────────────────────────
 
-DATA_ROOT   = Path(r"C:\github\VT2\data_opsamling_cleaned")
-OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_preprocessed")
+DATA_ROOT   = Path(__file__).parent.parent / "data_opsamling_cleaned"
+OUTPUT_ROOT = Path(__file__).parent.parent / "data_opsamling_preprocessed"
 
 OUTPUT_ROOT.mkdir(exist_ok=True)
 
  
 # Old dataset (from earlier project)
-OLD_DATA_ROOT = Path(r"C:\github\VT2\data_old_cleaned")
-OLD_OUTPUT_ROOT = Path(r"C:\github\VT2\data_old_preprocessed")
+OLD_DATA_ROOT = Path(__file__).parent.parent / "data_old_cleaned"
+OLD_OUTPUT_ROOT = Path(__file__).parent.parent / "data_old_preprocessed"
 
 OLD_OUTPUT_ROOT.mkdir(exist_ok=True)
 
 # ── Config ───────────────────────────────────────────────────────────────────
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"]
-FOLDERS_OLD = ["Intrinsic data", "Task data"]  # For old data: which subfolders to include
+FOLDERS_OLD = ["Intrinsic data", "Task data", "Extrinsic data"]  # For old data: which subfolders to include
 
 RESAMPLE_MS    = 2       # Target sample interval (ms)
 IDLE_DEPTH_RATE = 0.005  # Depth rate threshold (mm/ms) to detect screwing start
