@@ -45,7 +45,7 @@ _svm_model       = None
 _rf_model        = None
 _df              = None
 _scaler          = None
-_raw_pairs       = None
+_raw_pairs_by_model = {}
 _task_kind_fc    = None
 _intr_kind_fc    = None
 _selected_cols   = None
@@ -80,17 +80,25 @@ def get_df_and_scaler():
     return _df, _scaler
 
 
-def get_inference_assets():
-    global _raw_pairs, _task_kind_fc, _intr_kind_fc, _selected_cols
-    if _raw_pairs is None:
-        import inference_pipeline as ip
-        _raw_pairs = ip.list_test_pairs()
+def get_inference_assets(model_name="fnn"):
+    global _task_kind_fc, _intr_kind_fc, _selected_cols
+    import inference_pipeline as ip
+
+    # Shared assets (features list, tsfresh params) — build once
+    if _selected_cols is None:
         df, _ = get_df_and_scaler()
         _selected_cols = list(df.columns)
         _task_kind_fc, _intr_kind_fc = ip.build_kind_fc_parameters(_selected_cols)
-        print(f">> inference assets ready: {len(_raw_pairs)} test-set pairs, "
-              f"{len(_selected_cols)} features")
-    return _raw_pairs, _task_kind_fc, _intr_kind_fc, _selected_cols
+        print(f">> shared inference assets ready: {len(_selected_cols)} features")
+
+    # Per-model test pairs — each model has its own held-out split
+    if model_name not in _raw_pairs_by_model:
+        _raw_pairs_by_model[model_name] = ip.list_test_pairs(model_name)
+        print(f">> [{model_name}] test pairs ready: "
+              f"{len(_raw_pairs_by_model[model_name])} samples")
+
+    return (_raw_pairs_by_model[model_name],
+            _task_kind_fc, _intr_kind_fc, _selected_cols)
 
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
@@ -133,7 +141,7 @@ def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewRe
     import inference_pipeline as ip
 
     t0 = time.perf_counter()
-    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets()
+    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets(model_name)
     _, scaler = get_df_and_scaler()
     t_assets = time.perf_counter()
     print(f"[screw {screw_number}] assets ready:     {t_assets - t0:.3f}s")
@@ -423,6 +431,76 @@ HTML = r"""<!DOCTYPE html>
       );
     }
 
+    function PredictionsTable({ history, showTrue }) {
+      if (history.length === 0) return null;
+
+      const cellBase = {
+        padding: "8px 12px", fontSize: 12, textAlign: "left",
+        borderBottom: "1px solid #334155",
+      };
+      const headerCell = { ...cellBase, color: "#94a3b8", fontWeight: 700,
+        textTransform: "uppercase", letterSpacing: "0.05em", fontSize: 11 };
+
+      // Flatten history into rows: [{round, screw, result}, ...]
+      const rows = [];
+      history.forEach((round, rIdx) => {
+        round.forEach((result, sIdx) => {
+          rows.push({ round: rIdx + 1, screw: sIdx + 1, result });
+        });
+      });
+
+      const correctCount = rows.filter(r => r.result.correct).length;
+      const accuracy     = rows.length > 0 ? (correctCount / rows.length) * 100 : 0;
+
+      return R("div", {
+        style: { background: "#1e293b", borderRadius: 12,
+          padding: "20px 28px", marginTop: 20, width: SVG_W }
+      },
+        R("div", {
+          style: { display: "flex", justifyContent: "space-between",
+            alignItems: "center", marginBottom: 16 }
+        },
+          R("span", { style: { fontWeight: 700, fontSize: 15 } }, "Predictions"),
+          showTrue && R("span", { style: { color: "#94a3b8", fontSize: 12 } },
+            `${correctCount}/${rows.length} correct (${accuracy.toFixed(1)}%)`)
+        ),
+        R("div", { style: { overflowX: "auto" } },
+          R("table", { style: { width: "100%", borderCollapse: "collapse" } },
+            R("thead", null,
+              R("tr", null,
+                R("th", { style: headerCell }, "Round"),
+                R("th", { style: headerCell }, "Screw"),
+                R("th", { style: headerCell }, "Predicted"),
+                showTrue && R("th", { style: headerCell }, "True"),
+                showTrue && R("th", { style: headerCell }, "Correct"),
+                R("th", { style: headerCell }, "Confidence"),
+                R("th", { style: headerCell }, "ID")
+              )
+            ),
+            R("tbody", null,
+              ...rows.map((row, i) => {
+                const r = row.result;
+                return R("tr", { key: i },
+                  R("td", { style: cellBase }, row.round),
+                  R("td", { style: cellBase }, `#${row.screw}`),
+                  R("td", { style: { ...cellBase, color: r.color, fontWeight: 700 } },
+                    `${r.label} – ${r.full}`),
+                  showTrue && R("td", { style: cellBase }, r.true_label),
+                  showTrue && R("td", { style: { ...cellBase,
+                    color: r.correct ? "#86efac" : "#fca5a5", fontWeight: 700 } },
+                    r.correct ? "✓" : "✗"),
+                  R("td", { style: cellBase },
+                    r.confidence != null ? `${r.confidence}%` : "—"),
+                  R("td", { style: { ...cellBase, color: "#64748b", fontFamily: "monospace" } },
+                    r.base_id)
+                );
+              })
+            )
+          )
+        )
+      );
+    }
+
     /* ── Root App ── */
     function App() {
       const emptySlots = () => Array.from({ length: N }, () => ({ status: "empty", result: null }));
@@ -433,19 +511,23 @@ HTML = r"""<!DOCTYPE html>
       const [error,     setError]     = useState(null);
       const [showTrue,  setShowTrue]  = useState(false);
       const [modelName, setModelName] = useState("fnn");
-      const abortRef = useRef(false);
+      // Session ID prevents stale in-flight loops from updating state after
+      // Reset/Restart. Each run captures its own ID; any setSlots call from
+      // a session whose ID no longer matches sessionRef.current is ignored.
+      const sessionRef = useRef(0);
 
-      const runPredictions = useCallback(async (freshSlots) => {
+      const runPredictions = useCallback(async () => {
+        const mySession = ++sessionRef.current;
         setRunning(true);
         setError(null);
-        abortRef.current = false;
         const roundResults = [];
 
         for (let i = 0; i < N; i++) {
-          if (abortRef.current) break;
+          if (mySession !== sessionRef.current) return;
 
           // Mark this screw as working
           setSlots(prev => {
+            if (mySession !== sessionRef.current) return prev;
             const next = [...prev];
             next[i] = { status: "working", result: null };
             return next;
@@ -457,22 +539,23 @@ HTML = r"""<!DOCTYPE html>
           const fetchFn = fetch(`/api/predict_one?screw=${i + 1}&model=${modelName}`)
             .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); });
 
-          if (abortRef.current) break;
-
           try {
             const [, data] = await Promise.all([delay, fetchFn]);
 
-            if (abortRef.current) break;
+            if (mySession !== sessionRef.current) return;
 
             setSlots(prev => {
+              if (mySession !== sessionRef.current) return prev;
               const next = [...prev];
               next[i] = { status: "done", result: data };
               return next;
             });
             roundResults.push(data);
           } catch (e) {
+            if (mySession !== sessionRef.current) return;
             setError(e.message);
             setSlots(prev => {
+              if (mySession !== sessionRef.current) return prev;
               const next = [...prev];
               next[i] = { status: "empty", result: null };
               return next;
@@ -481,6 +564,7 @@ HTML = r"""<!DOCTYPE html>
           }
         }
 
+        if (mySession !== sessionRef.current) return;
         if (roundResults.length > 0) {
           setHistory(prev => [...prev, roundResults]);
         }
@@ -488,13 +572,13 @@ HTML = r"""<!DOCTYPE html>
       }, [modelName]);
 
       const handleStart = useCallback(() => {
-        const fresh = emptySlots();
-        setSlots(fresh);
-        runPredictions(fresh);
+        sessionRef.current++;   // invalidate any in-flight run before starting
+        setSlots(emptySlots());
+        runPredictions();
       }, [runPredictions]);
 
       const handleReset = useCallback(() => {
-        abortRef.current = true;
+        sessionRef.current++;   // invalidate any in-flight run
         setSlots(emptySlots());
         setHistory([]);
         setError(null);
@@ -553,7 +637,8 @@ HTML = r"""<!DOCTYPE html>
             style: { ...btnBase, background: "#7c3aed" }
           }, "✕ Reset")
         ),
-        R(Dashboard, { history })
+        R(Dashboard, { history }),
+        R(PredictionsTable, { history, showTrue })
       );
     }
 
