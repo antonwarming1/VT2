@@ -18,6 +18,7 @@ from tensorflow.keras import layers, Sequential
 from tensorflow.keras.optimizers import Adam
 import librosa
 from scipy import signal
+from scipy.stats import uniform, loguniform
 from tensorflow.keras.regularizers import l2 as l2_reg
 from scikeras.wrappers import KerasClassifier
 
@@ -128,9 +129,9 @@ def split_and_normalize(X, y, config):
 
 PARAM_SPACE = {
     'model__hidden_layers': [[64], [128, 64]],
-    'model__activation': ['relu', 'tanh'],
-    'model__dropout_rate': [ 0.2],
-    'batch_size': [16],
+    'model__activation': ['relu', 'tanh', 'sigmoid'],
+    'model__dropout_rate': [0.1, 0.2, 0.3],
+    'batch_size': [16, 32],
     'optimizer__learning_rate': [0.001, 0.0001],
     'model__l2': [0.0, 0.01],
 }
@@ -163,13 +164,8 @@ def grid_search(X_train, y_labels, config):
     print("\nGrid Search CV...")
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
 
-    # 3×2×2×2×2 = 48 combos × 5 folds — keeps runtime manageable
-    param_grid = {k: v for k, v in PARAM_SPACE.items() if k != 'model__dropout_rate'}
-    param_grid['model__dropout_rate'] = [0.1, 0.3]
-    param_grid['batch_size'] = [16, 32]
-
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
-    search = GridSearchCV(clf, param_grid, cv=skf, n_jobs=1, verbose=1)
+    search = GridSearchCV(clf, PARAM_SPACE, cv=skf, n_jobs=1, verbose=1)
     search.fit(X_train, y_labels)
 
     print(f"  Best score:  {search.best_score_:.4f}")
@@ -177,11 +173,36 @@ def grid_search(X_train, y_labels, config):
     return search.best_score_, search.best_params_
 
 
-def random_search(X_train, y_labels, config):
+def random_search(X_train, y_labels, config, scoring='accuracy'):
+    # Perform Randomized Search CV for hyperparameter tuning of the FNN
     print("\nRandom Search CV...")
-    clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
-    search = RandomizedSearchCV(clf, PARAM_SPACE, n_iter=10, cv=5,
-                                 n_jobs=1, verbose=1, random_state=config.RANDOM_STATE)
+
+    # Define parameter distributions for the FNN
+    param_distributions = {
+        'model__hidden_layers':     [[64], [128], [128, 64], [256, 128], [128, 64, 32]],
+        'model__activation':        ['relu', 'tanh', 'sigmoid'],
+        'model__dropout_rate':      uniform(loc=0.1, scale=0.3),     # [0.1, 0.4)
+        'model__l2':                loguniform(1e-4, 1e-1),
+        'batch_size':               [16, 32, 64],
+        'optimizer__learning_rate': loguniform(1e-4, 1e-2),
+    }
+    # setup model
+    model = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
+
+    # Use StratifiedKFold due to imbalanced data
+    skf = StratifiedKFold(n_splits=5, random_state=config.RANDOM_STATE, shuffle=True)
+    # do the random search with stratified kfold
+    search = RandomizedSearchCV(
+        model,
+        param_distributions,
+        n_iter=50,
+        cv=skf,
+        n_jobs=1,                 # keep at 1 — Keras/TF doesn't parallelize cleanly across processes
+        scoring=scoring,
+        verbose=1,
+        random_state=config.RANDOM_STATE,
+    )
+    # fit the random search
     search.fit(X_train, y_labels)
 
     print(f"  Best score:  {search.best_score_:.4f}")
