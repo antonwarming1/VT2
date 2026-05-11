@@ -11,6 +11,7 @@ import sys
 import time
 from pathlib import Path
 
+import joblib
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
@@ -33,11 +34,15 @@ CLASS_META = {
 }
 
 MODEL_PATH    = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
+SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
+RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
 FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
 
 # ── Lazy singletons ───────────────────────────────────────────────────────────
 
 _model           = None
+_svm_model       = None
+_rf_model        = None
 _df              = None
 _scaler          = None
 _raw_pairs       = None
@@ -51,6 +56,20 @@ def get_model():
     if _model is None:
         _model = keras.models.load_model(MODEL_PATH)
     return _model
+
+
+def get_svm_model():
+    global _svm_model
+    if _svm_model is None:
+        _svm_model = joblib.load(SVM_MODEL_PATH)
+    return _svm_model
+
+
+def get_rf_model():
+    global _rf_model
+    if _rf_model is None:
+        _rf_model = joblib.load(RF_MODEL_PATH)
+    return _rf_model
 
 
 def get_df_and_scaler():
@@ -84,30 +103,38 @@ class ScrewResult(BaseModel):
     label:       str
     full:        str
     color:       str
-    confidence:  float
+    confidence:  Optional[float]
     true_label:  str
     true_full:   str
     correct:     bool
     base_id:     str
 
 
+@app.get("/api/models")
+def list_models():
+    return {"models": ["fnn", "svm", "rf"]}
+
+
 @app.on_event("startup")
 async def startup():
-    print(">> startup: loading model...")
+    print(">> startup: loading FNN model...")
     get_model()
-    print(">> startup: model loaded. loading features CSV + scaler...")
+    print(">> startup: loading SVM model...")
+    get_svm_model()
+    print(">> startup: loading RF model...")
+    get_rf_model()
+    print(">> startup: all models loaded. loading features CSV + scaler...")
     get_df_and_scaler()
     print(">> startup: scaler ready. Server is up — inference assets will load on first request.")
 
 
-def _predict_one_instance(screw_number: int) -> ScrewResult:
+def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewResult:
     """Pick one random raw pair, run pipeline, return prediction."""
     import inference_pipeline as ip
 
     t0 = time.perf_counter()
     raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets()
     _, scaler = get_df_and_scaler()
-    model = get_model()
     t_assets = time.perf_counter()
     print(f"[screw {screw_number}] assets ready:     {t_assets - t0:.3f}s")
 
@@ -131,12 +158,24 @@ def _predict_one_instance(screw_number: int) -> ScrewResult:
 
         t_inf0 = time.perf_counter()
         X = scaler.transform(feat_series.values.reshape(1, -1))
-        probs = model.predict(X, verbose=0)[0]
+
+        if model_name == "svm":
+            cls  = int(get_svm_model().predict(X)[0])
+            conf = None
+        elif model_name == "rf":
+            rf     = get_rf_model()
+            cls    = int(rf.predict(X)[0])
+            probs  = rf.predict_proba(X)[0]
+            conf   = round(float(probs[cls]) * 100, 1)
+        else:  # fnn
+            probs  = get_model().predict(X, verbose=0)[0]
+            cls    = int(np.argmax(probs))
+            conf   = round(float(probs[cls]) * 100, 1)
+
         t_inf1 = time.perf_counter()
         print(f"[screw {screw_number}] model inference:  {t_inf1 - t_inf0:.3f}s")
         print(f"[screw {screw_number}] TOTAL:            {t_inf1 - t0:.3f}s")
 
-        cls = int(np.argmax(probs))
         pred_label = CLASS_LABELS[cls]
 
         return ScrewResult(
@@ -144,7 +183,7 @@ def _predict_one_instance(screw_number: int) -> ScrewResult:
             label      = pred_label,
             full       = CLASS_META[pred_label]["full"],
             color      = CLASS_META[pred_label]["color"],
-            confidence = round(float(probs[cls]) * 100, 1),
+            confidence = conf,
             true_label = label,
             true_full  = CLASS_META[label]["full"],
             correct    = pred_label == label,
@@ -156,8 +195,8 @@ def _predict_one_instance(screw_number: int) -> ScrewResult:
 
 
 @app.get("/api/predict_one", response_model=ScrewResult)
-def predict_one(screw: int = 1):
-    return _predict_one_instance(screw)
+def predict_one(screw: int = 1, model: str = "fnn"):
+    return _predict_one_instance(screw, model)
 
 
 # ── React SPA (served inline, no build step) ──────────────────────────────────
@@ -265,7 +304,7 @@ HTML = r"""<!DOCTYPE html>
           R("text", { x: ttCx, y: lineY(14), textAnchor: "middle",
             fontSize: "11", fontWeight: "700", fill: result.color,
             fontFamily: "Segoe UI, system-ui, sans-serif" },
-            `${result.full} (${result.confidence}%)`
+            `${result.full}${result.confidence != null ? ` (${result.confidence}%)` : ""}`
           ),
           showTrue && R("text", { x: ttCx, y: lineY(30), textAnchor: "middle",
             fontSize: "10", fill: result.correct ? "#86efac" : "#fca5a5",
@@ -388,11 +427,12 @@ HTML = r"""<!DOCTYPE html>
     function App() {
       const emptySlots = () => Array.from({ length: N }, () => ({ status: "empty", result: null }));
 
-      const [slots,    setSlots]    = useState(emptySlots());
-      const [history,  setHistory]  = useState([]);
-      const [running,  setRunning]  = useState(false);
-      const [error,    setError]    = useState(null);
-      const [showTrue, setShowTrue] = useState(false);
+      const [slots,     setSlots]     = useState(emptySlots());
+      const [history,   setHistory]   = useState([]);
+      const [running,   setRunning]   = useState(false);
+      const [error,     setError]     = useState(null);
+      const [showTrue,  setShowTrue]  = useState(false);
+      const [modelName, setModelName] = useState("fnn");
       const abortRef = useRef(false);
 
       const runPredictions = useCallback(async (freshSlots) => {
@@ -414,13 +454,15 @@ HTML = r"""<!DOCTYPE html>
           // Run pipeline and 4-second screw timer in parallel — result is
           // ready by the time the physical process finishes.
           const delay   = new Promise(r => setTimeout(r, 4000));
-          const fetchFn = fetch(`/api/predict_one?screw=${i + 1}`)
+          const fetchFn = fetch(`/api/predict_one?screw=${i + 1}&model=${modelName}`)
             .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); });
 
           if (abortRef.current) break;
 
           try {
             const [, data] = await Promise.all([delay, fetchFn]);
+
+            if (abortRef.current) break;
 
             setSlots(prev => {
               const next = [...prev];
@@ -443,7 +485,7 @@ HTML = r"""<!DOCTYPE html>
           setHistory(prev => [...prev, roundResults]);
         }
         setRunning(false);
-      }, []);
+      }, [modelName]);
 
       const handleStart = useCallback(() => {
         const fresh = emptySlots();
@@ -471,8 +513,24 @@ HTML = r"""<!DOCTYPE html>
       },
         R("h1", { style: { fontSize: "1.6rem", marginBottom: 4, letterSpacing: "0.05em" } },
           "Window Screw Fault Visualiser"),
-        R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 28 } },
-          "FNN · 5-class fault detection · full pipeline per screw"),
+        R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 16 } },
+          `${modelName.toUpperCase()} · 5-class fault detection · full pipeline per screw`),
+        R("div", { style: { display: "flex", gap: 8, marginBottom: 24 } },
+          ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "Random Forest"] ].map(([key, label]) =>
+            R("button", {
+              key,
+              disabled: running,
+              onClick: () => setModelName(key),
+              style: {
+                padding: "6px 18px", border: "none", borderRadius: 6, fontSize: 13,
+                fontWeight: 700, cursor: running ? "not-allowed" : "pointer",
+                background: modelName === key ? "#2563eb" : "#1e293b",
+                color: modelName === key ? "#fff" : "#94a3b8",
+                transition: "background 0.15s",
+              }
+            }, label)
+          )
+        ),
         R(Legend, null),
         R("div", { style: { borderRadius: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.6)", overflow: "visible" } },
           R(WindowScene, { slots, showTrue })
