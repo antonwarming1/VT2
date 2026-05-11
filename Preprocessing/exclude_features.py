@@ -63,8 +63,9 @@ def save_json(data, path):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f)
 
+
 def drop_csv_columns_df(df):
-    """Drop excluded columns from a DataFrame in memory and return the result."""
+    """In-memory version of drop_csv_columns: drop EXCLUDE_CSV columns from a DataFrame."""
     to_drop = [col for col in EXCLUDE_CSV if col in df.columns]
     return df.drop(columns=to_drop)
 
