@@ -62,6 +62,13 @@ YMAX_DENOISED = None
 YMAX_FILTERED = HIGHCUT
 YMAX_GAINED = HIGHCUT
 
+# Hvilke plots der skal laves (True/False)
+#                    [Input, Noise, Denoised, Bodeplot, Filtered, Gained]
+PlotInput = np.array([False, False, False,    False,    True,     False])
+#PlotInput = np.array([True,  True,  True,     False,    True,     False])
+
+# Vis plot titler (slås fra for at gemme til rapporten)
+PLOT_TITLES = False
 
 # ============================================================
 # FUNKTIONER
@@ -83,10 +90,8 @@ def validate_cutoffs(lowcut, highcut, samplerate):
 
 def bandpass_filter(data, samplerate, lowcut, highcut, order=6):
     nyquist = samplerate / 2
-    low = lowcut / nyquist
-    high = highcut / nyquist
 
-    sos = butter(order, [low, high], btype="bandpass", output="sos")
+    sos = butter(order, highcut, btype="lowpass", output="sos", fs=samplerate)
     filtered = sosfiltfilt(sos, data, axis=0)
     return filtered
 

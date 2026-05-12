@@ -17,8 +17,8 @@ import pandas as pd
 
 # ── Config ───────────────────────────────────────────────────────────────────
 
-INPUT_ROOT  = Path(r"C:\github\VT2\data_old_preprocessed")
-OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_final")
+INPUT_ROOT  = Path(__file__).parent.parent / "data_old_preprocessed"
+OUTPUT_ROOT = Path(__file__).parent.parent / "data_opsamling_final"
 
 PROCESS_SUBFOLDERS = ["--all"]   # ["Normal"], ["Normal","Under"], or ["--all"]
 
@@ -106,7 +106,10 @@ def main():
     if PROCESS_SUBFOLDERS == ["--all"]:
         if not INPUT_ROOT.exists():
             sys.exit(f"Error: {INPUT_ROOT} does not exist")
-        subfolders = sorted(d for d in INPUT_ROOT.iterdir() if d.is_dir())
+        subfolders = sorted(
+            d for d in INPUT_ROOT.iterdir()
+            if d.is_dir() and d.name != "Extrinsic data"
+        )
     else:
         subfolders = [INPUT_ROOT / name for name in PROCESS_SUBFOLDERS]
 

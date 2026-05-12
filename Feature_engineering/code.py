@@ -25,6 +25,10 @@ Output:
   Feature_engineering/features_selected.csv    — relevant features only
   Feature_engineering/labels.csv               — class labels
 """
+import os
+os.environ['OMP_NUM_THREADS'] = "1"
+os.environ['MKL_NUM_THREADS'] = "1"
+os.environ['OPENBLAS_NUM_THREADS'] = "1"
 
 import json
 import sys
@@ -47,13 +51,15 @@ from tsfresh.feature_extraction import EfficientFCParameters
 
 DATASET = "old"  # "old" or "new"
 
-OLD_DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_final")
+OLD_DATA_ROOT = Path(__file__).parent.parent / "data_opsamling_final"
 OLD_LABEL_MAP = {"N": 0, "NS": 1, "OT": 2, "P": 3, "UT": 4}
 
-NEW_DATA_ROOT = Path(r"C:\github\VT2\data_opsamling_preprocessed")
+NEW_DATA_ROOT = Path(__file__).parent.parent / "data_opsamling_preprocessed"
 NEW_LABEL_MAP = {"Normal": 0, "Under": 1}
 
-OUTPUT_DIR = Path(r"C:\github\VT2\Feature_engineering")
+OUTPUT_DIR = Path(__file__).parent.parent / "Feature_engineering"
+
+AUDIO_TSFRESH = False
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -170,14 +176,89 @@ def extract_from_long(df, name):
         column_id="id",
         column_sort="time",
         default_fc_parameters=EfficientFCParameters(),
-        n_jobs=0,
+        n_jobs=10,
         show_warnings=False,
-        disable_progressbar=True,
+        disable_progressbar=False,
     )
     impute(features)
     print(f"  {name} features: {features.shape}")
     return features
 
+
+def extract_audio_features(use_tsfresh=False):
+    AUDIO_ROOT = Path(__file__).parent.parent / "data_old_preprocessed" / "Extrinsic data"
+    
+    if not use_tsfresh:
+        features_list = []
+        i = 0
+        for folder in AUDIO_ROOT.iterdir():
+            if not folder.is_dir():
+                continue
+            print(f"Processing {folder.name}...")
+            for audio_file in folder.glob("*.csv"):
+                if i >= 10:  # Limit to first 10 files for testing
+                    break
+                i += 1
+                data = pd.read_csv(audio_file)
+                MAV = np.mean(np.abs(data["Amplitude"].values), dtype=np.float64)
+                SSI = np.sum(np.abs(data["Amplitude"].values)**2, dtype=np.float64)
+                WL = np.sum(np.abs(np.diff(data["Amplitude"].values)), dtype=np.float64)
+                WAMP = np.sum(np.abs(np.diff(data["Amplitude"].values)) > 0.5, dtype=np.float64)
+                RMS = np.sqrt(np.mean(data["Amplitude"].values**2, dtype=np.float64))
+                MEAN = np.mean(data["Amplitude"].values, dtype=np.float64)
+                VAR = np.var(data["Amplitude"].values, dtype=np.float64)
+                STD = np.std(data["Amplitude"].values, dtype=np.float64)
+                SKW = np.mean(((data["Amplitude"].values - MEAN) / STD) ** 3, dtype=np.float64)
+                KURT = np.mean(((data["Amplitude"].values - MEAN) / STD) ** 4, dtype=np.float64)
+                
+                # Store features as a row
+                features_list.append({
+                    "MAV_audio": MAV,
+                    "SSI_audio": SSI,
+                    "WL_audio": WL,
+                    "WAMP_audio": WAMP,
+                    "RMS_audio": RMS,
+                    "MEAN_audio": MEAN,
+                    "VAR_audio": VAR,
+                    "STD_audio": STD,
+                    "SKW_audio": SKW,
+                    "KURT_audio": KURT
+                })
+        features_df = pd.DataFrame(features_list)
+    else:
+        features_df = pd.DataFrame()
+        audio_frames = []
+        sample_id = 0
+        for folder in AUDIO_ROOT.iterdir():
+            i = 0
+            print(f"Building Extrinsic dataset {folder.name}...")
+            if not folder.is_dir():
+                continue
+            audio_files = {f.stem[1:]: f for f in sorted(folder.glob("*.csv"))}
+            for base_id in audio_files.keys():
+                """if i >= 10:  # Limit to first 10 files for testing
+                    break
+                i += 1"""
+                audio_frames.append(_csv_to_long(audio_files[base_id], sample_id))
+                sample_id += 1
+
+        df_long = pd.concat(audio_frames, ignore_index=True)
+        print(df_long.size)        
+        features = extract_features(
+            df_long,
+            column_id="id",
+            column_sort="time", 
+            default_fc_parameters=EfficientFCParameters(),
+            n_jobs=10,
+            show_warnings=False,
+            disable_progressbar=False,
+        )
+        impute(features)
+        features_df = pd.concat([features_df, features], ignore_index=True)
+
+    # Combine all features into a single dataframe
+    
+    return features_df
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
@@ -203,22 +284,38 @@ def main():
     task_features = extract_from_long(task_long, "Task").add_prefix("task_")
     intr_features = extract_from_long(intr_long, "Intrinsic").add_prefix("intr_")
 
+    # Extract audio features
+    audio_features = extract_audio_features(use_tsfresh=True).add_prefix("audio_")
+
     # Combine
     all_features = pd.concat([task_features, intr_features], axis=1)
+    all_features_audio = pd.concat([all_features, audio_features], axis=1)
     all_features.index.name = "id"
     print(f"\nCombined: {all_features.shape}")
 
     # Save extracted features
     all_features.to_csv(OUTPUT_DIR / "features_extracted.csv")
     print(f"Saved → features_extracted.csv")
+    # Save extracted audio features
+    audio_features.to_csv(OUTPUT_DIR / "features_extracted_audio.csv")
+    print(f"Saved → features_extracted_audio.csv")
+
+    
 
     # Feature selection
     if do_select:
         print("\nSelecting relevant features...")
-        selected = select_features(all_features, y)
+        selected = select_features(all_features, y, n_jobs=10)
         print(f"Selected: {selected.shape[1]} / {all_features.shape[1]}")
         selected.to_csv(OUTPUT_DIR / "features_selected.csv")
         print(f"Saved → features_selected.csv")
+        selected_audio = select_features(all_features_audio, y, n_jobs=10)
+        print(f"Selected (with audio): {selected_audio.shape[1]} / {all_features_audio.shape[1]}")
+        selected_audio.to_csv(OUTPUT_DIR / "features_selected_audio.csv")
+        print(f"Saved → features_selected_audio.csv")
+
+
+        
 
     # Save labels
     y.to_csv(OUTPUT_DIR / "labels.csv", header=True)
