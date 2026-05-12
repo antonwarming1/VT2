@@ -101,6 +101,18 @@ def build_kind_fc_parameters(selected_columns):
     return task_kind_to_fc, intr_kind_to_fc
 
 
+def _extract_one_kind(long_df, kind_to_fc, prefix):
+    """tsfresh extraction on one long-format frame: impute NaNs, prefix columns."""
+    feats = extract_features(
+        long_df,
+        column_id="id", column_sort="time",
+        kind_to_fc_parameters=kind_to_fc,
+        n_jobs=0, show_warnings=False, disable_progressbar=True,
+    )
+    impute(feats)
+    return feats.add_prefix(prefix)
+
+
 def pipeline_one(task_csv_path, intr_csv_path, sample_id,
                  task_kind_to_fc, intr_kind_to_fc, selected_columns):
     """
@@ -110,10 +122,8 @@ def pipeline_one(task_csv_path, intr_csv_path, sample_id,
     or None if no depth plateau detected (instance should be skipped).
     """
     # Step 1: Load and clean
-    task_df = pd.read_csv(task_csv_path)
-    intr_df = pd.read_csv(intr_csv_path)
-    task_df = clean_task_df(task_df)
-    intr_df = clean_intrinsic_df(intr_df)
+    task_df = clean_task_df(pd.read_csv(task_csv_path))
+    intr_df = clean_intrinsic_df(pd.read_csv(intr_csv_path))
 
     # Step 2: Plateau trim + resample + smooth
     result = preprocess_old_pair_df(task_df, intr_df)
@@ -130,32 +140,10 @@ def pipeline_one(task_csv_path, intr_csv_path, sample_id,
     intr_long = _csv_df_to_long(intr_df, sample_id)
 
     # Step 5: Extract features restricted to what the model uses
-    task_feats = extract_features(
-        task_long,
-        column_id="id",
-        column_sort="time",
-        kind_to_fc_parameters=task_kind_to_fc,
-        n_jobs=0,
-        show_warnings=False,
-        disable_progressbar=True,
-    )
-    impute(task_feats)
-    task_feats = task_feats.add_prefix("task_")
-
-    intr_feats = extract_features(
-        intr_long,
-        column_id="id",
-        column_sort="time",
-        kind_to_fc_parameters=intr_kind_to_fc,
-        n_jobs=0,
-        show_warnings=False,
-        disable_progressbar=True,
-    )
-    impute(intr_feats)
-    intr_feats = intr_feats.add_prefix("intr_")
+    task_feats = _extract_one_kind(task_long, task_kind_to_fc, "task_")
+    intr_feats = _extract_one_kind(intr_long, intr_kind_to_fc, "intr_")
 
     # Step 6: Combine and reindex to exact selected column order
     all_feats = pd.concat([task_feats, intr_feats], axis=1)
     all_feats = all_feats.reindex(columns=selected_columns, fill_value=0.0)
-
     return all_feats.iloc[0]

@@ -8,12 +8,15 @@ on the full training set, and saves the model.
 
 import time
 from pathlib import Path
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import optuna
+import numpy as np
 from scipy.stats import randint
+
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
@@ -181,6 +184,28 @@ def bayesian_search(X_train, y_train, config, n_trials=30):
     return study.best_value, study.best_params
 
 
+def Feature_importance(model, feature_names, top_n=20):
+    importances = model.feature_importances_
+    full_idx = np.argsort(importances)[::-1]
+
+    # Save the full ranking (all features) to CSV
+    pd.DataFrame({
+        "feature":    np.array(feature_names)[full_idx],
+        "importance": importances[full_idx],
+    }).to_csv(_RF_DIR / "feature_importance.csv", index=False)
+
+    # Plot only the top N
+    top = full_idx[:top_n]
+    top_names = np.array(feature_names)[top]
+    plt.figure(figsize=(10, 8))
+    sns.barplot(x=importances[top], y=top_names,
+                hue=top_names, palette='viridis', legend=False)
+    plt.title(f'Top {top_n} Feature Importances (Random Forest)')
+    plt.xlabel('Importance Score')
+    plt.ylabel('Feature')
+    plt.tight_layout()
+    plt.savefig(_RF_DIR / "feature_importance.png", dpi=300)
+    plt.show()
 # ── Final model ───────────────────────────────────────────────────────────────
 
 def build_final_model(config):
@@ -251,10 +276,18 @@ def solo_model(X_train, X_test, y_train, y_test, config):
     model = train_model(model, X_train, y_train)
     _, _, cm = evaluate_model(model, X_test, y_test, config)
     plot_confusion_matrix(cm, list(config.CLASS_LABELS.values()))
+
+    # Feature importance for the solo run
+    feature_names = pd.read_csv(config.FEATURES_PATH, index_col=0,
+                                 nrows=0).columns.tolist()
+    Feature_importance(model, feature_names)
+
     return model
 
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
+
+SOLO_MODE = True   # set True to skip the search and quickly test the solo path
 
 def main():
     print("Random Forest — Multi-Class Classification\n")
@@ -262,6 +295,11 @@ def main():
 
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_test, y_train, y_test = split_and_normalize(X, y, Config)
+
+    if SOLO_MODE:
+        solo_model(X_train, X_test, y_train, y_test, Config)
+        print(f"\nExecution time: {time.time() - start_time:.2f} seconds")
+        return
 
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
@@ -300,14 +338,17 @@ def main():
 
     _, _, cm = evaluate_model(model, X_test, y_test, Config)
     plot_confusion_matrix(cm, list(Config.CLASS_LABELS.values()))
-
+    
     joblib.dump(model, Config.MODEL_SAVE_PATH)
     print(f"Model saved to {Config.MODEL_SAVE_PATH}")
-
+    
+    #Visualize feature importance
+    feature_names = pd.read_csv(Config.FEATURES_PATH, index_col=0, nrows=0).columns.tolist()
+    Feature_importance(model, feature_names)
+    
     print(f"\nExecution time: {time.time() - start_time:.2f} seconds")
 
-    # ── Quick solo run (comment out the block above and uncomment below) ──────
-    # solo_model(X_train, X_test, y_train, y_test, Config)
+
 
 
 if __name__ == "__main__":
