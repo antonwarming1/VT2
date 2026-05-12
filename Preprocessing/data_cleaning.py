@@ -9,6 +9,8 @@ Cleans CSV and JSON data files in C:\\github\\VT2\\data_opsamling\\<subfolder>:
 4. JSON: Clips negative Current values to 0
 5. JSON: Checks for and reports NaN values
 6. JSON: Fixes Angle unit encoding (Â° -> °)
+7. WAV: Checks for and reports NaN values in audio, replaces with 0
+8. WAV: Saves cleaned audio as CSV with Time (ms) and Amplitude columns
 
 Cleaned files are saved to C:\\github\\VT2\\data_opsamling_cleaned\\<subfolder>.
 Run with: python data_cleaning.py <subfolder>
@@ -22,19 +24,21 @@ import json
 import shutil
 import sys
 from pathlib import Path
+import librosa
+import numpy as np
 
-DATA_ROOT = Path(r"C:\github\VT2\data_opsamling")
-OUTPUT_ROOT = Path(r"C:\github\VT2\data_opsamling_cleaned")
+DATA_ROOT = Path(__file__).parent.parent / "data_opsamling"
+OUTPUT_ROOT = Path(__file__).parent.parent / "data_opsamling_cleaned"
 
 # Old dataset (from earlier project)
-OLD_DATA_ROOT = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
-OLD_OUTPUT_ROOT = Path(r"C:\github\VT2\data_old_cleaned")
+OLD_DATA_ROOT = Path(__file__).parent.parent / "Data fra tidligere project" / "Dataset"
+OLD_OUTPUT_ROOT = Path(__file__).parent.parent / "data_old_cleaned"
 
 # ── Config ───────────────────────────────────────────────────────────────────
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"] Old data is from earlier project, different structure and signals than new data
 PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
-FOLDERS_OLD = ["Intrinsic data", "Task data"]  # For old data: which subfolders to include
-
+FOLDERS_OLD = ["Extrinsic data"]  # For old data: which subfolders to include "Intrinsic data", "Task data", "Extrinsic data"
+SAMPLERATE = 2200  # Sample rate to use when loading WAV files. Set to None to keep original sample rate.
 
 def load_json(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -44,6 +48,11 @@ def load_json(filepath):
 def save_json(data, filepath):
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f)
+
+def load_wav(filepath, sr=None):
+    """Load a WAV file with librosa, returning the audio time series and sample rate."""
+    y, sr = librosa.load(filepath, sr=sr, mono=True)
+    return y, sr
 
 
 def clean_task_df(df):
@@ -220,6 +229,24 @@ def clean_subfolder(data_dir, output_dir):
 
     return total_actions
 
+def clean_wav(filepath, output_path, sr=None):
+    """Clean a single WAV file. Returns list of actions taken."""
+    Actions = []
+    y, sr = load_wav(filepath, sr=sr)
+    df = pd.DataFrame({"Time (ms)": np.arange(len(y)) / sr * 1000, "Amplitude": y})
+       
+    # Check for NaN
+    nan_count = df["Amplitude"].isnull().sum()
+    if nan_count > 0:
+        Actions.append(f"  WARNING: {nan_count} NaN values found in audio — replaced with 0")
+        df["Amplitude"] = df["Amplitude"].fillna(0)
+
+    df.to_csv(output_path, index=False)
+    outpath = output_path.relative_to(OLD_OUTPUT_ROOT.parent.parent) 
+    Actions.append(f"  Audio saved to {outpath}")
+
+    return Actions
+
 
 def main():
     # Resolve subfolders from config
@@ -277,7 +304,18 @@ def main():
                     else:
                         print(f"{f.name}: OK")
                 for f in wav_files:
-                    shutil.copy2(f, out_dir / f.name)
+                    out = out_dir / f.name.replace(".wav", ".csv")
+                    actions = clean_wav(f, out, sr=SAMPLERATE)
+                    if actions:
+                        print(f"{f.name}:")
+                        for a in actions:
+                            print(a)
+                        grand_total += len(actions)
+                    else:
+                        print(f"{f.name}: OK")
+        Path(OLD_OUTPUT_ROOT / "Extrinsic data" / "samplerate.txt").write_text(f"{"44100" if SAMPLERATE is None else SAMPLERATE}")       
+                    
+                
 
     print(f"\nDone! {grand_total} total fixes applied.")
 
