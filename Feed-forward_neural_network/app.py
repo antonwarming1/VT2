@@ -11,6 +11,7 @@ import sys
 import time
 from pathlib import Path
 
+import joblib
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
@@ -33,14 +34,18 @@ CLASS_META = {
 }
 
 MODEL_PATH    = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
+SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
+RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
 FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
 
 # ── Lazy singletons ───────────────────────────────────────────────────────────
 
 _model           = None
+_svm_model       = None
+_rf_model        = None
 _df              = None
 _scaler          = None
-_raw_pairs       = None
+_raw_pairs_by_model = {}
 _task_kind_fc    = None
 _intr_kind_fc    = None
 _selected_cols   = None
@@ -53,6 +58,20 @@ def get_model():
     return _model
 
 
+def get_svm_model():
+    global _svm_model
+    if _svm_model is None:
+        _svm_model = joblib.load(SVM_MODEL_PATH)
+    return _svm_model
+
+
+def get_rf_model():
+    global _rf_model
+    if _rf_model is None:
+        _rf_model = joblib.load(RF_MODEL_PATH)
+    return _rf_model
+
+
 def get_df_and_scaler():
     global _df, _scaler
     if _df is None:
@@ -61,17 +80,25 @@ def get_df_and_scaler():
     return _df, _scaler
 
 
-def get_inference_assets():
-    global _raw_pairs, _task_kind_fc, _intr_kind_fc, _selected_cols
-    if _raw_pairs is None:
-        import inference_pipeline as ip
-        _raw_pairs = ip.list_test_pairs()
+def get_inference_assets(model_name="fnn"):
+    global _task_kind_fc, _intr_kind_fc, _selected_cols
+    import inference_pipeline as ip
+
+    # Shared assets (features list, tsfresh params) — build once
+    if _selected_cols is None:
         df, _ = get_df_and_scaler()
         _selected_cols = list(df.columns)
         _task_kind_fc, _intr_kind_fc = ip.build_kind_fc_parameters(_selected_cols)
-        print(f">> inference assets ready: {len(_raw_pairs)} test-set pairs, "
-              f"{len(_selected_cols)} features")
-    return _raw_pairs, _task_kind_fc, _intr_kind_fc, _selected_cols
+        print(f">> shared inference assets ready: {len(_selected_cols)} features")
+
+    # Per-model test pairs — each model has its own held-out split
+    if model_name not in _raw_pairs_by_model:
+        _raw_pairs_by_model[model_name] = ip.list_test_pairs(model_name)
+        print(f">> [{model_name}] test pairs ready: "
+              f"{len(_raw_pairs_by_model[model_name])} samples")
+
+    return (_raw_pairs_by_model[model_name],
+            _task_kind_fc, _intr_kind_fc, _selected_cols)
 
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
@@ -84,30 +111,38 @@ class ScrewResult(BaseModel):
     label:       str
     full:        str
     color:       str
-    confidence:  float
+    confidence:  Optional[float]
     true_label:  str
     true_full:   str
     correct:     bool
     base_id:     str
 
 
+@app.get("/api/models")
+def list_models():
+    return {"models": ["fnn", "svm", "rf"]}
+
+
 @app.on_event("startup")
 async def startup():
-    print(">> startup: loading model...")
+    print(">> startup: loading FNN model...")
     get_model()
-    print(">> startup: model loaded. loading features CSV + scaler...")
+    print(">> startup: loading SVM model...")
+    get_svm_model()
+    print(">> startup: loading RF model...")
+    get_rf_model()
+    print(">> startup: all models loaded. loading features CSV + scaler...")
     get_df_and_scaler()
     print(">> startup: scaler ready. Server is up — inference assets will load on first request.")
 
 
-def _predict_one_instance(screw_number: int) -> ScrewResult:
+def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewResult:
     """Pick one random raw pair, run pipeline, return prediction."""
     import inference_pipeline as ip
 
     t0 = time.perf_counter()
-    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets()
+    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets(model_name)
     _, scaler = get_df_and_scaler()
-    model = get_model()
     t_assets = time.perf_counter()
     print(f"[screw {screw_number}] assets ready:     {t_assets - t0:.3f}s")
 
@@ -131,12 +166,24 @@ def _predict_one_instance(screw_number: int) -> ScrewResult:
 
         t_inf0 = time.perf_counter()
         X = scaler.transform(feat_series.values.reshape(1, -1))
-        probs = model.predict(X, verbose=0)[0]
+
+        if model_name == "svm":
+            cls  = int(get_svm_model().predict(X)[0])
+            conf = None
+        elif model_name == "rf":
+            rf     = get_rf_model()
+            cls    = int(rf.predict(X)[0])
+            probs  = rf.predict_proba(X)[0]
+            conf   = round(float(probs[cls]) * 100, 1)
+        else:  # fnn
+            probs  = get_model().predict(X, verbose=0)[0]
+            cls    = int(np.argmax(probs))
+            conf   = round(float(probs[cls]) * 100, 1)
+
         t_inf1 = time.perf_counter()
         print(f"[screw {screw_number}] model inference:  {t_inf1 - t_inf0:.3f}s")
         print(f"[screw {screw_number}] TOTAL:            {t_inf1 - t0:.3f}s")
 
-        cls = int(np.argmax(probs))
         pred_label = CLASS_LABELS[cls]
 
         return ScrewResult(
@@ -144,7 +191,7 @@ def _predict_one_instance(screw_number: int) -> ScrewResult:
             label      = pred_label,
             full       = CLASS_META[pred_label]["full"],
             color      = CLASS_META[pred_label]["color"],
-            confidence = round(float(probs[cls]) * 100, 1),
+            confidence = conf,
             true_label = label,
             true_full  = CLASS_META[label]["full"],
             correct    = pred_label == label,
@@ -156,8 +203,8 @@ def _predict_one_instance(screw_number: int) -> ScrewResult:
 
 
 @app.get("/api/predict_one", response_model=ScrewResult)
-def predict_one(screw: int = 1):
-    return _predict_one_instance(screw)
+def predict_one(screw: int = 1, model: str = "fnn"):
+    return _predict_one_instance(screw, model)
 
 
 # ── React SPA (served inline, no build step) ──────────────────────────────────
@@ -265,7 +312,7 @@ HTML = r"""<!DOCTYPE html>
           R("text", { x: ttCx, y: lineY(14), textAnchor: "middle",
             fontSize: "11", fontWeight: "700", fill: result.color,
             fontFamily: "Segoe UI, system-ui, sans-serif" },
-            `${result.full} (${result.confidence}%)`
+            `${result.full}${result.confidence != null ? ` (${result.confidence}%)` : ""}`
           ),
           showTrue && R("text", { x: ttCx, y: lineY(30), textAnchor: "middle",
             fontSize: "10", fill: result.correct ? "#86efac" : "#fca5a5",
@@ -384,28 +431,103 @@ HTML = r"""<!DOCTYPE html>
       );
     }
 
+    function PredictionsTable({ history, showTrue }) {
+      if (history.length === 0) return null;
+
+      const cellBase = {
+        padding: "8px 12px", fontSize: 12, textAlign: "left",
+        borderBottom: "1px solid #334155",
+      };
+      const headerCell = { ...cellBase, color: "#94a3b8", fontWeight: 700,
+        textTransform: "uppercase", letterSpacing: "0.05em", fontSize: 11 };
+
+      // Flatten history into rows: [{round, screw, result}, ...]
+      const rows = [];
+      history.forEach((round, rIdx) => {
+        round.forEach((result, sIdx) => {
+          rows.push({ round: rIdx + 1, screw: sIdx + 1, result });
+        });
+      });
+
+      const correctCount = rows.filter(r => r.result.correct).length;
+      const accuracy     = rows.length > 0 ? (correctCount / rows.length) * 100 : 0;
+
+      return R("div", {
+        style: { background: "#1e293b", borderRadius: 12,
+          padding: "20px 28px", marginTop: 20, width: SVG_W }
+      },
+        R("div", {
+          style: { display: "flex", justifyContent: "space-between",
+            alignItems: "center", marginBottom: 16 }
+        },
+          R("span", { style: { fontWeight: 700, fontSize: 15 } }, "Predictions"),
+          showTrue && R("span", { style: { color: "#94a3b8", fontSize: 12 } },
+            `${correctCount}/${rows.length} correct (${accuracy.toFixed(1)}%)`)
+        ),
+        R("div", { style: { overflowX: "auto" } },
+          R("table", { style: { width: "100%", borderCollapse: "collapse" } },
+            R("thead", null,
+              R("tr", null,
+                R("th", { style: headerCell }, "Round"),
+                R("th", { style: headerCell }, "Screw"),
+                R("th", { style: headerCell }, "Predicted"),
+                showTrue && R("th", { style: headerCell }, "True"),
+                showTrue && R("th", { style: headerCell }, "Correct"),
+                R("th", { style: headerCell }, "Confidence"),
+                R("th", { style: headerCell }, "ID")
+              )
+            ),
+            R("tbody", null,
+              ...rows.map((row, i) => {
+                const r = row.result;
+                return R("tr", { key: i },
+                  R("td", { style: cellBase }, row.round),
+                  R("td", { style: cellBase }, `#${row.screw}`),
+                  R("td", { style: { ...cellBase, color: r.color, fontWeight: 700 } },
+                    `${r.label} – ${r.full}`),
+                  showTrue && R("td", { style: cellBase }, r.true_label),
+                  showTrue && R("td", { style: { ...cellBase,
+                    color: r.correct ? "#86efac" : "#fca5a5", fontWeight: 700 } },
+                    r.correct ? "✓" : "✗"),
+                  R("td", { style: cellBase },
+                    r.confidence != null ? `${r.confidence}%` : "—"),
+                  R("td", { style: { ...cellBase, color: "#64748b", fontFamily: "monospace" } },
+                    r.base_id)
+                );
+              })
+            )
+          )
+        )
+      );
+    }
+
     /* ── Root App ── */
     function App() {
       const emptySlots = () => Array.from({ length: N }, () => ({ status: "empty", result: null }));
 
-      const [slots,    setSlots]    = useState(emptySlots());
-      const [history,  setHistory]  = useState([]);
-      const [running,  setRunning]  = useState(false);
-      const [error,    setError]    = useState(null);
-      const [showTrue, setShowTrue] = useState(false);
-      const abortRef = useRef(false);
+      const [slots,     setSlots]     = useState(emptySlots());
+      const [history,   setHistory]   = useState([]);
+      const [running,   setRunning]   = useState(false);
+      const [error,     setError]     = useState(null);
+      const [showTrue,  setShowTrue]  = useState(false);
+      const [modelName, setModelName] = useState("fnn");
+      // Session ID prevents stale in-flight loops from updating state after
+      // Reset/Restart. Each run captures its own ID; any setSlots call from
+      // a session whose ID no longer matches sessionRef.current is ignored.
+      const sessionRef = useRef(0);
 
-      const runPredictions = useCallback(async (freshSlots) => {
+      const runPredictions = useCallback(async () => {
+        const mySession = ++sessionRef.current;
         setRunning(true);
         setError(null);
-        abortRef.current = false;
         const roundResults = [];
 
         for (let i = 0; i < N; i++) {
-          if (abortRef.current) break;
+          if (mySession !== sessionRef.current) return;
 
           // Mark this screw as working
           setSlots(prev => {
+            if (mySession !== sessionRef.current) return prev;
             const next = [...prev];
             next[i] = { status: "working", result: null };
             return next;
@@ -414,23 +536,26 @@ HTML = r"""<!DOCTYPE html>
           // Run pipeline and 4-second screw timer in parallel — result is
           // ready by the time the physical process finishes.
           const delay   = new Promise(r => setTimeout(r, 4000));
-          const fetchFn = fetch(`/api/predict_one?screw=${i + 1}`)
+          const fetchFn = fetch(`/api/predict_one?screw=${i + 1}&model=${modelName}`)
             .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); });
-
-          if (abortRef.current) break;
 
           try {
             const [, data] = await Promise.all([delay, fetchFn]);
 
+            if (mySession !== sessionRef.current) return;
+
             setSlots(prev => {
+              if (mySession !== sessionRef.current) return prev;
               const next = [...prev];
               next[i] = { status: "done", result: data };
               return next;
             });
             roundResults.push(data);
           } catch (e) {
+            if (mySession !== sessionRef.current) return;
             setError(e.message);
             setSlots(prev => {
+              if (mySession !== sessionRef.current) return prev;
               const next = [...prev];
               next[i] = { status: "empty", result: null };
               return next;
@@ -439,20 +564,21 @@ HTML = r"""<!DOCTYPE html>
           }
         }
 
+        if (mySession !== sessionRef.current) return;
         if (roundResults.length > 0) {
           setHistory(prev => [...prev, roundResults]);
         }
         setRunning(false);
-      }, []);
+      }, [modelName]);
 
       const handleStart = useCallback(() => {
-        const fresh = emptySlots();
-        setSlots(fresh);
-        runPredictions(fresh);
+        sessionRef.current++;   // invalidate any in-flight run before starting
+        setSlots(emptySlots());
+        runPredictions();
       }, [runPredictions]);
 
       const handleReset = useCallback(() => {
-        abortRef.current = true;
+        sessionRef.current++;   // invalidate any in-flight run
         setSlots(emptySlots());
         setHistory([]);
         setError(null);
@@ -471,8 +597,24 @@ HTML = r"""<!DOCTYPE html>
       },
         R("h1", { style: { fontSize: "1.6rem", marginBottom: 4, letterSpacing: "0.05em" } },
           "Window Screw Fault Visualiser"),
-        R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 28 } },
-          "FNN · 5-class fault detection · full pipeline per screw"),
+        R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 16 } },
+          `${modelName.toUpperCase()} · 5-class fault detection · full pipeline per screw`),
+        R("div", { style: { display: "flex", gap: 8, marginBottom: 24 } },
+          ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "Random Forest"] ].map(([key, label]) =>
+            R("button", {
+              key,
+              disabled: running,
+              onClick: () => setModelName(key),
+              style: {
+                padding: "6px 18px", border: "none", borderRadius: 6, fontSize: 13,
+                fontWeight: 700, cursor: running ? "not-allowed" : "pointer",
+                background: modelName === key ? "#2563eb" : "#1e293b",
+                color: modelName === key ? "#fff" : "#94a3b8",
+                transition: "background 0.15s",
+              }
+            }, label)
+          )
+        ),
         R(Legend, null),
         R("div", { style: { borderRadius: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.6)", overflow: "visible" } },
           R(WindowScene, { slots, showTrue })
@@ -495,7 +637,8 @@ HTML = r"""<!DOCTYPE html>
             style: { ...btnBase, background: "#7c3aed" }
           }, "✕ Reset")
         ),
-        R(Dashboard, { history })
+        R(Dashboard, { history }),
+        R(PredictionsTable, { history, showTrue })
       );
     }
 

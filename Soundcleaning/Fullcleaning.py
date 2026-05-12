@@ -9,16 +9,20 @@ from pathlib import Path
 # INDSTILLINGER - REDIGÉR KUN DET HER
 # ============================================================
 
-BASE_PATH = Path(r"C:\Users\Nicok\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2")
-
 # Mappe med de originale lydfiler
-INPUT_FOLDER = BASE_PATH / r"Data fra tidligere project\Dataset\Extrinsic data\OT"
+INPUT_FOLDER = Path(
+    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Data fra tidligere project\Dataset\Extrinsic data\UT"
+)
 
 # Rodmappe, hvor den nye cleaned mappe skal oprettes
-OUTPUT_ROOT = BASE_PATH / "Soundcleaning"
+OUTPUT_ROOT = Path(
+    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning"
+)
 
 # Støjreference
-NOISE_FILE = BASE_PATH / r"Soundcleaning\Optaget_støj.wav"
+NOISE_FILE = Path(
+    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning\Optaget_støj.wav"
+)
 
 # Filnavnssuffix, så fx fil.wav bliver til fil_C.wav
 OUTPUT_SUFFIX = "_C"
@@ -62,11 +66,12 @@ def validate_cutoffs(lowcut, highcut, samplerate):
             f"HIGHCUT skal være mindre end Nyquist-frekvensen ({nyquist:.2f} Hz)."
         )
 
-def lowpass_filter(data, samplerate, highcut, order=6):
+def bandpass_filter(data, samplerate, lowcut, highcut, order=6):
     nyquist = samplerate / 2
+    low = lowcut / nyquist
     high = highcut / nyquist
 
-    sos = butter(order, high, btype="lowpass", output="sos")
+    sos = butter(order, [low, high], btype="bandpass", output="sos")
     filtered = sosfiltfilt(sos, data, axis=0)
     return filtered
 
@@ -122,13 +127,13 @@ def process_file(input_file: Path, output_file: Path, noise_cache: dict):
     )
 
     # Frekvensfilter
-    y_filtered = lowpass_filter(y_clean, sr_old, HIGHCUT, FILTER_ORDER)
+    y_filtered = bandpass_filter(y_clean, sr_old, LOWCUT, HIGHCUT, FILTER_ORDER)
 
     # Gain
-    # y_gained = apply_gain_db(y_filtered, GAIN_DB)
+    y_gained = apply_gain_db(y_filtered, GAIN_DB)
 
     # Clipping check
-    y_final = handle_clipping(y_filtered, AUTO_NORMALIZE_IF_CLIPPING)
+    y_final = handle_clipping(y_gained, AUTO_NORMALIZE_IF_CLIPPING)
 
     # Gem
     output_file.parent.mkdir(parents=True, exist_ok=True)

@@ -37,9 +37,11 @@ RAW_ROOT    = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
 LABELS_PATH = Path(r"C:\github\VT2\Feature_engineering\labels.csv")
 LABELS      = ["N", "NS", "OT", "P", "UT"]
 
-# Must match FNN.py Config exactly so we reconstruct the identical split
+# Each model was trained with its own test split — reconstruct the matching one
+# so the app only ever evaluates a model on samples it never saw during training.
 _RANDOM_STATE = 42
-_TEST_SIZE    = 0.1
+MODEL_TEST_SIZES = {"fnn": 0.1, "svm": 0.2, "rf": 0.2}
+_DEFAULT_TEST_SIZE = MODEL_TEST_SIZES["fnn"]
 
 
 def list_raw_pairs():
@@ -62,20 +64,20 @@ def list_raw_pairs():
     return pairs
 
 
-def list_test_pairs():
+def list_test_pairs(model_name="fnn"):
     """
-    Return only the pairs that were in the held-out test set during training.
-
-    Reconstructs the identical 10% stratified split used in FNN.py
-    (random_state=42) so we never evaluate on training or validation data.
+    Return only the pairs that were in the held-out test set during training
+    for the given model. Each model uses its own test_size (see MODEL_TEST_SIZES)
+    so we never evaluate it on samples it saw during training.
     """
+    test_size = MODEL_TEST_SIZES.get(model_name, _DEFAULT_TEST_SIZE)
     all_pairs = list_raw_pairs()
     y = pd.read_csv(LABELS_PATH, index_col=0).values.flatten()
 
     indices = np.arange(len(y))
     _, test_idx = train_test_split(
         indices,
-        test_size=_TEST_SIZE,
+        test_size=test_size,
         random_state=_RANDOM_STATE,
         stratify=y,
     )
