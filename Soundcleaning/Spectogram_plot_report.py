@@ -60,7 +60,7 @@ YMAX_GAINED = 2000
 # Hvilke plots der skal laves (True/False)
 #                    [Input, Noise, Denoised, Bodeplot, Filtered, Gained]
 PlotInput = np.array([False, False, False,    False,    True,     False])
-PlotInput = np.array([True,  True,  True,     False,    True,     False])
+#PlotInput = np.array([True,  True,  True,     False,    True,     False])
 
 # Vis plot titler (slås fra for at gemme til rapporten)
 PLOT_TITLES = False
@@ -85,9 +85,8 @@ def validate_cutoffs(lowcut, highcut, samplerate):
 
 def lowpass_filter(data, samplerate, highcut, order=6, plot_response=False, fignum=1):
     nyquist = samplerate / 2
-    high = highcut / nyquist
 
-    sos = butter(order, high, btype="lowpass", output="sos")
+    sos = butter(order, highcut, btype="lowpass", output="sos", fs=samplerate)
     filtered = sosfiltfilt(sos, data, axis=0)
     if plot_response:
         plot_frequency_response(sos, nyquist, order, fig_num=fignum)

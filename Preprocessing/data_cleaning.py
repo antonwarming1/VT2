@@ -9,6 +9,8 @@ Cleans CSV and JSON data files in C:\\github\\VT2\\data_opsamling\\<subfolder>:
 4. JSON: Clips negative Current values to 0
 5. JSON: Checks for and reports NaN values
 6. JSON: Fixes Angle unit encoding (Â° -> °)
+7. WAV: Checks for and reports NaN values in audio, replaces with 0
+8. WAV: Saves cleaned audio as CSV with Time (ms) and Amplitude columns
 
 Cleaned files are saved to C:\\github\\VT2\\data_opsamling_cleaned\\<subfolder>.
 Run with: python data_cleaning.py <subfolder>
@@ -36,7 +38,7 @@ OLD_OUTPUT_ROOT = Path(__file__).parent.parent / "data_old_cleaned"
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"] Old data is from earlier project, different structure and signals than new data
 PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
 FOLDERS_OLD = ["Extrinsic data"]  # For old data: which subfolders to include "Intrinsic data", "Task data", "Extrinsic data"
-
+SAMPLERATE = 2200  # Sample rate to use when loading WAV files. Set to None to keep original sample rate.
 
 def load_json(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -303,7 +305,7 @@ def main():
                         print(f"{f.name}: OK")
                 for f in wav_files:
                     out = out_dir / f.name.replace(".wav", ".csv")
-                    actions = clean_wav(f, out, sr=4000)
+                    actions = clean_wav(f, out, sr=SAMPLERATE)
                     if actions:
                         print(f"{f.name}:")
                         for a in actions:
@@ -311,6 +313,9 @@ def main():
                         grand_total += len(actions)
                     else:
                         print(f"{f.name}: OK")
+        Path(OLD_OUTPUT_ROOT / "Extrinsic data" / "samplerate.txt").write_text(f"{"44100" if SAMPLERATE is None else SAMPLERATE}")       
+                    
+                
 
     print(f"\nDone! {grand_total} total fixes applied.")
 

@@ -15,7 +15,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
-from scipy.signal import savgol_filter
+from scipy.signal import savgol_filter, butter, sosfiltfilt
+import noisereduce as nr
+import librosa
+
 
 
 # ── Config ───────────────────────────────────────────────────────────────────
@@ -34,7 +37,7 @@ OLD_OUTPUT_ROOT.mkdir(exist_ok=True)
 
 # ── Config ───────────────────────────────────────────────────────────────────
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"]
-FOLDERS_OLD = ["Intrinsic data", "Task data", "Extrinsic data"]  # For old data: which subfolders to include
+FOLDERS_OLD = ["Extrinsic data"]  # For old data: which subfolders to include
 
 RESAMPLE_MS    = 2       # Target sample interval (ms)
 IDLE_DEPTH_RATE = 0.005  # Depth rate threshold (mm/ms) to detect screwing start
@@ -48,6 +51,9 @@ SMOOTH_COLS_INTR = ["Torque (Nm)", "Current (V)"]  # Which Intrinsic/JSON column
 SAVGOL_WINDOW  = 11              # Must be odd
 SAVGOL_POLY    = 3
 
+EXTRINSIC_ONLY = True            # If True, only preprocess the Extrinsic data from the old dataset (no Task/Intrinsic pairs)
+SAMPLERATE = int(Path(OLD_DATA_ROOT / "Extrinsic data" / "samplerate.txt").read_text().strip())
+Y_NOISE, sr_noise = librosa.load(Path(__file__).parent.parent / "soundcleaning" / "Optaget_støj.wav", sr = SAMPLERATE, mono=True)
 
 # ── JSON helpers ─────────────────────────────────────────────────────────────
 
@@ -344,6 +350,43 @@ def preprocess_old_pair_df(task_df, intr_df):
 
     return task_df, intr_df
 
+# ------------------- Audio preprocessing functions -------------------
+
+def lowpass_filter(data, samplerate, highcut, order=6):
+    nyquist = samplerate / 2
+    high = highcut / nyquist
+
+    sos = butter(order, high, btype="lowpass", output="sos")
+    filtered = sosfiltfilt(sos, data, axis=0)
+    return filtered
+
+def preprocess_audio(file_path, out_path, samplerate):
+    """Read csv, apply noise reduction and lowpass filter, save cleaned csv."""
+    if not file_path.exists():
+        raise FileNotFoundError(f"Audio file not found: {file_path}")
+    
+    samplerate = int(samplerate)
+    if samplerate <= 0:
+        raise ValueError(f"Invalid samplerate: {samplerate}")
+    
+    df = pd.read_csv(file_path)
+    if "Amplitude" not in df.columns:
+        raise ValueError(f"'Amplitude' column not found in {file_path}")
+    df["Amplitude"] = nr.reduce_noise(
+        y = df["Amplitude"].to_numpy(dtype=np.float32),
+        sr = samplerate,
+        y_noise = Y_NOISE,
+        freq_mask_smooth_hz=100,
+        time_mask_smooth_ms=128,
+        prop_decrease = 0.8,
+        stationary = False
+        )
+    df["Amplitude"] = lowpass_filter(df["Amplitude"].values, samplerate, highcut=1000)
+
+    df.to_csv(out_path, index=False)
+    print(f"Processed audio saved to {out_path.relative_to(OLD_DATA_ROOT.parent)}")
+
+
 
 def main():
     """Find all CSV/JSON pairs in the configured subfolders and preprocess them."""
@@ -384,7 +427,7 @@ def main():
         print(f"{'#'*50}")
         intrinsic_root = OLD_DATA_ROOT / "Intrinsic data"
         task_root = OLD_DATA_ROOT / "Task data"
-        if not intrinsic_root.exists() or not task_root.exists():
+        if not intrinsic_root.exists() or not task_root.exists() or EXTRINSIC_ONLY:
             print("  Old dataset not found, skipping.")
         else:
             for label_dir in sorted(intrinsic_root.iterdir()):
@@ -411,6 +454,30 @@ def main():
                         task_files[base_id], intr_files[base_id],
                         out_dir / f"t{base_id}.csv", out_dir / f"i{base_id}.csv"
                     )
+        if "Extrinsic data" in FOLDERS_OLD:
+            print(f"\n{'#'*50}")
+            print(f"  EXTRINSIC DATASET")
+            print(f"{'#'*50}")
+            extrinsic_root = OLD_DATA_ROOT / "Extrinsic data"
+            if not extrinsic_root.exists():
+                print("  Extrinsic dataset not found, skipping.")
+            else:
+                for Label_dir in sorted(extrinsic_root.iterdir()):
+                    if not Label_dir.is_dir():
+                        continue
+                    label = Label_dir.name
+                    out_dir = OLD_OUTPUT_ROOT / "Extrinsic data" / label
+                    out_dir.mkdir(parents=True, exist_ok=True)
+                    extr_files = {f.stem: f for f in sorted(Label_dir.glob("*.csv"))}
+                    for base in extr_files:
+                        preprocess_audio(Label_dir / f"{base}.csv", out_dir / f"{base}.csv", SAMPLERATE)
+                        
+                  
+                    
+                    
+                    
+
+
 
     print(f"\nDone! Output:", end="")
     if "new" in OLD_OR_NEW_DATA:
@@ -420,10 +487,10 @@ def main():
     print()
 
     # ── Visualize first instance after preprocessing ──
-    from Preprocessing.visualize_preprocessing import visualize_old_first_instance
+    """from Preprocessing.visualize_preprocessing import visualize_old_first_instance
     if "old" in OLD_OR_NEW_DATA and OLD_OUTPUT_ROOT.exists():
         print("\n── Visualizing first old-dataset sample ──")
-        visualize_old_first_instance(label="N", preprocessed_dir=OLD_OUTPUT_ROOT)
+        visualize_old_first_instance(label="N", preprocessed_dir=OLD_OUTPUT_ROOT)"""
 
 
 if __name__ == "__main__":
