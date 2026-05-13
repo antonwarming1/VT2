@@ -37,7 +37,7 @@ OLD_OUTPUT_ROOT = Path(__file__).parent.parent / "data_old_cleaned"
 # ── Config ───────────────────────────────────────────────────────────────────
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"] Old data is from earlier project, different structure and signals than new data
 PROCESS_SUBFOLDERS = ["--all"]         # For new data: ["Normal"], ["Normal","Under"], or ["--all"]
-FOLDERS_OLD = ["Extrinsic data"]  # For old data: which subfolders to include "Intrinsic data", "Task data", "Extrinsic data"
+FOLDERS_OLD = ["Extrinsic data", "Intrinsic data", "Task data"]  # For old data: which subfolders to include "Intrinsic data", "Task data", "Extrinsic data"
 SAMPLERATE = 2200  # Sample rate to use when loading WAV files. Set to None to keep original sample rate.
 
 def load_json(filepath):
@@ -313,7 +313,7 @@ def main():
                         grand_total += len(actions)
                     else:
                         print(f"{f.name}: OK")
-        Path(OLD_OUTPUT_ROOT / "Extrinsic data" / "samplerate.txt").write_text(f"{"44100" if SAMPLERATE is None else SAMPLERATE}")       
+        Path(OLD_OUTPUT_ROOT / "Extrinsic data" / "samplerate.txt").write_text(f"{'44100' if SAMPLERATE is None else SAMPLERATE}")
                     
                 
 

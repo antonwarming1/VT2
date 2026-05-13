@@ -180,7 +180,10 @@ def extract_from_long(df, name):
         show_warnings=False,
         disable_progressbar=False,
     )
-    impute(features)
+    unreliable = features.columns[features.isna().any()]
+    if len(unreliable):
+        features = features.drop(columns=unreliable)
+        print(f"  Dropped {len(unreliable)} features with any NaN across training instances")
     print(f"  {name} features: {features.shape}")
     return features
 

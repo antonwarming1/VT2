@@ -49,6 +49,7 @@ _raw_pairs_by_model = {}
 _task_kind_fc    = None
 _intr_kind_fc    = None
 _selected_cols   = None
+_training_means  = None
 
 
 def get_model():
@@ -81,13 +82,14 @@ def get_df_and_scaler():
 
 
 def get_inference_assets(model_name="fnn"):
-    global _task_kind_fc, _intr_kind_fc, _selected_cols
+    global _task_kind_fc, _intr_kind_fc, _selected_cols, _training_means
     import inference_pipeline as ip
 
     # Shared assets (features list, tsfresh params) — build once
     if _selected_cols is None:
         df, _ = get_df_and_scaler()
         _selected_cols = list(df.columns)
+        _training_means = df.mean()
         _task_kind_fc, _intr_kind_fc = ip.build_kind_fc_parameters(_selected_cols)
         print(f">> shared inference assets ready: {len(_selected_cols)} features")
 
@@ -98,7 +100,7 @@ def get_inference_assets(model_name="fnn"):
               f"{len(_raw_pairs_by_model[model_name])} samples")
 
     return (_raw_pairs_by_model[model_name],
-            _task_kind_fc, _intr_kind_fc, _selected_cols)
+            _task_kind_fc, _intr_kind_fc, _selected_cols, _training_means)
 
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
@@ -136,12 +138,12 @@ async def startup():
     print(">> startup: scaler ready. Server is up — inference assets will load on first request.")
 
 
-def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewResult:
+def _predict_one_instance(screw_number, model_name="fnn"):
     """Pick one random raw pair, run pipeline, return prediction."""
     import inference_pipeline as ip
 
     t0 = time.perf_counter()
-    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets(model_name)
+    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols, training_means = get_inference_assets(model_name)
     _, scaler = get_df_and_scaler()
     t_assets = time.perf_counter()
     print(f"[screw {screw_number}] assets ready:     {t_assets - t0:.3f}s")
@@ -156,6 +158,7 @@ def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewRe
             task_kind_to_fc=task_kind_fc,
             intr_kind_to_fc=intr_kind_fc,
             selected_columns=selected_cols,
+            training_means=training_means,
         )
         t_pipe1 = time.perf_counter()
         print(f"[screw {screw_number}] pipeline (attempt {attempt+1}): {t_pipe1 - t_pipe0:.3f}s  id={base_id}")

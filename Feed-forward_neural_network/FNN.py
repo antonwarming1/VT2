@@ -416,7 +416,7 @@ def main():
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
     solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
-   
+    
 
 if __name__ == "__main__":
     main()
