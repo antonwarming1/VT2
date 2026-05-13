@@ -287,7 +287,7 @@ def solo_model(X_train, X_test, y_train, y_test, config):
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
-SOLO_MODE = True   # set True to skip the search and quickly test the solo path
+SOLO_MODE = False   # set True to skip the search and quickly test the solo path
 
 def main():
     print("Random Forest — Multi-Class Classification\n")
