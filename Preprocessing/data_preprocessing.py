@@ -37,7 +37,7 @@ OLD_OUTPUT_ROOT.mkdir(exist_ok=True)
 
 # ── Config ───────────────────────────────────────────────────────────────────
 OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"]
-FOLDERS_OLD = ["Extrinsic data"]  # For old data: which subfolders to include
+FOLDERS_OLD = ["Extrinsic data", "Intrinsic data", "Task data"]  # For old data: which subfolders to include
 
 RESAMPLE_MS    = 2       # Target sample interval (ms)
 IDLE_DEPTH_RATE = 0.005  # Depth rate threshold (mm/ms) to detect screwing start
@@ -51,7 +51,7 @@ SMOOTH_COLS_INTR = ["Torque (Nm)", "Current (V)"]  # Which Intrinsic/JSON column
 SAVGOL_WINDOW  = 11              # Must be odd
 SAVGOL_POLY    = 3
 
-EXTRINSIC_ONLY = True            # If True, only preprocess the Extrinsic data from the old dataset (no Task/Intrinsic pairs)
+EXTRINSIC_ONLY = False            # If True, only preprocess the Extrinsic data from the old dataset (no Task/Intrinsic pairs)
 SAMPLERATE = int(Path(OLD_DATA_ROOT / "Extrinsic data" / "samplerate.txt").read_text().strip())
 Y_NOISE, sr_noise = librosa.load(Path(__file__).parent.parent / "soundcleaning" / "Optaget_støj.wav", sr = SAMPLERATE, mono=True)
 

@@ -30,7 +30,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
 
@@ -416,7 +416,7 @@ def main():
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
     solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
-   
+    
 
 if __name__ == "__main__":
     main()

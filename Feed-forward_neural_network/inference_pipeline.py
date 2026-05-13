@@ -114,12 +114,17 @@ def _extract_one_kind(long_df, kind_to_fc, prefix):
 
 
 def pipeline_one(task_csv_path, intr_csv_path, sample_id,
-                 task_kind_to_fc, intr_kind_to_fc, selected_columns):
+                 task_kind_to_fc, intr_kind_to_fc, selected_columns,
+                 training_means=None):
     """
     Run the full preprocessing + feature extraction pipeline for one raw instance.
 
     Returns a pd.Series of features aligned to selected_columns order,
     or None if no depth plateau detected (instance should be skipped).
+
+    training_means: pd.Series of per-column means from the training set.
+                    Used to fill features tsfresh cannot compute for this instance.
+                    Falls back to 0.0 if not provided.
     """
     # Step 1: Load and clean
     task_df = clean_task_df(pd.read_csv(task_csv_path))
@@ -145,5 +150,9 @@ def pipeline_one(task_csv_path, intr_csv_path, sample_id,
 
     # Step 6: Combine and reindex to exact selected column order
     all_feats = pd.concat([task_feats, intr_feats], axis=1)
-    all_feats = all_feats.reindex(columns=selected_columns, fill_value=0.0)
+    all_feats = all_feats.reindex(columns=selected_columns)
+    if training_means is not None:
+        all_feats = all_feats.fillna(training_means)
+    else:
+        all_feats = all_feats.fillna(0.0)
     return all_feats.iloc[0]
