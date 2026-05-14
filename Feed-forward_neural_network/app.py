@@ -23,13 +23,13 @@ from sklearn.preprocessing import StandardScaler
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "P", 4: "UT"}
+CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "NE", 4: "UT"}
 
 CLASS_META = {
     "N":  {"full": "Normal",          "color": "#22c55e"},
-    "NS": {"full": "Not Screwed",     "color": "#6b7280"},
+    "NS": {"full": "No Screw",     "color": "#6b7280"},
     "OT": {"full": "Over Tightened",  "color": "#ef4444"},
-    "P":  {"full": "Partial",         "color": "#f59e0b"},
+    "NE":  {"full": "No Engage",         "color": "#f59e0b"},
     "UT": {"full": "Under Tightened", "color": "#3b82f6"},
 }
 
@@ -267,7 +267,7 @@ HTML = r"""<!DOCTYPE html>
       N:  { full: "Normal",          color: "#22c55e" },
       NS: { full: "Not Screwed",     color: "#6b7280" },
       OT: { full: "Over Tightened",  color: "#ef4444" },
-      P:  { full: "Partial",         color: "#f59e0b" },
+      NE:  { full: "No Engage",         color: "#f59e0b" },
       UT: { full: "Under Tightened", color: "#3b82f6" },
     };
 
@@ -599,11 +599,11 @@ HTML = r"""<!DOCTYPE html>
           alignItems: "center", padding: "40px 16px" }
       },
         R("h1", { style: { fontSize: "1.6rem", marginBottom: 4, letterSpacing: "0.05em" } },
-          "Window Screw Fault Visualiser"),
+          "Dashboard"),
         R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 16 } },
-          `${modelName.toUpperCase()} · 5-class fault detection · full pipeline per screw`),
+          `${modelName.toUpperCase()} · 5-class fault detection`),
         R("div", { style: { display: "flex", gap: 8, marginBottom: 24 } },
-          ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "Random Forest"] ].map(([key, label]) =>
+          ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "RF"] ].map(([key, label]) =>
             R("button", {
               key,
               disabled: running,
@@ -630,7 +630,7 @@ HTML = r"""<!DOCTYPE html>
             onClick: handleStart, disabled: running,
             style: { ...btnBase, background: running ? "#334155" : "#2563eb",
               cursor: running ? "not-allowed" : "pointer" }
-          }, running ? "Running pipeline…" : "⟳ Resample & Predict"),
+          }, running ? "Running pipeline…" : "⟳ Start Prediction"),
           R("button", {
             onClick: () => setShowTrue(v => !v),
             style: { ...btnBase, background: showTrue ? "#0f766e" : "#334155" }

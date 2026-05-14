@@ -36,6 +36,7 @@ from Feature_engineering.code import _csv_df_to_long
 RAW_ROOT    = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
 LABELS_PATH = Path(r"C:\github\VT2\Feature_engineering\labels.csv")
 LABELS      = ["N", "NS", "OT", "P", "UT"]
+_LABEL_REMAP = {"P": "NE"}
 
 # Each model was trained with its own test split — reconstruct the matching one
 # so the app only ever evaluates a model on samples it never saw during training.
@@ -58,8 +59,9 @@ def list_raw_pairs():
 
         task_files = {f.stem[1:]: f for f in sorted(task_dir.glob("t*.csv"))}
         intr_files = {f.stem[1:]: f for f in sorted(intr_dir.glob("i*.csv"))}
+        mapped_label = _LABEL_REMAP.get(label, label)
         for base_id in sorted(task_files.keys() & intr_files.keys()):
-            pairs.append((label, base_id, task_files[base_id], intr_files[base_id]))
+            pairs.append((mapped_label, base_id, task_files[base_id], intr_files[base_id]))
 
     return pairs
 
