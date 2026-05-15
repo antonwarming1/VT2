@@ -33,7 +33,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_extracted_audio.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "RandomForest" / "trained_rf.joblib"
 
@@ -43,12 +43,12 @@ class Config:
     RANDOM_STATE = 42
 
     # Hyperparameter defaults (overwritten by the best search result before final training)
-    N_ESTIMATORS = 100
+    N_ESTIMATORS = 30
     MAX_DEPTH = None
     MIN_SAMPLES_SPLIT = 2
-    MIN_SAMPLES_LEAF = 1
+    MIN_SAMPLES_LEAF = 5
     MAX_FEATURES = "sqrt"
-    CLASS_WEIGHT = None
+    CLASS_WEIGHT = "balanced"
 
     CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "P", 4: "UT"}
 
