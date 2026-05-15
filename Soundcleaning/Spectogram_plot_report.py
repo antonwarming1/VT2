@@ -1,5 +1,5 @@
 import numpy as np
-import soundfile as sf
+#import soundfile as sf
 import librosa
 import noisereduce as nr
 from scipy.signal import butter, sosfiltfilt
@@ -13,23 +13,20 @@ import matplotlib.pyplot as plt
 # ============================================================
 
 # Kun én inputfil
-INPUT_AUDIO_FILE = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Data fra tidligere project\Dataset\Extrinsic data\N\e030520236057.wav"
-    
-)
+INPUT_AUDIO_FILE = Path(__file__).parent.parent / "Data fra tidligere project" / "Dataset" / "Extrinsic data" / "N" / "e030520236057.wav"
 
 # Støjreference
-NOISE_AUDIO_FILE = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning\Optaget_støj.wav"
-)
+NOISE_AUDIO_FILE = Path(__file__).parent.parent / "Soundcleaning" / "Optaget_støj.wav"
+
 
 # Hvor outputfilen skal gemmes
-OUTPUT_ROOT = Path(
-    r"C:\Users\mjuul\OneDrive - Aalborg Universitet\Dokumenter\GitHub\VT2\Soundcleaning"
-)
+OUTPUT_ROOT = Path(__file__).parent.parent / "Soundcleaning"
 
 # Filnavnssuffix, så fx fil.wav bliver til fil_P.wav
 OUTPUT_SUFFIX = "_P"
+
+# Samplerate brugt
+SAMPLERATE = 2200
 
 # Noise reduction
 PROP_DECREASE = 0.8
@@ -50,7 +47,7 @@ AUTO_NORMALIZE_IF_CLIPPING = True
 N_FFT = 2048
 HOP_LENGTH = 512
 WINDOW = "hann"
-DB_FLOOR = -120  # nederste dB-grænse i spektrogrammet
+DB_FLOOR = -50  # nederste dB-grænse i spektrogrammet
 
 # Y-akser:
 # None = brug hele Nyquist-området automatisk
@@ -88,8 +85,7 @@ def validate_cutoffs(lowcut, highcut, samplerate):
             f"HIGHCUT skal være mindre end Nyquist-frekvensen ({nyquist:.2f} Hz)."
         )
 
-def bandpass_filter(data, samplerate, lowcut, highcut, order=6):
-    nyquist = samplerate / 2
+def bandpass_filter(data, samplerate, highcut, order=6):
 
     sos = butter(order, highcut, btype="lowpass", output="sos", fs=samplerate)
     filtered = sosfiltfilt(sos, data, axis=0)
@@ -166,7 +162,7 @@ def process_single_file():
     # 1. Load input lydfil
     # --------------------------------------------------------
     print("1) Loader input lydfil...")
-    y_old, sr_old = librosa.load(str(INPUT_AUDIO_FILE), sr=None, mono=True)
+    y_old, sr_old = librosa.load(str(INPUT_AUDIO_FILE), sr=SAMPLERATE, mono=True)
     validate_cutoffs(LOWCUT, HIGHCUT, sr_old)
 
     # --------------------------------------------------------
@@ -185,7 +181,7 @@ def process_single_file():
     # 3. Load støjfil
     # --------------------------------------------------------
     print("3) Loader støjfil...")
-    y_noise, sr_noise = librosa.load(str(NOISE_AUDIO_FILE), sr=None, mono=True)
+    y_noise, sr_noise = librosa.load(str(NOISE_AUDIO_FILE), sr=SAMPLERATE, mono=True)
 
     if sr_noise != sr_old:
         print(f"   Resampler støjfil fra {sr_noise} Hz til {sr_old} Hz...")
@@ -211,6 +207,8 @@ def process_single_file():
         y=y_old,
         sr=sr_old,
         y_noise=y_noise,
+        freq_mask_smooth_hz=100,
+        time_mask_smooth_ms=128,
         prop_decrease=PROP_DECREASE,
         stationary=STATIONARY
     )
@@ -228,7 +226,7 @@ def process_single_file():
     # 6. Cut alt over 1000 Hz og plot
     # --------------------------------------------------------
     print("6) Filtrerer til 1-1000 Hz...")
-    y_filtered = bandpass_filter(y_clean, sr_old, LOWCUT, HIGHCUT, FILTER_ORDER)
+    y_filtered = bandpass_filter(y_clean, sr_old, HIGHCUT, FILTER_ORDER)
 
     print("   Plotter spectrogram efter frekvens-cut...")
     plot_spectrogram(
@@ -236,7 +234,7 @@ def process_single_file():
         sr_old,
         f"Frequency-isolation ({LOWCUT}-{HIGHCUT} Hz)",
         fig_num=4,
-        ymax=YMAX_FILTERED
+        ymax=1100
     )
 
     # --------------------------------------------------------
@@ -258,7 +256,7 @@ def process_single_file():
     # Gem outputfil
     output_name = f"{INPUT_AUDIO_FILE.stem}{OUTPUT_SUFFIX}{INPUT_AUDIO_FILE.suffix}"
     output_file = OUTPUT_ROOT / output_name
-    sf.write(str(output_file), y_final, sr_old)
+    #sf.write(str(output_file), y_final, sr_old)
 
     print()
     print(f"Output gemt som:\n{output_file}")

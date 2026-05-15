@@ -16,18 +16,33 @@ if errorlevel 1 (
 )
 
 echo Found Conda:
-conda --version
+call conda --version
 echo.
 
 echo Installing packages via conda...
-conda install -y pandas numpy matplotlib
+call conda install -y pandas numpy matplotlib 
+
 
 echo.
 echo Installing remaining packages via pip...
+pip install tensorflow
+pip install scipy
+pip install scikit-learn
+pip install seaborn
+pip install joblib
+pip install fastapi
+pip install uvicorn
+pip install librosa
+pip install requests
+pip install pydantic
+pip install tsfresh
 pip install pyModbusTCP
-pip install python-snap7
-pip install PyAudio
 pip install xmltodict
+pip install noisereduce
+pip install optuna
+pip install soundfile
+pip install python-snap7
+pip install pyaudio
 
 echo.
 echo ============================================
