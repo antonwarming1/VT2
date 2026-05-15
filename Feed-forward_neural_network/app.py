@@ -249,18 +249,21 @@ HTML = r"""<!DOCTYPE html>
     const R = React.createElement;
 
     const N = 8;
-    const SVG_W = 560;
+    const SVG_W = 600;
 
-    /* Screw positions inside the 560x400 scene (2 per corner, 36x36 px each) */
+    /* Screw positions — one per frame arm at each corner (36x36 px each).
+       Each screw is centered in the 62px frame bar (perp. axis = 31px).
+       The two screws at each corner sit on opposite sides of the 45° joint line. */
+    /* Processing order: top screws (x asc), then bottom screws (x asc) */
     const POSITIONS = [
-      { x: 10,  y:  8  },  // top-left  A
-      { x: 10,  y: 46  },  // top-left  B
-      { x: 514, y:  8  },  // top-right A
-      { x: 514, y: 46  },  // top-right B
-      { x: 10,  y: 316 },  // bot-left  A
-      { x: 10,  y: 354 },  // bot-left  B
-      { x: 514, y: 316 },  // bot-right A
-      { x: 514, y: 354 },  // bot-right B
+      { x: 13,  y: 50  },  // 1 top-left  – left bar  (x=13, top)
+      { x: 50,  y: 13  },  // 2 top-left  – top bar   (x=50, top)
+      { x: 514, y: 13  },  // 3 top-right – top bar   (x=514, top)
+      { x: 551, y: 50  },  // 4 top-right – right bar (x=551, top)
+      { x: 13,  y: 354 },  // 5 bot-left  – left bar  (x=13, bot)
+      { x: 50,  y: 391 },  // 6 bot-left  – bot bar   (x=50, bot)
+      { x: 514, y: 391 },  // 7 bot-right – bot bar   (x=514, bot)
+      { x: 551, y: 354 },  // 8 bot-right – right bar (x=551, bot)
     ];
 
     const CLASS_META = {
@@ -332,15 +335,15 @@ HTML = r"""<!DOCTYPE html>
     }
 
     function WindowScene({ slots, showTrue }) {
-      const W = SVG_W, H = 400;
+      const W = SVG_W, H = 440;
       return R("svg", { width: W, height: H, style: { display: "block", overflow: "visible" } },
         R("rect", { x: 0, y: 0, width: W, height: H, rx: 12,
           fill: "#374151", stroke: "#4b5563", strokeWidth: 3 }),
-        R("rect", { x: 42, y: 42, width: W-84, height: H-84, rx: 4,
+        R("rect", { x: 62, y: 62, width: W-124, height: H-124, rx: 4,
           fill: "rgba(147,197,253,0.12)", stroke: "rgba(148,163,184,0.3)", strokeWidth: 2 }),
-        R("line", { x1: W/2, y1: 42, x2: W/2, y2: H-42,
+        R("line", { x1: W/2, y1: 62, x2: W/2, y2: H-62,
           stroke: "rgba(148,163,184,0.2)", strokeWidth: 3 }),
-        R("line", { x1: 42, y1: H/2, x2: W-42, y2: H/2,
+        R("line", { x1: 62, y1: H/2, x2: W-62, y2: H/2,
           stroke: "rgba(148,163,184,0.2)", strokeWidth: 3 }),
         ...slots.map((slot, i) => R(Screw, {
           key: i,

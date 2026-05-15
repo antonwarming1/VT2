@@ -373,6 +373,7 @@ def main():
     # Run search methods (grid search excluded — too many candidates for available memory)
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
+    
     random_score, random_params = random_search(X_train, y_train, Config)
     bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
 
