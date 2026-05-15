@@ -36,6 +36,7 @@ from Feature_engineering.code import _csv_df_to_long
 RAW_ROOT    = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
 LABELS_PATH = Path(r"C:\github\VT2\Feature_engineering\labels.csv")
 LABELS      = ["N", "NS", "OT", "P", "UT"]
+_LABEL_REMAP = {"P": "NE"}
 
 # Each model was trained with its own test split — reconstruct the matching one
 # so the app only ever evaluates a model on samples it never saw during training.
@@ -58,8 +59,9 @@ def list_raw_pairs():
 
         task_files = {f.stem[1:]: f for f in sorted(task_dir.glob("t*.csv"))}
         intr_files = {f.stem[1:]: f for f in sorted(intr_dir.glob("i*.csv"))}
+        mapped_label = _LABEL_REMAP.get(label, label)
         for base_id in sorted(task_files.keys() & intr_files.keys()):
-            pairs.append((label, base_id, task_files[base_id], intr_files[base_id]))
+            pairs.append((mapped_label, base_id, task_files[base_id], intr_files[base_id]))
 
     return pairs
 
@@ -114,12 +116,17 @@ def _extract_one_kind(long_df, kind_to_fc, prefix):
 
 
 def pipeline_one(task_csv_path, intr_csv_path, sample_id,
-                 task_kind_to_fc, intr_kind_to_fc, selected_columns):
+                 task_kind_to_fc, intr_kind_to_fc, selected_columns,
+                 training_means=None):
     """
     Run the full preprocessing + feature extraction pipeline for one raw instance.
 
     Returns a pd.Series of features aligned to selected_columns order,
     or None if no depth plateau detected (instance should be skipped).
+
+    training_means: pd.Series of per-column means from the training set.
+                    Used to fill features tsfresh cannot compute for this instance.
+                    Falls back to 0.0 if not provided.
     """
     # Step 1: Load and clean
     task_df = clean_task_df(pd.read_csv(task_csv_path))
@@ -145,5 +152,9 @@ def pipeline_one(task_csv_path, intr_csv_path, sample_id,
 
     # Step 6: Combine and reindex to exact selected column order
     all_feats = pd.concat([task_feats, intr_feats], axis=1)
-    all_feats = all_feats.reindex(columns=selected_columns, fill_value=0.0)
+    all_feats = all_feats.reindex(columns=selected_columns)
+    if training_means is not None:
+        all_feats = all_feats.fillna(training_means)
+    else:
+        all_feats = all_feats.fillna(0.0)
     return all_feats.iloc[0]

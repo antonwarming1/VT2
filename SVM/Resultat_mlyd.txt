@@ -1,0 +1,22 @@
+Best method: Bayesian  (CV f1_macro 0.9643)
+Params: {'C': 7.427689716572869, 'gamma': 0.0001105398411221819, 'kernel': 'rbf', 'class_weight': 'balanced'}
+
+--- Final Training [Bayesian params] ---
+
+Final model: SVC(C=7.427689716572869, class_weight='balanced', gamma=0.0001105398411221819,
+    random_state=42)
+
+Training final model...
+
+Test Accuracy: 0.9368
+              precision    recall  f1-score   support
+
+           N       0.94      0.93      0.93        83
+          NS       0.94      0.94      0.94        32
+          OT       0.94      0.97      0.95        62
+           P       0.94      0.97      0.95        30
+          UT       0.93      0.90      0.92        62
+
+    accuracy                           0.94       269
+   macro avg       0.94      0.94      0.94       269
+weighted avg       0.94      0.94      0.94       269

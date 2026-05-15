@@ -23,13 +23,13 @@ from sklearn.preprocessing import StandardScaler
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "P", 4: "UT"}
+CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "NE", 4: "UT"}
 
 CLASS_META = {
     "N":  {"full": "Normal",          "color": "#22c55e"},
-    "NS": {"full": "Not Screwed",     "color": "#6b7280"},
+    "NS": {"full": "No Screw",     "color": "#6b7280"},
     "OT": {"full": "Over Tightened",  "color": "#ef4444"},
-    "P":  {"full": "Partial",         "color": "#f59e0b"},
+    "NE":  {"full": "No Engage",         "color": "#f59e0b"},
     "UT": {"full": "Under Tightened", "color": "#3b82f6"},
 }
 
@@ -49,6 +49,7 @@ _raw_pairs_by_model = {}
 _task_kind_fc    = None
 _intr_kind_fc    = None
 _selected_cols   = None
+_training_means  = None
 
 
 def get_model():
@@ -81,13 +82,14 @@ def get_df_and_scaler():
 
 
 def get_inference_assets(model_name="fnn"):
-    global _task_kind_fc, _intr_kind_fc, _selected_cols
+    global _task_kind_fc, _intr_kind_fc, _selected_cols, _training_means
     import inference_pipeline as ip
 
     # Shared assets (features list, tsfresh params) — build once
     if _selected_cols is None:
         df, _ = get_df_and_scaler()
         _selected_cols = list(df.columns)
+        _training_means = df.mean()
         _task_kind_fc, _intr_kind_fc = ip.build_kind_fc_parameters(_selected_cols)
         print(f">> shared inference assets ready: {len(_selected_cols)} features")
 
@@ -98,7 +100,7 @@ def get_inference_assets(model_name="fnn"):
               f"{len(_raw_pairs_by_model[model_name])} samples")
 
     return (_raw_pairs_by_model[model_name],
-            _task_kind_fc, _intr_kind_fc, _selected_cols)
+            _task_kind_fc, _intr_kind_fc, _selected_cols, _training_means)
 
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
@@ -136,12 +138,12 @@ async def startup():
     print(">> startup: scaler ready. Server is up — inference assets will load on first request.")
 
 
-def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewResult:
+def _predict_one_instance(screw_number, model_name="fnn"):
     """Pick one random raw pair, run pipeline, return prediction."""
     import inference_pipeline as ip
 
     t0 = time.perf_counter()
-    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols = get_inference_assets(model_name)
+    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols, training_means = get_inference_assets(model_name)
     _, scaler = get_df_and_scaler()
     t_assets = time.perf_counter()
     print(f"[screw {screw_number}] assets ready:     {t_assets - t0:.3f}s")
@@ -156,6 +158,7 @@ def _predict_one_instance(screw_number: int, model_name: str = "fnn") -> ScrewRe
             task_kind_to_fc=task_kind_fc,
             intr_kind_to_fc=intr_kind_fc,
             selected_columns=selected_cols,
+            training_means=training_means,
         )
         t_pipe1 = time.perf_counter()
         print(f"[screw {screw_number}] pipeline (attempt {attempt+1}): {t_pipe1 - t_pipe0:.3f}s  id={base_id}")
@@ -264,7 +267,7 @@ HTML = r"""<!DOCTYPE html>
       N:  { full: "Normal",          color: "#22c55e" },
       NS: { full: "Not Screwed",     color: "#6b7280" },
       OT: { full: "Over Tightened",  color: "#ef4444" },
-      P:  { full: "Partial",         color: "#f59e0b" },
+      NE:  { full: "No Engage",         color: "#f59e0b" },
       UT: { full: "Under Tightened", color: "#3b82f6" },
     };
 
@@ -596,11 +599,11 @@ HTML = r"""<!DOCTYPE html>
           alignItems: "center", padding: "40px 16px" }
       },
         R("h1", { style: { fontSize: "1.6rem", marginBottom: 4, letterSpacing: "0.05em" } },
-          "Window Screw Fault Visualiser"),
+          "Dashboard"),
         R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 16 } },
-          `${modelName.toUpperCase()} · 5-class fault detection · full pipeline per screw`),
+          `${modelName.toUpperCase()} · 5-class fault detection`),
         R("div", { style: { display: "flex", gap: 8, marginBottom: 24 } },
-          ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "Random Forest"] ].map(([key, label]) =>
+          ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "RF"] ].map(([key, label]) =>
             R("button", {
               key,
               disabled: running,
@@ -627,7 +630,7 @@ HTML = r"""<!DOCTYPE html>
             onClick: handleStart, disabled: running,
             style: { ...btnBase, background: running ? "#334155" : "#2563eb",
               cursor: running ? "not-allowed" : "pointer" }
-          }, running ? "Running pipeline…" : "⟳ Resample & Predict"),
+          }, running ? "Running pipeline…" : "⟳ Start Prediction"),
           R("button", {
             onClick: () => setShowTrue(v => !v),
             style: { ...btnBase, background: showTrue ? "#0f766e" : "#334155" }

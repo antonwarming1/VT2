@@ -33,6 +33,8 @@ class Config:
     FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
+    TRAINING_HISTORY_PATH = BASE_DIR / "Feed-forward_neural_network" / "training_history.png"
+    CONFUSION_MATRIX_PATH = BASE_DIR / "Feed-forward_neural_network" / "confusion_matrix.png"
 
 
     # Data split: 70% train / 20% val / 10% test
@@ -43,7 +45,7 @@ class Config:
 
     # Architecture defaults (updated by best search result before final training)
     HIDDEN_LAYERS = [128, 64, 32]
-    ACTIVATION_FUNCTION = 'relu'
+    ACTIVATION_FUNCTION = 'tanh'
     DROPOUT_RATE = 0.2
     LEARNING_RATE = 0.001
     L2_REGULARIZATION = 0.01
@@ -51,9 +53,9 @@ class Config:
     BATCH_SIZE = 32
     EPOCHS = 100
     SEARCH_EPOCHS = 20   # fewer epochs during hyperparameter search
-    EARLY_STOPPING_PATIENCE = 10
+    EARLY_STOPPING_PATIENCE = 5
 
-    CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "P", 4: "UT"}
+    CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "NE", 4: "UT"}
 
 
 # ── Model factory ────────────────────────────────────────────────────────────
@@ -62,6 +64,7 @@ class Config:
 
 def build_keras_model(input_dim, num_classes=5,
                        hidden_layers=None, activation='relu', dropout_rate=0.2, l2=0.0):
+    keras.backend.clear_session()
     if hidden_layers is None:
         hidden_layers = [128, 64, 32]
     model = Sequential()
@@ -127,9 +130,9 @@ def split_and_normalize(X, y, config):
 # ── Hyperparameter search ─────────────────────────────────────────────────────
 
 PARAM_SPACE = {
-    'model__hidden_layers': [[64], [128, 64]],
-    'model__activation': ['relu', 'tanh', 'sigmoid'],
-    'model__dropout_rate': [0.1, 0.2, 0.3],
+    'model__hidden_layers': [ [128, 64],[128, 64, 32], [256, 128], [256, 128, 64], [256, 128, 64, 32] ],
+    'model__activation': ['relu', 'tanh' ],
+    'model__dropout_rate': [0.1, 0.2],
     'batch_size': [16, 32],
     'optimizer__learning_rate': [0.001, 0.0001],
     'model__l2': [0.0, 0.01],
@@ -154,8 +157,8 @@ def base_model_cv(X_train, y_labels, config):
     print("\nBase model cross-validation...")
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
-    scores = cross_val_score(clf, X_train, y_labels, cv=cv, scoring='accuracy')
-    print(f"  CV accuracy: {scores.mean():.4f} (+/- {scores.std():.4f})")
+    scores = cross_val_score(clf, X_train, y_labels, cv=cv, scoring='f1_macro')
+    print(f"  CV F1-Macro: {scores.mean():.4f} (+/- {scores.std():.4f})")
     return scores.mean(), None
 
 
@@ -164,7 +167,7 @@ def grid_search(X_train, y_labels, config):
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
 
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
-    search = GridSearchCV(clf, PARAM_SPACE, cv=skf, n_jobs=1, verbose=1)
+    search = GridSearchCV(clf, PARAM_SPACE, cv=skf, n_jobs=1, verbose=1, scoring='f1_macro', error_score='raise')
     search.fit(X_train, y_labels)
 
     print(f"  Best score:  {search.best_score_:.4f}")
@@ -172,17 +175,17 @@ def grid_search(X_train, y_labels, config):
     return search.best_score_, search.best_params_
 
 
-def random_search(X_train, y_labels, config, scoring='accuracy'):
+def random_search(X_train, y_labels, config, scoring='f1_macro'):
     # Perform Randomized Search CV for hyperparameter tuning of the FNN
     print("\nRandom Search CV...")
 
     # Define parameter distributions for the FNN
     param_distributions = {
-        'model__hidden_layers':     [[64], [128], [128, 64], [256, 128], [128, 64, 32]],
-        'model__activation':        ['relu', 'tanh', 'sigmoid'],
+        'model__hidden_layers':     [[128, 64],[128, 64, 32], [256, 128], [256, 128, 64], [256, 128, 64, 32]],
+        'model__activation':        ['relu', 'tanh'],
         'model__dropout_rate':      uniform(loc=0.1, scale=0.3),     # [0.1, 0.4)
-        'model__l2':                loguniform(1e-4, 1e-1),
-        'batch_size':               [16, 32, 64],
+        'model__l2':                loguniform(1e-4, 1e-1), # [0.0001, 0.1) on log scale]
+        'batch_size':               [16, 32],
         'optimizer__learning_rate': loguniform(1e-4, 1e-2),
     }
     # setup model
@@ -319,7 +322,7 @@ def plot_search_comparison(scores_by_method):
     plt.show()
 
 
-def plot_training_history(history):
+def plot_training_history(history, save_path=None):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
     ax1.plot(history.history['loss'], label='Train')
@@ -331,18 +334,22 @@ def plot_training_history(history):
     ax2.set_title('Accuracy'); ax2.set_xlabel('Epoch'); ax2.legend(); ax2.grid(True)
 
     plt.tight_layout()
-    plt.savefig(r"Feed-forward_neural_network\training_history.png", dpi=300)
+    if save_path:
+        plt.savefig(save_path, dpi=300)
+        print(f"  Saved training history -> {save_path}")
     plt.show()
 
 
-def plot_confusion_matrix(cm, class_names):
+def plot_confusion_matrix(cm, class_names, save_path=None):
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
                 xticklabels=class_names, yticklabels=class_names)
     plt.title('Confusion Matrix')
     plt.ylabel('True'); plt.xlabel('Predicted')
     plt.tight_layout()
-    plt.savefig(r"Feed-forward_neural_network\confusion_matrix.png", dpi=300)
+    if save_path:
+        plt.savefig(save_path, dpi=300)
+        print(f"  Saved confusion matrix -> {save_path}")
     plt.show()
 
 
@@ -351,36 +358,34 @@ def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
     model = build_final_model(config, X_train.shape[1], len(config.CLASS_LABELS))
     history = train_model(model, X_train, y_train, X_val, y_val, config)
     cm = evaluate_model(model, X_test, y_test, config)[2]
-    plot_confusion_matrix(cm, list(config.CLASS_LABELS.values()))
+    plot_training_history(history, save_path=config.TRAINING_HISTORY_PATH)
+    plot_confusion_matrix(cm, list(config.CLASS_LABELS.values()), save_path=config.CONFUSION_MATRIX_PATH)
     return model, history
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
-    """
     print("Feed-Forward Neural Network — Multi-Class Classification\n")
-
+    
     # Load and prepare data
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
 
-    # Run all four search methods
+    # Run search methods (grid search excluded — too many candidates for available memory)
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
-    grid_score, grid_params = grid_search(X_train, y_train, Config)
     random_score, random_params = random_search(X_train, y_train, Config)
     bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
 
     # Compare and pick the best
     results = {
         'Base Model': (base_score, None),
-        'Grid Search': (grid_score, grid_params),
         'Rand Search': (random_score, random_params),
         'Bayesian': (bayes_score, bayes_params),
     }
     plot_search_comparison({name: score for name, (score, _) in results.items()})
 
     best_name, (best_score, best_params) = max(results.items(), key=lambda x: x[1][0])
-    print(f"\nBest method: {best_name}  (CV acc {best_score:.4f})")
+    print(f"\nBest method: {best_name}  (CV F1-Macro {best_score:.4f})")
     print(f"Params: {best_params}")
 
     # Apply best params to Config before final training
@@ -404,8 +409,9 @@ def main():
 
     # Evaluate and plot
     _, _, cm = evaluate_model(model, X_test, y_test, Config)
-    plot_training_history(history)
-    plot_confusion_matrix(cm, list(Config.CLASS_LABELS.values()))
+    plot_training_history(history, save_path=Config.TRAINING_HISTORY_PATH)
+    plot_confusion_matrix(cm, list(Config.CLASS_LABELS.values()), save_path=Config.CONFUSION_MATRIX_PATH)
+    
 
     # Save
     model.save(Config.MODEL_SAVE_PATH)
@@ -415,8 +421,8 @@ def main():
     """
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
-    solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
-   
-
+    model, history = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
+    model.save(Config.MODEL_SAVE_PATH)
+    """
 if __name__ == "__main__":
     main()
