@@ -44,24 +44,15 @@ class Config:
     RANDOM_STATE = 42
 
     # Architecture defaults (updated by best search result before final training)
-<<<<<<< Updated upstream
     HIDDEN_LAYERS = [128, 64, 32]
     ACTIVATION_FUNCTION = 'tanh'
-=======
-    HIDDEN_LAYERS = [128, 64]
-    ACTIVATION_FUNCTION = 'relu'
->>>>>>> Stashed changes
     DROPOUT_RATE = 0.2
     LEARNING_RATE = 0.001
     L2_REGULARIZATION = 0.01
 
     BATCH_SIZE = 32
     EPOCHS = 100
-<<<<<<< Updated upstream
-    SEARCH_EPOCHS = 35   # fewer epochs during hyperparameter search
-=======
     SEARCH_EPOCHS = 20   # fewer epochs during hyperparameter search
->>>>>>> Stashed changes
     EARLY_STOPPING_PATIENCE = 5
 
     CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "NE", 4: "UT"}
@@ -139,15 +130,9 @@ def split_and_normalize(X, y, config):
 # ── Hyperparameter search ─────────────────────────────────────────────────────
 
 PARAM_SPACE = {
-<<<<<<< Updated upstream
-    'model__hidden_layers': [ [128, 64], [256, 128], [128, 64, 32], [256, 128, 64], [128, 64, 32, 16] ],
-    'model__activation': ['relu', 'tanh' ],
-    'model__dropout_rate': [0.1, 0.2, 0.3],
-=======
     'model__hidden_layers': [ [128, 64],[128, 64, 32], [256, 128], [256, 128, 64], [256, 128, 64, 32] ],
     'model__activation': ['relu', 'tanh' ],
     'model__dropout_rate': [0.1, 0.2],
->>>>>>> Stashed changes
     'batch_size': [16, 32],
     'optimizer__learning_rate': [0.001, 0.0001],
     'model__l2': [0.0, 0.01],
@@ -400,7 +385,7 @@ def main():
     plot_search_comparison({name: score for name, (score, _) in results.items()})
 
     best_name, (best_score, best_params) = max(results.items(), key=lambda x: x[1][0])
-    print(f"\nBest method: {best_name}  (CV acc {best_score:.4f})")
+    print(f"\nBest method: {best_name}  (CV F1-Macro {best_score:.4f})")
     print(f"Params: {best_params}")
 
     # Apply best params to Config before final training
@@ -436,13 +421,8 @@ def main():
     """
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
-<<<<<<< Updated upstream
     model, history = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
     model.save(Config.MODEL_SAVE_PATH)
-=======
-    solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
-    """
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()
