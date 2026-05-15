@@ -265,10 +265,10 @@ HTML = r"""<!DOCTYPE html>
 
     const CLASS_META = {
       N:  { full: "Normal",          color: "#22c55e" },
-      NS: { full: "Not Screwed",     color: "#6b7280" },
       OT: { full: "Over Tightened",  color: "#ef4444" },
-      NE:  { full: "No Engage",         color: "#f59e0b" },
       UT: { full: "Under Tightened", color: "#3b82f6" },
+      NE: { full: "No Engage",       color: "#f59e0b" },
+      NS: { full: "No Screw",        color: "#6b7280" },
     };
 
     function Screw({ x, y, status, result, showTrue, tooltipBelow }) {
