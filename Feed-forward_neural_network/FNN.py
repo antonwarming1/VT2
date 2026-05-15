@@ -44,15 +44,24 @@ class Config:
     RANDOM_STATE = 42
 
     # Architecture defaults (updated by best search result before final training)
+<<<<<<< Updated upstream
     HIDDEN_LAYERS = [128, 64, 32]
     ACTIVATION_FUNCTION = 'tanh'
+=======
+    HIDDEN_LAYERS = [128, 64]
+    ACTIVATION_FUNCTION = 'relu'
+>>>>>>> Stashed changes
     DROPOUT_RATE = 0.2
     LEARNING_RATE = 0.001
     L2_REGULARIZATION = 0.01
 
     BATCH_SIZE = 32
     EPOCHS = 100
+<<<<<<< Updated upstream
     SEARCH_EPOCHS = 35   # fewer epochs during hyperparameter search
+=======
+    SEARCH_EPOCHS = 20   # fewer epochs during hyperparameter search
+>>>>>>> Stashed changes
     EARLY_STOPPING_PATIENCE = 5
 
     CLASS_LABELS = {0: "N", 1: "NS", 2: "OT", 3: "NE", 4: "UT"}
@@ -64,6 +73,7 @@ class Config:
 
 def build_keras_model(input_dim, num_classes=5,
                        hidden_layers=None, activation='relu', dropout_rate=0.2, l2=0.0):
+    keras.backend.clear_session()
     if hidden_layers is None:
         hidden_layers = [128, 64, 32]
     model = Sequential()
@@ -129,9 +139,15 @@ def split_and_normalize(X, y, config):
 # ── Hyperparameter search ─────────────────────────────────────────────────────
 
 PARAM_SPACE = {
+<<<<<<< Updated upstream
     'model__hidden_layers': [ [128, 64], [256, 128], [128, 64, 32], [256, 128, 64], [128, 64, 32, 16] ],
     'model__activation': ['relu', 'tanh' ],
     'model__dropout_rate': [0.1, 0.2, 0.3],
+=======
+    'model__hidden_layers': [ [128, 64],[128, 64, 32], [256, 128], [256, 128, 64], [256, 128, 64, 32] ],
+    'model__activation': ['relu', 'tanh' ],
+    'model__dropout_rate': [0.1, 0.2],
+>>>>>>> Stashed changes
     'batch_size': [16, 32],
     'optimizer__learning_rate': [0.001, 0.0001],
     'model__l2': [0.0, 0.01],
@@ -156,8 +172,8 @@ def base_model_cv(X_train, y_labels, config):
     print("\nBase model cross-validation...")
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
-    scores = cross_val_score(clf, X_train, y_labels, cv=cv, scoring='accuracy')
-    print(f"  CV accuracy: {scores.mean():.4f} (+/- {scores.std():.4f})")
+    scores = cross_val_score(clf, X_train, y_labels, cv=cv, scoring='f1_macro')
+    print(f"  CV F1-Macro: {scores.mean():.4f} (+/- {scores.std():.4f})")
     return scores.mean(), None
 
 
@@ -166,7 +182,7 @@ def grid_search(X_train, y_labels, config):
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS)
 
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
-    search = GridSearchCV(clf, PARAM_SPACE, cv=skf, n_jobs=1, verbose=1)
+    search = GridSearchCV(clf, PARAM_SPACE, cv=skf, n_jobs=1, verbose=1, scoring='f1_macro', error_score='raise')
     search.fit(X_train, y_labels)
 
     print(f"  Best score:  {search.best_score_:.4f}")
@@ -174,17 +190,17 @@ def grid_search(X_train, y_labels, config):
     return search.best_score_, search.best_params_
 
 
-def random_search(X_train, y_labels, config, scoring='accuracy'):
+def random_search(X_train, y_labels, config, scoring='f1_macro'):
     # Perform Randomized Search CV for hyperparameter tuning of the FNN
     print("\nRandom Search CV...")
 
     # Define parameter distributions for the FNN
     param_distributions = {
-        'model__hidden_layers':     [[64], [128], [128, 64], [256, 128], [128, 64, 32]],
-        'model__activation':        ['relu', 'tanh', 'sigmoid'],
+        'model__hidden_layers':     [[128, 64],[128, 64, 32], [256, 128], [256, 128, 64], [256, 128, 64, 32]],
+        'model__activation':        ['relu', 'tanh'],
         'model__dropout_rate':      uniform(loc=0.1, scale=0.3),     # [0.1, 0.4)
-        'model__l2':                loguniform(1e-4, 1e-1),
-        'batch_size':               [16, 32, 64],
+        'model__l2':                loguniform(1e-4, 1e-1), # [0.0001, 0.1) on log scale]
+        'batch_size':               [16, 32],
         'optimizer__learning_rate': loguniform(1e-4, 1e-2),
     }
     # setup model
@@ -363,24 +379,21 @@ def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
-    """
     print("Feed-Forward Neural Network — Multi-Class Classification\n")
-
+    
     # Load and prepare data
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
 
-    # Run all four search methods
+    # Run search methods (grid search excluded — too many candidates for available memory)
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
-    grid_score, grid_params = grid_search(X_train, y_train, Config)
     random_score, random_params = random_search(X_train, y_train, Config)
     bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
 
     # Compare and pick the best
     results = {
         'Base Model': (base_score, None),
-        'Grid Search': (grid_score, grid_params),
         'Rand Search': (random_score, random_params),
         'Bayesian': (bayes_score, bayes_params),
     }
@@ -423,8 +436,13 @@ def main():
     """
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
+<<<<<<< Updated upstream
     model, history = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
     model.save(Config.MODEL_SAVE_PATH)
+=======
+    solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
+    """
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     main()

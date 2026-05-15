@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tasklist /FI \"IMAGENAME eq python.exe\" /FO TABLE)"
+      "Bash(tasklist /FI \"IMAGENAME eq python.exe\" /FO TABLE)",
+      "PowerShell(Start-Process powershell -Verb RunAs -ArgumentList \"-Command Set-ItemProperty -Path 'HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\FileSystem' -Name LongPathsEnabled -Value 1\" -Wait; Write-Host \"Done\")"
     ]
   }
 }
