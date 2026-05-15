@@ -423,6 +423,6 @@ def main():
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
     model, history = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
     model.save(Config.MODEL_SAVE_PATH)
-
+    """
 if __name__ == "__main__":
     main()
