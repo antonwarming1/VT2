@@ -38,6 +38,12 @@ SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
 RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
 FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
 
+# ── With-audio models — set paths here when trained ──────────────────────────
+AUDIO_MODEL_PATH     = r""  # e.g. r"C:\github\VT2\Feed-forward_neural_network\trained_model_audio.keras"
+AUDIO_SVM_MODEL_PATH = r""  # e.g. r"C:\github\VT2\SVM\trained_svm_audio.joblib"
+AUDIO_RF_MODEL_PATH  = r""  # e.g. r"C:\github\VT2\RandomForest\trained_rf_audio.joblib"
+AUDIO_FEATURES_PATH  = r"C:\github\VT2\Feature_engineering\features_selected_audio.csv"
+
 # ── Lazy singletons ───────────────────────────────────────────────────────────
 
 _model           = None
@@ -50,6 +56,19 @@ _task_kind_fc    = None
 _intr_kind_fc    = None
 _selected_cols   = None
 _training_means  = None
+
+# Audio-mode singletons
+_audio_model              = None
+_audio_svm_model          = None
+_audio_rf_model           = None
+_audio_df                 = None
+_audio_scaler             = None
+_audio_raw_pairs_by_model = {}
+_audio_task_kind_fc       = None
+_audio_intr_kind_fc       = None
+_audio_audio_kind_fc      = None
+_audio_selected_cols      = None
+_audio_training_means     = None
 
 
 def get_model():
@@ -103,6 +122,71 @@ def get_inference_assets(model_name="fnn"):
             _task_kind_fc, _intr_kind_fc, _selected_cols, _training_means)
 
 
+# ── Audio-mode getters ────────────────────────────────────────────────────────
+
+def _require_path(path: str, label: str):
+    if not path:
+        raise HTTPException(503, detail=f"{label} model path is not configured")
+    if not Path(path).exists():
+        raise HTTPException(503, detail=f"{label} model file not found: {path}")
+
+
+def get_audio_model():
+    global _audio_model
+    _require_path(AUDIO_MODEL_PATH, "Audio FNN")
+    if _audio_model is None:
+        _audio_model = keras.models.load_model(AUDIO_MODEL_PATH)
+    return _audio_model
+
+
+def get_audio_svm_model():
+    global _audio_svm_model
+    _require_path(AUDIO_SVM_MODEL_PATH, "Audio SVM")
+    if _audio_svm_model is None:
+        _audio_svm_model = joblib.load(AUDIO_SVM_MODEL_PATH)
+    return _audio_svm_model
+
+
+def get_audio_rf_model():
+    global _audio_rf_model
+    _require_path(AUDIO_RF_MODEL_PATH, "Audio RF")
+    if _audio_rf_model is None:
+        _audio_rf_model = joblib.load(AUDIO_RF_MODEL_PATH)
+    return _audio_rf_model
+
+
+def get_audio_df_and_scaler():
+    global _audio_df, _audio_scaler
+    if _audio_df is None:
+        _audio_df    = pd.read_csv(AUDIO_FEATURES_PATH, index_col=0)
+        _audio_scaler = StandardScaler().fit(_audio_df.values)
+    return _audio_df, _audio_scaler
+
+
+def get_audio_inference_assets(model_name="fnn"):
+    global _audio_task_kind_fc, _audio_intr_kind_fc, _audio_audio_kind_fc
+    global _audio_selected_cols, _audio_training_means
+    import inference_pipeline as ip
+
+    if _audio_selected_cols is None:
+        df, _ = get_audio_df_and_scaler()
+        _audio_selected_cols  = list(df.columns)
+        _audio_training_means = df.mean()
+        (_audio_task_kind_fc,
+         _audio_intr_kind_fc,
+         _audio_audio_kind_fc) = ip.build_kind_fc_parameters_audio(_audio_selected_cols)
+        print(f">> audio inference assets ready: {len(_audio_selected_cols)} features")
+
+    if model_name not in _audio_raw_pairs_by_model:
+        _audio_raw_pairs_by_model[model_name] = ip.list_test_pairs_audio(model_name)
+        print(f">> [audio/{model_name}] test pairs ready: "
+              f"{len(_audio_raw_pairs_by_model[model_name])} samples")
+
+    return (_audio_raw_pairs_by_model[model_name],
+            _audio_task_kind_fc, _audio_intr_kind_fc, _audio_audio_kind_fc,
+            _audio_selected_cols, _audio_training_means)
+
+
 # ── FastAPI app ───────────────────────────────────────────────────────────────
 
 app = FastAPI(title="Screw Fault Visualiser")
@@ -125,6 +209,18 @@ def list_models():
     return {"models": ["fnn", "svm", "rf"]}
 
 
+@app.get("/api/model_status")
+def model_status():
+    return {
+        "no_audio": {"fnn": True, "svm": True, "rf": True},
+        "audio": {
+            "fnn": bool(AUDIO_MODEL_PATH),
+            "svm": bool(AUDIO_SVM_MODEL_PATH),
+            "rf":  bool(AUDIO_RF_MODEL_PATH),
+        },
+    }
+
+
 @app.on_event("startup")
 async def startup():
     print(">> startup: loading FNN model...")
@@ -138,28 +234,50 @@ async def startup():
     print(">> startup: scaler ready. Server is up — inference assets will load on first request.")
 
 
-def _predict_one_instance(screw_number, model_name="fnn"):
+def _predict_one_instance(screw_number, model_name="fnn", audio_mode=False):
     """Pick one random raw pair, run pipeline, return prediction."""
     import inference_pipeline as ip
 
     t0 = time.perf_counter()
-    raw_pairs, task_kind_fc, intr_kind_fc, selected_cols, training_means = get_inference_assets(model_name)
-    _, scaler = get_df_and_scaler()
+
+    if audio_mode:
+        assets = get_audio_inference_assets(model_name)
+        raw_pairs, task_kind_fc, intr_kind_fc, audio_kind_fc, selected_cols, training_means = assets
+        _, scaler = get_audio_df_and_scaler()
+    else:
+        raw_pairs, task_kind_fc, intr_kind_fc, selected_cols, training_means = get_inference_assets(model_name)
+        _, scaler = get_df_and_scaler()
+
     t_assets = time.perf_counter()
     print(f"[screw {screw_number}] assets ready:     {t_assets - t0:.3f}s")
 
     max_attempts = 16
     for attempt in range(max_attempts):
-        label, base_id, task_path, intr_path = random.choice(raw_pairs)
+        pair = random.choice(raw_pairs)
+
+        if audio_mode:
+            label, base_id, task_path, intr_path, audio_wav_path = pair
+        else:
+            label, base_id, task_path, intr_path = pair
 
         t_pipe0 = time.perf_counter()
-        feat_series = ip.pipeline_one(
-            task_path, intr_path, sample_id=0,
-            task_kind_to_fc=task_kind_fc,
-            intr_kind_to_fc=intr_kind_fc,
-            selected_columns=selected_cols,
-            training_means=training_means,
-        )
+        if audio_mode:
+            feat_series = ip.pipeline_one_audio(
+                task_path, intr_path, audio_wav_path, sample_id=0,
+                task_kind_to_fc=task_kind_fc,
+                intr_kind_to_fc=intr_kind_fc,
+                audio_kind_to_fc=audio_kind_fc,
+                selected_columns=selected_cols,
+                training_means=training_means,
+            )
+        else:
+            feat_series = ip.pipeline_one(
+                task_path, intr_path, sample_id=0,
+                task_kind_to_fc=task_kind_fc,
+                intr_kind_to_fc=intr_kind_fc,
+                selected_columns=selected_cols,
+                training_means=training_means,
+            )
         t_pipe1 = time.perf_counter()
         print(f"[screw {screw_number}] pipeline (attempt {attempt+1}): {t_pipe1 - t_pipe0:.3f}s  id={base_id}")
 
@@ -171,15 +289,18 @@ def _predict_one_instance(screw_number, model_name="fnn"):
         X = scaler.transform(feat_series.values.reshape(1, -1))
 
         if model_name == "svm":
-            cls  = int(get_svm_model().predict(X)[0])
+            model_fn = get_audio_svm_model if audio_mode else get_svm_model
+            cls  = int(model_fn().predict(X)[0])
             conf = None
         elif model_name == "rf":
-            rf     = get_rf_model()
+            model_fn = get_audio_rf_model if audio_mode else get_rf_model
+            rf     = model_fn()
             cls    = int(rf.predict(X)[0])
             probs  = rf.predict_proba(X)[0]
             conf   = round(float(probs[cls]) * 100, 1)
         else:  # fnn
-            probs  = get_model().predict(X, verbose=0)[0]
+            model_fn = get_audio_model if audio_mode else get_model
+            probs  = model_fn().predict(X, verbose=0)[0]
             cls    = int(np.argmax(probs))
             conf   = round(float(probs[cls]) * 100, 1)
 
@@ -206,8 +327,8 @@ def _predict_one_instance(screw_number, model_name="fnn"):
 
 
 @app.get("/api/predict_one", response_model=ScrewResult)
-def predict_one(screw: int = 1, model: str = "fnn"):
-    return _predict_one_instance(screw, model)
+def predict_one(screw: int = 1, model: str = "fnn", audio: bool = False):
+    return _predict_one_instance(screw, model, audio)
 
 
 # ── React SPA (served inline, no build step) ──────────────────────────────────
@@ -517,6 +638,7 @@ HTML = r"""<!DOCTYPE html>
       const [error,     setError]     = useState(null);
       const [showTrue,  setShowTrue]  = useState(false);
       const [modelName, setModelName] = useState("fnn");
+      const [audioMode, setAudioMode] = useState(false);
       // Session ID prevents stale in-flight loops from updating state after
       // Reset/Restart. Each run captures its own ID; any setSlots call from
       // a session whose ID no longer matches sessionRef.current is ignored.
@@ -542,7 +664,7 @@ HTML = r"""<!DOCTYPE html>
           // Run pipeline and 4-second screw timer in parallel — result is
           // ready by the time the physical process finishes.
           const delay   = new Promise(r => setTimeout(r, 4000));
-          const fetchFn = fetch(`/api/predict_one?screw=${i + 1}&model=${modelName}`)
+          const fetchFn = fetch(`/api/predict_one?screw=${i + 1}&model=${modelName}&audio=${audioMode}`)
             .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); });
 
           try {
@@ -575,7 +697,7 @@ HTML = r"""<!DOCTYPE html>
           setHistory(prev => [...prev, roundResults]);
         }
         setRunning(false);
-      }, [modelName]);
+      }, [modelName, audioMode]);
 
       const handleStart = useCallback(() => {
         sessionRef.current++;   // invalidate any in-flight run before starting
@@ -604,7 +726,28 @@ HTML = r"""<!DOCTYPE html>
         R("h1", { style: { fontSize: "1.6rem", marginBottom: 4, letterSpacing: "0.05em" } },
           "Dashboard"),
         R("p", { style: { color: "#94a3b8", fontSize: 13, marginBottom: 16 } },
-          `${modelName.toUpperCase()} · 5-class fault detection`),
+          `${audioMode ? "Audio" : "No Audio"} · ${modelName.toUpperCase()} · 5-class fault detection`),
+        R("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 16 } },
+          R("span", { style: { fontSize: 13, fontWeight: 700,
+            color: !audioMode ? "#e2e8f0" : "#94a3b8" } }, "No Audio"),
+          R("button", {
+            onClick: () => { if (!running) setAudioMode(v => !v); },
+            style: {
+              position: "relative", width: 48, height: 26, border: "none",
+              borderRadius: 99, cursor: running ? "not-allowed" : "pointer",
+              background: audioMode ? "#2563eb" : "#334155",
+              transition: "background 0.2s", padding: 0, flexShrink: 0,
+            }
+          },
+            R("div", { style: {
+              position: "absolute", top: 3, left: audioMode ? 25 : 3,
+              width: 20, height: 20, borderRadius: "50%", background: "#fff",
+              transition: "left 0.2s",
+            }})
+          ),
+          R("span", { style: { fontSize: 13, fontWeight: 700,
+            color: audioMode ? "#e2e8f0" : "#94a3b8" } }, "Audio")
+        ),
         R("div", { style: { display: "flex", gap: 8, marginBottom: 24 } },
           ...[ ["fnn", "FNN"], ["svm", "SVM"], ["rf", "RF"] ].map(([key, label]) =>
             R("button", {
