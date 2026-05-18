@@ -292,7 +292,7 @@ def train_model(model, X_train, y_train, X_val, y_val, config):
         callbacks=[early_stop],
         verbose=1
     )
-    return history
+    return history, model
 
 
 def evaluate_model(model, X_test, y_test, config):
@@ -406,7 +406,7 @@ def main():
     # Train final model on train/val splits (no cross-validation)
     print(f"\n--- Final Training [{best_name} params] ---")
     model = build_final_model(Config, X_train.shape[1], len(Config.CLASS_LABELS))
-    history = train_model(model, X_train, y_train, X_val, y_val, Config)
+    history, model = train_model(model, X_train, y_train, X_val, y_val, Config)
 
     # Evaluate and plot
     _, _, cm = evaluate_model(model, X_test, y_test, Config)
