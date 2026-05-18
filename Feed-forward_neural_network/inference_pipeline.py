@@ -22,11 +22,9 @@ Public API (audio):
 import sys
 from pathlib import Path
 
-import librosa
 import noisereduce
 import numpy as np
 import pandas as pd
-from scipy.signal import butter, sosfiltfilt
 from sklearn.model_selection import train_test_split
 from tsfresh import extract_features
 from tsfresh.feature_extraction.settings import from_columns
@@ -37,8 +35,8 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from Preprocessing.data_cleaning import clean_task_df, clean_intrinsic_df
-from Preprocessing.data_preprocessing import preprocess_old_pair_df
+from Preprocessing.data_cleaning import clean_task_df, clean_intrinsic_df, load_wav
+from Preprocessing.data_preprocessing import preprocess_old_pair_df, lowpass_filter, Y_NOISE
 from Preprocessing.exclude_features import drop_csv_columns_df
 from Feature_engineering.code import _csv_df_to_long
 
@@ -47,8 +45,7 @@ LABELS_PATH = Path(r"C:\github\VT2\Feature_engineering\labels.csv")
 LABELS      = ["N", "NS", "OT", "P", "UT"]
 _LABEL_REMAP = {"P": "NE"}
 
-AUDIO_RAW_ROOT  = Path(r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data (clean)")
-AUDIO_NOISE_REF = Path(r"C:\github\VT2\Soundcleaning\Optaget_støj.wav")
+AUDIO_RAW_ROOT   = Path(r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data (clean)")
 AUDIO_SAMPLERATE = 2200
 
 # Each model was trained with its own test split — reconstruct the matching one
@@ -255,29 +252,26 @@ def build_kind_fc_parameters_audio(selected_columns):
 
 
 def _clean_wav_df(wav_path, samplerate=AUDIO_SAMPLERATE):
-    """Load a WAV file into a Time(ms)/Amplitude DataFrame (in-memory clean_wav)."""
-    y, sr = librosa.load(str(wav_path), sr=samplerate, mono=True)
+    """Load a WAV file into a Time(ms)/Amplitude DataFrame — mirrors data_cleaning.clean_wav."""
+    y, sr = load_wav(str(wav_path), sr=samplerate)
     y = np.where(np.isnan(y), 0.0, y)
     time_ms = np.arange(len(y)) / sr * 1000
     return pd.DataFrame({"Time (ms)": time_ms, "Amplitude": y})
 
 
 def _preprocess_audio_df(df, samplerate=AUDIO_SAMPLERATE):
-    """Noise-reduce and lowpass-filter an Amplitude DataFrame (in-memory preprocess_audio)."""
-    noise_ref, _ = librosa.load(str(AUDIO_NOISE_REF), sr=samplerate, mono=True)
+    """Noise-reduce and lowpass-filter — mirrors data_preprocessing.preprocess_audio."""
     cleaned = noisereduce.reduce_noise(
-        y=df["Amplitude"].values,
-        y_noise=noise_ref,
+        y=df["Amplitude"].to_numpy(dtype=np.float32),
+        y_noise=Y_NOISE,
         sr=samplerate,
         prop_decrease=0.8,
         stationary=False,
         freq_mask_smooth_hz=100,
         time_mask_smooth_ms=128,
     )
-    sos=butter(6, 1000, btype="low", fs=samplerate, output="sos")
-    filtered=sosfiltfilt(sos, cleaned)
     out = df.copy()
-    out["Amplitude"] = filtered
+    out["Amplitude"] = lowpass_filter(cleaned, samplerate, highcut=1000)
     return out
 
 
@@ -288,32 +282,29 @@ def pipeline_one_audio(task_csv_path, intr_csv_path, audio_wav_path, sample_id,
     Full pipeline (task + intrinsic + audio) for one raw instance.
     Returns a pd.Series aligned to selected_columns, or None if no plateau found.
     """
-    # Steps 1–3: task + intrinsic (identical to pipeline_one)
-    task_df = clean_task_df(pd.read_csv(task_csv_path))
-    intr_df = clean_intrinsic_df(pd.read_csv(intr_csv_path))
+    # Steps 1–3: clean all three signals, then trim together at the plateau
+    task_df  = clean_task_df(pd.read_csv(task_csv_path))
+    intr_df  = clean_intrinsic_df(pd.read_csv(intr_csv_path))
+    audio_df = _clean_wav_df(audio_wav_path)
 
-    result = preprocess_old_pair_df(task_df, intr_df)
+    result = preprocess_old_pair_df(task_df, intr_df, audio_df)
     if result is None:
         return None
-    task_df, intr_df = result
+    task_df, intr_df, audio_df = result
 
     task_df = drop_csv_columns_df(task_df)
     intr_df = drop_csv_columns_df(intr_df)
 
+    # Noise reduce + lowpass on the already-trimmed audio
+    audio_df = _preprocess_audio_df(audio_df)
+
     # Step 4: tsfresh long format
-    task_long = _csv_df_to_long(task_df, sample_id)
-    intr_long = _csv_df_to_long(intr_df, sample_id)
-
-    # Step 5: extract task + intrinsic features
-    task_feats = _extract_one_kind(task_long, task_kind_to_fc, "task_")
-    intr_feats = _extract_one_kind(intr_long, intr_kind_to_fc, "intr_")
-
-    # Audio steps: clean → preprocess → long format → extract
-    audio_df   = _clean_wav_df(audio_wav_path)
-    audio_df   = _preprocess_audio_df(audio_df)
+    task_long  = _csv_df_to_long(task_df,  sample_id)
+    intr_long  = _csv_df_to_long(intr_df,  sample_id)
     audio_long = _csv_df_to_long(audio_df, sample_id)
     audio_feats = _extract_one_kind(audio_long, audio_kind_to_fc, "audio_")
-
+    task_feats  = _extract_one_kind(task_long,  task_kind_to_fc,  "task_")
+    intr_feats  = _extract_one_kind(intr_long,  intr_kind_to_fc,  "intr_")
     # Step 6: combine and align
     all_feats = pd.concat([task_feats, intr_feats, audio_feats], axis=1)
     all_feats = all_feats.reindex(columns=selected_columns)

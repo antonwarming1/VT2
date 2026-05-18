@@ -276,6 +276,7 @@ def preprocess_pair(csv_path, json_path, out_csv, out_json):
 
     csv_df = trim_to_start(csv_df, active_start)
     json_df = trim_to_start(json_df, active_start)
+    
     print(f"  Trimmed at depth increase: first {active_start:.0f} ms removed")
 
     # Step 2: Resample both to uniform time steps
@@ -297,7 +298,7 @@ def preprocess_pair(csv_path, json_path, out_csv, out_json):
 
 
 
-def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrinsic):
+def preprocess_old_pair(task_csv_path, intrinsic_csv_path,sound_csv_path, out_task, out_intrinsic, out_sound):
     """
     Preprocess one old-dataset pair (Task CSV + Intrinsic CSV):
       1. Detect when screwing starts from Intrinsic Depth (mm)
@@ -307,7 +308,7 @@ def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrins
     """
     task_df = pd.read_csv(task_csv_path)
     intr_df = pd.read_csv(intrinsic_csv_path)
-
+    sound_df = pd.read_csv(sound_csv_path)
     # Detect plateau from Intrinsic Depth (mm)
     plateau_time = detect_plateau(intr_df, depth_col="Depth (mm)")
 
@@ -318,6 +319,9 @@ def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrins
     # Step 1: Trim everything before the depth plateau, keep the tail
     task_df = trim_to_start(task_df, plateau_time)
     intr_df = trim_to_start(intr_df, plateau_time)
+    sound_df = trim_to_start(sound_df, plateau_time)
+
+
     print(f"  Trimmed at depth plateau: first {plateau_time:.0f} ms removed")
 
     task_df = resample_uniform(task_df, smooth=SMOOTH_CSV)
@@ -325,17 +329,21 @@ def preprocess_old_pair(task_csv_path, intrinsic_csv_path, out_task, out_intrins
 
     task_df.to_csv(out_task, index=False)
     intr_df.to_csv(out_intrinsic, index=False)
+    sound_df.to_csv(out_sound, index=False)
+
 
     task_end = task_df["Time (ms)"].iloc[-1]
     intr_end = intr_df["Time (ms)"].iloc[-1]
+    sound_end = sound_df["Time (ms)"].iloc[-1]
     print(f"  Task: {task_end:.0f} ms ({len(task_df)} pts)  "
-          f"Intrinsic: {intr_end:.0f} ms ({len(intr_df)} pts)")
+          f"Intrinsic: {intr_end:.0f} ms ({len(intr_df)} pts)  "
+          f"Sound: {sound_end:.0f} ms ({len(sound_df)} pts)")
     return True
 
 
-def preprocess_old_pair_df(task_df, intr_df):
+def preprocess_old_pair_df(task_df, intr_df, sound_df):
     """
-    In-memory version of preprocess_old_pair. Returns (task_df, intr_df) or None
+    In-memory version of preprocess_old_pair. Returns (task_df, intr_df, sound_df) or None
     if no depth plateau detected (instance should be skipped).
     """
     plateau_time = detect_plateau(intr_df, depth_col="Depth (mm)")
@@ -344,11 +352,12 @@ def preprocess_old_pair_df(task_df, intr_df):
 
     task_df = trim_to_start(task_df, plateau_time)
     intr_df = trim_to_start(intr_df, plateau_time)
+    sound_df = trim_to_start(sound_df, plateau_time)
 
     task_df = resample_uniform(task_df, smooth=SMOOTH_CSV)
     intr_df = resample_uniform(intr_df, smooth=SMOOTH_INTR, smooth_cols=SMOOTH_COLS_INTR)
 
-    return task_df, intr_df
+    return task_df, intr_df, sound_df
 
 # ------------------- Audio preprocessing functions -------------------
 
@@ -372,6 +381,8 @@ def preprocess_audio(file_path, out_path, samplerate):
     df = pd.read_csv(file_path)
     if "Amplitude" not in df.columns:
         raise ValueError(f"'Amplitude' column not found in {file_path}")
+    #trim data with 
+
     df["Amplitude"] = nr.reduce_noise(
         y = df["Amplitude"].to_numpy(dtype=np.float32),
         sr = samplerate,
@@ -448,12 +459,18 @@ def main():
 
                 print(f"\n{'='*50}\n  {label} — {len(paired)} pairs\n{'='*50}")
 
+                audio_cleaned_root = OLD_DATA_ROOT / "Extrinsic data"
                 for base_id in paired:
                     print(f"i{base_id} / t{base_id}:")
-                    preprocess_old_pair(
-                        task_files[base_id], intr_files[base_id],
-                        out_dir / f"t{base_id}.csv", out_dir / f"i{base_id}.csv"
-                    )
+                    sound_path = audio_cleaned_root / label / f"e{base_id}.csv"
+                    if sound_path.exists():
+                        preprocess_old_pair(
+                            task_files[base_id], intr_files[base_id], sound_path,
+                            out_dir / f"t{base_id}.csv", out_dir / f"i{base_id}.csv",
+                            out_dir / f"e{base_id}.csv"
+                        )
+                    else:
+                        print(f"  WARNING: no audio file for {base_id}, skipping audio trim")
         if "Extrinsic data" in FOLDERS_OLD:
             print(f"\n{'#'*50}")
             print(f"  EXTRINSIC DATASET")

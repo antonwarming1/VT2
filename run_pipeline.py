@@ -36,7 +36,7 @@ def main():
     print("=" * 60)
     print("  Step 4/4: Feature engineering")
     print("=" * 60)
-    feature_engineering()
+    #feature_engineering()
 
     print("\n" + "=" * 60)
     print("  Pipeline complete!")
