@@ -39,9 +39,9 @@ RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
 FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
 
 # ── With-audio models — set paths here when trained ──────────────────────────
-AUDIO_MODEL_PATH     = r""  # e.g. r"C:\github\VT2\Feed-forward_neural_network\trained_model_audio.keras"
-AUDIO_SVM_MODEL_PATH = r""  # e.g. r"C:\github\VT2\SVM\trained_svm_audio.joblib"
-AUDIO_RF_MODEL_PATH  = r""  # e.g. r"C:\github\VT2\RandomForest\trained_rf_audio.joblib"
+AUDIO_MODEL_PATH     = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
+AUDIO_SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
+AUDIO_RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
 AUDIO_FEATURES_PATH  = r"C:\github\VT2\Feature_engineering\features_selected_audio.csv"
 
 # ── Lazy singletons ───────────────────────────────────────────────────────────

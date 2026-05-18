@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import optuna
-from scipy.stats import uniform
+from scipy.stats import loguniform
 
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
@@ -135,8 +135,8 @@ def random_search(X_train, y_train, config):
 
     param_dist = {
         "kernel": ["rbf"],
-        "C": uniform(0.01, 100),
-        "gamma": uniform(0.0001, 1),
+        "C": loguniform(0.01, 100),
+        "gamma": loguniform(0.0001, 1),
         "class_weight": [None, "balanced"],
     }
 

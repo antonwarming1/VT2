@@ -274,8 +274,8 @@ def _preprocess_audio_df(df, samplerate=AUDIO_SAMPLERATE):
         freq_mask_smooth_hz=100,
         time_mask_smooth_ms=128,
     )
-    sos      = butter(6, 1000, btype="low", fs=samplerate, output="sos")
-    filtered = sosfiltfilt(sos, cleaned)
+    sos=butter(6, 1000, btype="low", fs=samplerate, output="sos")
+    filtered=sosfiltfilt(sos, cleaned)
     out = df.copy()
     out["Amplitude"] = filtered
     return out
