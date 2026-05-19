@@ -1,3 +1,33 @@
+SVM — Multi-Class Classification
+
+Loading data...
+  X: (1341, 2046),  y: (1341,)
+  Train: 1072  Test: 269
+
+--- Hyperparameter Search ---
+
+Base model cross-validation...
+  CV f1_macro: 0.9567 (+/- 0.0152)
+
+=== Grid Search CV (SVM) ===
+Fitting 5 folds for each of 40 candidates, totalling 200 fits
+  Best score:  0.9594
+  Best params: {'C': 0.1, 'class_weight': None, 'kernel': 'linear'}
+
+=== Randomized Search CV (SVM) ===
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+  Best score:  0.9623
+  Best params: {'C': np.float64(2.801635158716261), 'class_weight': 'balanced', 'gamma': np.float64(0.00015369603110608848), 'kernel': 'rbf'}
+
+=== Bayesian Optimization (SVM, 30 trials) ===
+Best trial: 7. Best value: 0.963: 100%|███████████| 30/30 [02:15<00:00,  4.51s/it]
+  Best trial: 7
+  Best CV f1_macro: 0.9630
+  Best hyperparameters:
+    C: 2.342384984711291
+    gamma: 0.00015339162591163628
+    class_weight: None
+
 Best method: Bayesian  (CV f1_macro 0.9630)
 Params: {'C': 2.342384984711291, 'gamma': 0.00015339162591163628, 'kernel': 'rbf', 'class_weight': None}
 
