@@ -101,9 +101,9 @@ def _json_to_long(filepath, sample_id):
 def build_old_dataset():
     """
     Old data: pair t*.csv / i*.csv by matching ID after prefix letter.
-    Returns (task_long, intr_long, labels).
+    Returns (task_long, intr_long, extr_long, labels).
     """
-    task_frames, intr_frames, labels = [], [], {}
+    task_frames, intr_frames, extr_frames, labels = [], [], [], {}
     sample_id = 0
 
     for subfolder, label in OLD_LABEL_MAP.items():
@@ -111,10 +111,11 @@ def build_old_dataset():
         if not folder.exists():
             print(f"  WARNING: {folder} not found, skipping")
             continue
-
+        
         task_files = {f.stem[1:]: f for f in sorted(folder.glob("t*.csv"))}
         intr_files = {f.stem[1:]: f for f in sorted(folder.glob("i*.csv"))}
-        paired = sorted(task_files.keys() & intr_files.keys())
+        extr_files= {f.stem[1:]: f for f in sorted(folder.glob("e*.csv"))}
+        paired = sorted(task_files.keys() & intr_files.keys() & extr_files.keys())
 
         if not paired:
             print(f"  WARNING: no pairs in {subfolder}")
@@ -124,20 +125,22 @@ def build_old_dataset():
         for base_id in paired:
             task_frames.append(_csv_to_long(task_files[base_id], sample_id))
             intr_frames.append(_csv_to_long(intr_files[base_id], sample_id))
+            extr_frames.append(_csv_to_long(extr_files[base_id], sample_id))
             labels[sample_id] = label
             sample_id += 1
 
     return (pd.concat(task_frames, ignore_index=True),
             pd.concat(intr_frames, ignore_index=True),
+            pd.concat(extr_frames, ignore_index=True),
             pd.Series(labels, name="label"))
 
 
 def build_new_dataset():
     """
     New data: pair *.csv / *.json by matching filename stem.
-    Returns (task_long, intr_long, labels).
+    Returns (task_long, intr_long, extr_long, labels).
     """
-    task_frames, intr_frames, labels = [], [], {}
+    task_frames, intr_frames, extr_frames, labels = [], [], [], {}
     sample_id = 0
 
     for subfolder, label in NEW_LABEL_MAP.items():
@@ -272,7 +275,7 @@ def main():
     # Build dataset
     print(f"Building dataset (DATASET={DATASET})...")
     if DATASET == "old":
-        task_long, intr_long, y = build_old_dataset()
+        task_long, intr_long, extr_long, y = build_old_dataset()
     else:
         task_long, intr_long, y = build_new_dataset()
 
@@ -288,7 +291,7 @@ def main():
     intr_features = extract_from_long(intr_long, "Intrinsic").add_prefix("intr_")
 
     # Extract audio features
-    audio_features = extract_audio_features(use_tsfresh=True).add_prefix("audio_")
+    audio_features = extract_from_long(extr_long, "Audio").add_prefix("audio_")
 
     # Combine
     all_features = pd.concat([task_features, intr_features], axis=1)
@@ -298,10 +301,10 @@ def main():
 
     # Save extracted features
     all_features.to_csv(OUTPUT_DIR / "features_extracted.csv")
-    print(f"Saved → features_extracted.csv")
+    print(f"Saved -> features_extracted.csv")
     # Save extracted audio features
     audio_features.to_csv(OUTPUT_DIR / "features_extracted_audio.csv")
-    print(f"Saved → features_extracted_audio.csv")
+    print(f"Saved -> features_extracted_audio.csv")
 
     
 
@@ -311,18 +314,18 @@ def main():
         selected = select_features(all_features, y, n_jobs=10)
         print(f"Selected: {selected.shape[1]} / {all_features.shape[1]}")
         selected.to_csv(OUTPUT_DIR / "features_selected.csv")
-        print(f"Saved → features_selected.csv")
+        print(f"Saved -> features_selected.csv")
         selected_audio = select_features(all_features_audio, y, n_jobs=10)
         print(f"Selected (with audio): {selected_audio.shape[1]} / {all_features_audio.shape[1]}")
         selected_audio.to_csv(OUTPUT_DIR / "features_selected_audio.csv")
-        print(f"Saved → features_selected_audio.csv")
+        print(f"Saved -> features_selected_audio.csv")
 
 
         
 
     # Save labels
     y.to_csv(OUTPUT_DIR / "labels.csv", header=True)
-    print(f"Saved → labels.csv")
+    print(f"Saved -> labels.csv")
 
     print("\nDone!")
 

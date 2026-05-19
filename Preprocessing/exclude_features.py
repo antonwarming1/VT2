@@ -131,7 +131,7 @@ def main():
         for csv_file in csv_files:
             dropped = drop_csv_columns(csv_file, out_dir / csv_file.name)
             kept = pd.read_csv(out_dir / csv_file.name).columns.tolist()
-            print(f"  {csv_file.stem}.csv: dropped {dropped} → kept {kept}")
+            print(f"  {csv_file.stem}.csv: dropped {dropped} | kept {kept}")
 
         for json_file in json_files:
             dropped = drop_json_columns(json_file, out_dir / json_file.name)

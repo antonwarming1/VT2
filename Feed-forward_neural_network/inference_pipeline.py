@@ -45,7 +45,7 @@ LABELS_PATH = Path(r"C:\github\VT2\Feature_engineering\labels.csv")
 LABELS      = ["N", "NS", "OT", "P", "UT"]
 _LABEL_REMAP = {"P": "NE"}
 
-AUDIO_RAW_ROOT   = Path(r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data (clean)")
+AUDIO_RAW_ROOT   = Path(r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data")
 AUDIO_SAMPLERATE = 2200
 
 # Each model was trained with its own test split — reconstruct the matching one
