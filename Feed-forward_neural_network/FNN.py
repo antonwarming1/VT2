@@ -234,7 +234,7 @@ def objective(trial, X_train, y_labels, config):
     return scores.mean()
 
 
-def bayesian_search(X_train, y_labels, config, n_trials=20):
+def bayesian_search(X_train, y_labels, config, n_trials=50):
     print(f"\n=== RUNNING BAYESIAN OPTIMIZATION ({n_trials} trials) ===")
 
     sampler = optuna.samplers.TPESampler(seed=config.RANDOM_STATE)
