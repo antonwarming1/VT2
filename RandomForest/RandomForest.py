@@ -113,7 +113,7 @@ def grid_search(X_train, y_train, config):
         "max_depth": [None, 10, 20, 30],
         "min_samples_split": [2, 5, 10],
         "min_samples_leaf": [1, 2, 5],
-        "max_features": ["sqrt", "log2"],
+        "max_features": ["sqrt", 'log2'],
         "class_weight": [None, "balanced"],
     }
 
@@ -140,7 +140,7 @@ def random_search(X_train, y_train, config):
     }
 
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
-    search = RandomizedSearchCV(model, param_distributions=param_dist, n_iter=30,
+    search = RandomizedSearchCV(model, param_distributions=param_dist, n_iter=50,
                                  scoring="f1_macro", cv=skf, n_jobs=-1,
                                  random_state=config.RANDOM_STATE, verbose=1)
     search.fit(X_train, y_train)
@@ -167,7 +167,7 @@ def objective(trial, X_train, y_train, config):
     return scores.mean()
 
 
-def bayesian_search(X_train, y_train, config, n_trials=30):
+def bayesian_search(X_train, y_train, config, n_trials=50):
     print(f"\n=== Bayesian Optimization (Random Forest, {n_trials} trials) ===")
 
     sampler = optuna.samplers.TPESampler(seed=config.RANDOM_STATE)
