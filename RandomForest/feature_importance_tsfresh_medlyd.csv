@@ -1,0 +1,2442 @@
+feature,importance
+intr_Torque (Nm)__quantile__q_0.8,0.010076814735004018
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.8",0.007969901879415129
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.4",0.006857380105328805
+intr_Current (V)__autocorrelation__lag_9,0.006802257069186781
+intr_Torque (Nm)__autocorrelation__lag_8,0.0065627209059071975
+task_Robot_I (A)__number_cwt_peaks__n_5,0.0063804562773423
+intr_Torque (Nm)__cid_ce__normalize_True,0.006369997191385807
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_5,0.006369208516104448
+intr_Torque (Nm)__autocorrelation__lag_9,0.006337728679567069
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""min""",0.005875401899179627
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.4",0.00571426327381532
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_9",0.005637130117193442
+intr_Torque (Nm)__last_location_of_maximum,0.005516170344032596
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_70",0.00546422467339518
+intr_Torque (Nm)__number_crossing_m__m_1,0.005390030794619998
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""min""",0.005316044175202337
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.6",0.005309437234902238
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.4__ql_0.0",0.005275642191450466
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_8",0.005269268821449338
+intr_Current (V)__maximum,0.005257728601241507
+intr_Current (V)__ratio_beyond_r_sigma__r_2.5,0.005102211471134057
+intr_Current (V)__variance,0.005012839865969112
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""mean""",0.005009604141348172
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_0,0.005005098359138078
+intr_Torque (Nm)__quantile__q_0.7,0.004944463679738941
+intr_Current (V)__autocorrelation__lag_3,0.004941993924340353
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_67",0.004928093270673083
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.2",0.004890355911239697
+intr_Current (V)__standard_deviation,0.004825951890618723
+intr_Current (V)__index_mass_quantile__q_0.1,0.004818619711242952
+intr_Torque (Nm)__variance,0.004754097296968906
+"intr_Current (V)__agg_autocorrelation__f_agg_""var""__maxlag_40",0.004743208208357192
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.0",0.004668145343090568
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_59",0.004643598452068942
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_78",0.004582036578522179
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_1,0.0045166425001774745
+intr_Current (V)__quantile__q_0.9,0.004514822689227671
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.2",0.004490472282644745
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_4",0.004442963665640428
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""min""",0.0043750335817597874
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.2",0.004360539436088311
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_9",0.004356664696454927
+intr_Current (V)__mean_n_absolute_max__number_of_maxima_7,0.0043418171382428325
+intr_Torque (Nm)__quantile__q_0.6,0.004341056801858658
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_1",0.0042870173403116
+intr_Current (V)__c3__lag_1,0.00428123126334696
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_5",0.004235690440464575
+intr_Current (V)__friedrich_coefficients__coeff_2__m_3__r_30,0.0042009793845201
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""min""",0.004186132175484526
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""min""",0.004167285360798903
+intr_Current (V)__c3__lag_2,0.004125300620489352
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""var""",0.004063285862482477
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""min""",0.004052741962825541
+intr_Torque (Nm)__sum_values,0.004010952512841229
+intr_Torque (Nm)__longest_strike_above_mean,0.00392255411884381
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_12",0.0036812845771294783
+intr_Current (V)__absolute_maximum,0.003668134763863755
+intr_Current (V)__spkt_welch_density__coeff_2,0.0036599065626557715
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_3",0.003651868525008313
+"intr_Current (V)__agg_autocorrelation__f_agg_""median""__maxlag_40",0.0036021732723480948
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.6",0.003594516105336718
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.8",0.003352271098694125
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.0",0.003345980087588282
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""mean""",0.003340396459142577
+intr_Torque (Nm)__abs_energy,0.0032907557168140515
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_5",0.0032846145646749938
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_17",0.0032668656834860294
+intr_Torque (Nm)__autocorrelation__lag_6,0.0032417384696753976
+intr_Current (V)__autocorrelation__lag_6,0.0032183984884239843
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""min""",0.003187726613728143
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""max""",0.003164698678159667
+intr_Current (V)__autocorrelation__lag_2,0.0031157791475328283
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.4",0.003106425112173685
+intr_Torque (Nm)__mean_change,0.003088066296851199
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.2__ql_0.0",0.003076531018078893
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_1",0.003075540713106484
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_2",0.003074058203909783
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.2",0.003048216079711478
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.6",0.003033493579217692
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.0",0.003030397496676883
+"intr_Current (V)__linear_trend__attr_""rvalue""",0.0030053204424064055
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""min""",0.003004637116795511
+intr_Current (V)__number_cwt_peaks__n_5,0.0029856316156108235
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""min""",0.0029533968711857985
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.6",0.0029501066839970063
+intr_Current (V)__index_mass_quantile__q_0.2,0.002949188809001155
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_71",0.002922172953547301
+intr_Torque (Nm)__c3__lag_1,0.0029179120708077073
+"intr_Torque (Nm)__agg_autocorrelation__f_agg_""median""__maxlag_40",0.002907125370644569
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_12",0.0029030458372126308
+intr_Current (V)__number_peaks__n_10,0.0028900151272135684
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""min""",0.002887857952452408
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_65",0.0028735195634561695
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.0",0.0028654223216982976
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_80",0.0028469687329741437
+intr_Torque (Nm)__kurtosis,0.0028384028503816564
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""mean""",0.002836067186070204
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""min""",0.0028271488214108857
+"intr_Current (V)__fft_aggregated__aggtype_""centroid""",0.0028234608281142498
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_2,0.0028201713950956565
+intr_Current (V)__cid_ce__normalize_False,0.0028134858064669645
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.6",0.0028092371040270925
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_4",0.0028081635744478454
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""min""",0.002806992433245373
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.2",0.0027920658058620397
+intr_Torque (Nm)__autocorrelation__lag_7,0.0027915763398373
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_4",0.002787519466023786
+intr_Current (V)__variation_coefficient,0.0027799134497467188
+audio_Amplitude__number_peaks__n_3,0.002779774252840983
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_1",0.002771676537536149
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""max""",0.002764908618663133
+intr_Current (V)__sum_values,0.002753567668474015
+intr_Current (V)__quantile__q_0.6,0.0027533384150916144
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_0",0.002747078416828546
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""mean""",0.0027365960642801116
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_1",0.0026974141261390493
+intr_Current (V)__max_langevin_fixed_point__m_3__r_30,0.0026926507600552223
+"audio_Amplitude__linear_trend__attr_""stderr""",0.0026848510720914164
+intr_Current (V)__autocorrelation__lag_8,0.0026816831683149937
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_10",0.002680558900557016
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_6",0.002677662211552477
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_10",0.0026481819608569685
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_81",0.0026465383411557776
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_72",0.0026456495364338283
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_17",0.0026402785851590595
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""max""",0.0026298081030260616
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""max""",0.002624261459244728
+intr_Current (V)__range_count__max_1__min_-1,0.0026242136330528716
+intr_Current (V)__lempel_ziv_complexity__bins_5,0.002619823517179428
+intr_Torque (Nm)__number_peaks__n_5,0.0026149831777346317
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_84",0.002610359531655131
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_95",0.0026011672202459995
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_75",0.0025981768199143974
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""max""",0.0025933216866597807
+"intr_Torque (Nm)__fft_aggregated__aggtype_""skew""",0.0025906316510240974
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""min""",0.0025852446265877864
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_97",0.00258397551205809
+intr_Current (V)__index_mass_quantile__q_0.6,0.002557508745865468
+intr_Current (V)__absolute_sum_of_changes,0.0025553824229744763
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_2",0.0025553274856221202
+intr_Torque (Nm)__index_mass_quantile__q_0.8,0.0025504290685581933
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_68",0.0025442420506945037
+intr_Torque (Nm)__absolute_maximum,0.002535316046399073
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""mean""",0.0025259268994013324
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_2",0.0025107475276300696
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_3",0.002510315226292763
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_93",0.002507921626743565
+intr_Current (V)__benford_correlation,0.002506425415990473
+intr_Torque (Nm)__quantile__q_0.4,0.0025016264599262653
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_2",0.002492328678201412
+task_Robot_I (A)__index_mass_quantile__q_0.7,0.002488631206136551
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_9",0.0024884637776727957
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.0",0.002473310770979322
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_64",0.0024717000407139048
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.4",0.0024546626650410438
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_0",0.002450901810535369
+intr_Torque (Nm)__index_mass_quantile__q_0.9,0.0024489315246904496
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_62",0.0024383416432181312
+"intr_Torque (Nm)__linear_trend__attr_""stderr""",0.002431072403346536
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.4__ql_0.0",0.002426549740127153
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_66",0.0024196367609738436
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.2",0.0024195737296018953
+intr_Current (V)__c3__lag_3,0.0023872203035426136
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_57",0.002377921004549318
+intr_Torque (Nm)__mean,0.002375707328355954
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_82",0.0023743124960462067
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""var""",0.0023546625110931097
+"task_Robot_I (A)__fft_aggregated__aggtype_""variance""",0.0023537992788367494
+audio_Amplitude__number_peaks__n_50,0.0023482080025495978
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_83",0.0023442550708638525
+intr_Current (V)__friedrich_coefficients__coeff_1__m_3__r_30,0.002342461126524758
+intr_Current (V)__last_location_of_maximum,0.002338339257282897
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""mean""",0.002332695087168508
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_60",0.0023131948376781068
+intr_Torque (Nm)__number_peaks__n_1,0.0023057831491795785
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""min""",0.002301018886792303
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_10",0.0022940481849639594
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_3",0.002291667378379771
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_64",0.002280574410832561
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""mean""",0.0022622845608222704
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_1.5,0.0022576828630363186
+intr_Current (V)__lempel_ziv_complexity__bins_3,0.0022496573177067433
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_20",0.0022492255341337083
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_11",0.00224045446131208
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_7,0.0022335832277161466
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""max""",0.0022324542409833097
+intr_Current (V)__ar_coefficient__coeff_0__k_10,0.002207965081473638
+intr_Torque (Nm)__spkt_welch_density__coeff_2,0.002205090398954103
+"intr_Current (V)__fft_aggregated__aggtype_""kurtosis""",0.0022000018584011935
+task_Robot_I (A)__number_peaks__n_1,0.0021934095425696853
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_8,0.0021914074706189932
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.2",0.0021878700478094953
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""min""",0.0021758093085275597
+intr_Torque (Nm)__variation_coefficient,0.0021715159909285573
+intr_Current (V)__partial_autocorrelation__lag_1,0.0021639634407269836
+intr_Torque (Nm)__lempel_ziv_complexity__bins_100,0.0021598243724779147
+"intr_Current (V)__augmented_dickey_fuller__attr_""usedlag""__autolag_""AIC""",0.0021544664631616356
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.2",0.0021432379187410417
+task_Robot_I (A)__index_mass_quantile__q_0.4,0.002137704344658859
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_2.5,0.0021369856643035827
+"intr_Torque (Nm)__agg_autocorrelation__f_agg_""var""__maxlag_40",0.002128148319859021
+intr_Current (V)__autocorrelation__lag_5,0.0021265253535885736
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_17",0.0021235307112949194
+intr_Torque (Nm)__mean_abs_change,0.00211996191793833
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_3,0.0020910198264343298
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_6",0.0020869150860492987
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_56",0.0020730313036143723
+task_Robot_I (A)__number_peaks__n_5,0.0020592456404334544
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""min""",0.0020564840267315674
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_6,0.002056373180404458
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""max""",0.0020253003138375803
+"intr_Torque (Nm)__linear_trend__attr_""slope""",0.0020178743021273763
+intr_Current (V)__count_above_mean,0.002003144034272288
+task_Robot_I (A)__cid_ce__normalize_True,0.0019978337641528192
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.4",0.0019965073824453
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""min""",0.0019962619599109294
+"intr_Torque (Nm)__augmented_dickey_fuller__attr_""pvalue""__autolag_""AIC""",0.0019893465473562978
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_63",0.001988381320543926
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""max""",0.001980999257055861
+intr_Current (V)__number_peaks__n_50,0.001979700090300026
+intr_Current (V)__time_reversal_asymmetry_statistic__lag_1,0.0019793907208279452
+intr_Current (V)__quantile__q_0.8,0.0019767699297621065
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""min""",0.0019766671876126508
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""min""",0.0019730363821307993
+intr_Current (V)__quantile__q_0.4,0.0019679355607184227
+intr_Current (V)__ratio_beyond_r_sigma__r_6,0.0019539290805745766
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.0",0.001950624760770947
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_88",0.001930949626091296
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_98",0.0019160411766139152
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.4",0.001915134647332856
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.2",0.0019143720239218121
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""max""",0.0018980160086607507
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_50",0.001896762460686499
+"intr_Current (V)__fft_aggregated__aggtype_""variance""",0.001892100369450011
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_87",0.001889338425240806
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_58",0.0018837342377517991
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.2",0.0018691874704322375
+task_Robot_I (A)__last_location_of_minimum,0.0018499022504284595
+intr_Current (V)__ratio_beyond_r_sigma__r_7,0.0018167019962345053
+intr_Torque (Nm)__maximum,0.0018128211669297242
+"intr_Torque (Nm)__augmented_dickey_fuller__attr_""teststat""__autolag_""AIC""",0.001808354342364966
+"audio_Amplitude__augmented_dickey_fuller__attr_""usedlag""__autolag_""AIC""",0.0017781747005017256
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_80",0.0017346393980377107
+intr_Torque (Nm)__large_standard_deviation__r_0.25,0.0017177248532055237
+"intr_Current (V)__agg_autocorrelation__f_agg_""mean""__maxlag_40",0.0016800039156394059
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""max""",0.0016289452409926192
+"intr_Torque (Nm)__agg_autocorrelation__f_agg_""mean""__maxlag_40",0.001624449124319372
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_79",0.0016208232741380696
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_45",0.0015931499063504234
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_3",0.001564300857545536
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_89",0.0015641167196930735
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""max""",0.0015539074788155833
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_2,0.0015432323330724163
+task_Robot_I (A)__ratio_beyond_r_sigma__r_0.5,0.0015329275333167693
+intr_Torque (Nm)__standard_deviation,0.0015247822093529403
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_32",0.0015106140057037397
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_66",0.0015053763406069807
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.4",0.0014880877350241693
+intr_Torque (Nm)__ar_coefficient__coeff_1__k_10,0.0014759966264361406
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_5",0.001427740801868175
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_36",0.0014155608419692475
+intr_Torque (Nm)__autocorrelation__lag_5,0.0014146453070894838
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_94",0.0014030815234836848
+"intr_Torque (Nm)__linear_trend__attr_""intercept""",0.0013938052301245315
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_10",0.001370304932446839
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.2",0.0013606322361263059
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_74",0.001358866354040301
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.6",0.001355812093454702
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_10",0.0013443551803790045
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_19",0.0013387438638474474
+intr_Torque (Nm)__partial_autocorrelation__lag_5,0.0013386637669095477
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""mean""",0.0013099073980648512
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_3,0.0013029387874382641
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_26",0.0012645890818548673
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_0",0.0012619746637660579
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_4",0.0012548258239372322
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.4",0.0012397453944043041
+intr_Current (V)__mean,0.0012274697682577954
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_16",0.001212621610629912
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.0",0.0012102975310175213
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_39",0.001201266470326847
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_6",0.0012009749300714453
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.0",0.0011955970781349198
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""var""",0.0011686058356469365
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_37",0.0011536852220871
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_0.5,0.0011097955757339124
+intr_Current (V)__abs_energy,0.0010895930789902213
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""max""",0.0010865373328151568
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_42",0.0010814001352973262
+task_Robot_I (A)__variance,0.0010723891435670896
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.4",0.001063090197197419
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.4",0.001043405588055262
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.4",0.0010317203844660966
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_71",0.001021759284254623
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_22",0.0010196133289130692
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.4",0.001013036768558196
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.2",0.0010109826256723318
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_29",0.0009858421813492286
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_71",0.0009739629286561691
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_0,0.0009703865637447773
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""max""",0.0009631780461872749
+intr_Torque (Nm)__index_mass_quantile__q_0.3,0.0009620693175179092
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_2",0.0009432101735454298
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_2",0.0009428469125368308
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_83",0.0009362090763382155
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_12",0.0009314010417452508
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_9,0.0009150225257323538
+intr_Torque (Nm)__absolute_sum_of_changes,0.0008903723645011127
+intr_Current (V)__lempel_ziv_complexity__bins_2,0.0008901414182705075
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_63",0.0008888735630941335
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_10",0.0008634679059446867
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""var""",0.0008589651735935808
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_38",0.0008412056386120212
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.0",0.0008394420262342862
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""mean""",0.0008307407369631006
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_1",0.0008162593742746882
+task_Robot_I (A)__autocorrelation__lag_7,0.0008145236610079164
+"task_Robot_I (A)__linear_trend__attr_""slope""",0.0008017662367662196
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_6",0.0007959798785740911
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_5",0.0007890711514701716
+"task_Robot_I (A)__linear_trend__attr_""stderr""",0.0007889870289320263
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.0",0.0007864737879611154
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_29",0.000781440861601208
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""mean""",0.0007799462804110814
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.4",0.0007699504371567424
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""min""",0.0007666205906890046
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_7",0.0007427190875329209
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.0",0.0007318305403962497
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_20",0.0007304327731756409
+intr_Current (V)__ratio_beyond_r_sigma__r_1,0.000724695192739838
+task_Robot_I (A)__quantile__q_0.3,0.0007227578152695119
+task_Robot_I (A)__index_mass_quantile__q_0.9,0.0007018832507754408
+intr_Current (V)__large_standard_deviation__r_0.05,0.0006942584863699288
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.0",0.0006931033135004022
+intr_Torque (Nm)__max_langevin_fixed_point__m_3__r_30,0.0006898051110894963
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_82",0.0006723754245202103
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.4",0.0006709787073711235
+intr_Torque (Nm)__range_count__max_1__min_-1,0.0006701100290201758
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.0",0.0006688258045094668
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.4",0.0006665297359452036
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_13",0.0006631699254456857
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_19",0.0006537512335737879
+task_Robot_I (A)__index_mass_quantile__q_0.3,0.000651560713753796
+intr_Current (V)__ratio_beyond_r_sigma__r_1.5,0.0006466064061061676
+audio_Amplitude__number_crossing_m__m_0,0.0006453571227260863
+intr_Current (V)__autocorrelation__lag_1,0.0006429213629480654
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""mean""",0.0006289405666374498
+intr_Current (V)__mean_abs_change,0.0006280720112518102
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_54",0.0006267958257527107
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_29",0.0006239731954520072
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_8",0.0006160704962807707
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_66",0.0006155173531875355
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_76",0.0006008324352362164
+intr_Current (V)__kurtosis,0.0005991655516071763
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""max""",0.0005974747338337749
+intr_Torque (Nm)__quantile__q_0.3,0.0005942491889040771
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_22",0.0005905217536053485
+task_Robot_I (A)__length,0.0005901516620277963
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""mean""",0.0005897810648856538
+intr_Torque (Nm)__number_peaks__n_10,0.0005865195639794691
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_13",0.0005832061886148747
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.2",0.0005797246738365664
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.8",0.0005790915097355491
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.0",0.0005778267530038945
+task_Robot_I (A)__number_peaks__n_3,0.0005775101138086216
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_11",0.0005717523014544612
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_3",0.000571299442600171
+intr_Torque (Nm)__large_standard_deviation__r_0.2,0.0005707053948123732
+intr_Current (V)__ar_coefficient__coeff_1__k_10,0.0005679828173721109
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_11",0.000566550683689077
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_88",0.0005615649949088245
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_27",0.0005582296368626229
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_2,0.0005554321506857099
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_3",0.0005495707362581526
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_3,0.0005314645195520597
+intr_Current (V)__autocorrelation__lag_7,0.0005306357588073285
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.2",0.0005253457740940564
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.8",0.0005245628387849739
+task_Robot_I (A)__c3__lag_1,0.0005211291859473047
+intr_Torque (Nm)__autocorrelation__lag_1,0.0005177685820697598
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_6,0.0005164183760262533
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.8",0.000511608881546459
+intr_Current (V)__longest_strike_above_mean,0.0005088437524039646
+intr_Current (V)__spkt_welch_density__coeff_8,0.0004924826142829621
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_19",0.0004919297801934403
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_15",0.0004915596173889328
+intr_Current (V)__index_mass_quantile__q_0.3,0.0004871178634425258
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_1",0.00048540219193112677
+intr_Torque (Nm)__length,0.0004768673347117608
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_45",0.0004718114011070497
+task_Robot_I (A)__index_mass_quantile__q_0.8,0.0004635198256948453
+intr_Current (V)__friedrich_coefficients__coeff_0__m_3__r_30,0.00046208700335724994
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_15",0.00045957601180915305
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_16",0.00045910803083942846
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_12",0.00045899812834374444
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_86",0.0004570041118040645
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_7",0.0004559767324310375
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.2",0.0004544078959668927
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.4",0.00044405424091082876
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""mean""",0.0004421530002606887
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.6",0.00044185017267707206
+"audio_Amplitude__agg_autocorrelation__f_agg_""mean""__maxlag_40",0.00044052030885261077
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_95",0.00043645009767259816
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""min""",0.0004339101379951443
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_78",0.0004302033559464602
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""min""",0.0004290860549632621
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_17",0.0004287828070508065
+task_Robot_I (A)__index_mass_quantile__q_0.6,0.0004276440598189362
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.0",0.00042621791243341393
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.0",0.0004239214080975773
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_55",0.00041647657341755
+intr_Torque (Nm)__time_reversal_asymmetry_statistic__lag_1,0.00041584355688562284
+intr_Torque (Nm)__lempel_ziv_complexity__bins_10,0.0004111059097539001
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.2",0.00041021149915309414
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""mean""",0.0004082130597670782
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_34",0.00040477392000629417
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.4",0.0003978078116114083
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_15",0.0003950055615863329
+task_Robot_I (A)__median,0.00039405189541180967
+intr_Torque (Nm)__range_count__max_1000000000000.0__min_0,0.0003938294532775141
+intr_Current (V)__index_mass_quantile__q_0.4,0.00039376955464299465
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_70",0.00039357278768683564
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_20",0.0003897212771003105
+intr_Torque (Nm)__friedrich_coefficients__coeff_0__m_3__r_30,0.0003888394973302383
+intr_Torque (Nm)__permutation_entropy__dimension_5__tau_1,0.00038879334289158623
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_37",0.0003846928641553875
+intr_Torque (Nm)__c3__lag_2,0.0003832928226343491
+intr_Current (V)__number_cwt_peaks__n_1,0.0003830442147129105
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_25",0.0003795912226284165
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.0",0.0003788209465197437
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""mean""",0.000377721707078944
+task_Robot_I (A)__count_below_mean,0.00037659873029264733
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_73",0.00037621069654280426
+task_Robot_I (A)__autocorrelation__lag_9,0.0003760126718613049
+intr_Torque (Nm)__root_mean_square,0.0003624904815490691
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_25",0.0003544886895015142
+intr_Torque (Nm)__c3__lag_3,0.00035334928237253663
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_87",0.00035187173254475664
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_6,0.0003514260482169125
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""mean""",0.0003460030232580219
+"intr_Torque (Nm)__fft_aggregated__aggtype_""centroid""",0.0003442394426074691
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.4",0.00034417574203147143
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_6,0.00034155094072035804
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""var""",0.00033945537436944165
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_16",0.00033939249469231645
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_75",0.0003339161038787792
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_72",0.00033289456299666906
+intr_Current (V)__ratio_beyond_r_sigma__r_0.5,0.0003318480219178078
+intr_Torque (Nm)__ar_coefficient__coeff_0__k_10,0.00032935674490173794
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.6",0.00032874177841229064
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_30",0.0003281062890782461
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""max""",0.000327312469422365
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_36",0.0003268948353644728
+intr_Current (V)__lempel_ziv_complexity__bins_10,0.000326630124217483
+intr_Current (V)__median,0.00032543114355420053
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_4",0.0003248974793255825
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_95",0.0003209407328625213
+intr_Current (V)__ar_coefficient__coeff_9__k_10,0.0003173087327872012
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_41",0.00031317890948822746
+intr_Current (V)__quantile__q_0.2,0.00031261319011079635
+task_Robot_I (A)__spkt_welch_density__coeff_8,0.0003071507546141325
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""mean""",0.00030540124226573385
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_5",0.0003051665603968625
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_10",0.0003026716593716476
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_69",0.00030076095301212463
+intr_Torque (Nm)__partial_autocorrelation__lag_1,0.00029881317679668817
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_98",0.000296427936628299
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_6",0.00029316461206028586
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.2",0.00029314852434070477
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_75",0.00029215065699863017
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_83",0.0002919557610022315
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.0",0.00028944666988239734
+intr_Torque (Nm)__quantile__q_0.1,0.00028728268162434126
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.2",0.00028605081767125957
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.2",0.00028566042235153127
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""min""",0.00028548290154276854
+intr_Current (V)__binned_entropy__max_bins_10,0.00028094380392206837
+intr_Current (V)__fourier_entropy__bins_100,0.00028071152675802934
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_0",0.0002771813977290887
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.2",0.0002770197061648085
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.2__ql_0.0",0.0002742078406874562
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.2",0.00027356442023319396
+intr_Current (V)__time_reversal_asymmetry_statistic__lag_3,0.0002734581994652968
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""var""",0.0002715068724886526
+"intr_Current (V)__augmented_dickey_fuller__attr_""teststat""__autolag_""AIC""",0.0002713895268246873
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_59",0.00026735633081047564
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.2",0.00026660873588953577
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_61",0.0002661667495809845
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_8",0.0002632358914863776
+audio_Amplitude__number_peaks__n_5,0.0002631001690177231
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""max""",0.0002617187448680337
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""min""",0.0002581010555089073
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.2",0.00025670411777723313
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_32",0.0002561022520072378
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_85",0.00025573649344879415
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""max""",0.00025265978599507607
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.2",0.00025092456600839626
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_19",0.00024880741297765997
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_75",0.0002486462259275677
+task_Robot_I (A)__time_reversal_asymmetry_statistic__lag_2,0.00024713297573347525
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_51",0.0002470574348262125
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""min""",0.0002468727371332455
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_24",0.00024389394131746545
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_65",0.00024367621472930898
+intr_Torque (Nm)__count_above_mean,0.00024035500938905183
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""mean""",0.00023958853572272242
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.2",0.00023815681785254304
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.4",0.00023815481537744733
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_6",0.00023777370105817867
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_9",0.00023682192160944936
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_16",0.00023670110082980704
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_55",0.00023633423724890706
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_14",0.00023583789909634585
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_70",0.0002357710428378898
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_89",0.0002348546306287276
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_65",0.00023251860342066372
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""max""",0.00023192489858592228
+audio_Amplitude__quantile__q_0.9,0.0002308264724754658
+intr_Current (V)__minimum,0.0002275240589458546
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_71",0.00022538904211139452
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_1",0.0002241260790701685
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_5",0.00022324874091836765
+audio_Amplitude__spkt_welch_density__coeff_8,0.00022213631539422503
+intr_Current (V)__longest_strike_below_mean,0.00022193611971256885
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_86",0.00021778263408427808
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.4",0.0002177061192717286
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_2",0.00021662819838260037
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""max""",0.0002157969222319902
+"intr_Current (V)__cwt_coefficients__coeff_6__w_20__widths_(2, 5, 10, 20)",0.00021482177414591894
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.6",0.00021336486192484092
+task_Robot_I (A)__index_mass_quantile__q_0.2,0.00021319037435731065
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""max""",0.00021309321409671784
+intr_Torque (Nm)__median,0.00021270673529035717
+intr_Current (V)__friedrich_coefficients__coeff_3__m_3__r_30,0.00021259500895312055
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""min""",0.00021130556682986273
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_74",0.0002112278743945198
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_94",0.00021105789748796316
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""mean""",0.00020685663266576152
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_80",0.0002039452143213688
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_2",0.0002037171787348774
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""var""",0.0002019204755977466
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_11",0.0002013067447960129
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_34",0.00019698907939260047
+intr_Torque (Nm)__time_reversal_asymmetry_statistic__lag_2,0.00019567299378155933
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_73",0.00019542254886723676
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.2__ql_0.0",0.00019532842900121057
+intr_Current (V)__permutation_entropy__dimension_7__tau_1,0.00019345920602492452
+"intr_Current (V)__linear_trend__attr_""stderr""",0.00019272567456494758
+intr_Current (V)__cid_ce__normalize_True,0.00019185162063923243
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_22",0.00019174443459979925
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""mean""",0.0001911619272544539
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_23",0.00019068538008353743
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_86",0.0001905074200565042
+"task_Robot_I (A)__cwt_coefficients__coeff_2__w_10__widths_(2, 5, 10, 20)",0.00018997238851166607
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""min""",0.00018975977765556704
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""mean""",0.00018764805816263552
+audio_Amplitude__partial_autocorrelation__lag_5,0.00018720467662869397
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""max""",0.0001871169297427865
+intr_Current (V)__fourier_entropy__bins_5,0.00018466817643677624
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.2",0.00018279137263190785
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_22",0.00018062058884897925
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""var""",0.00018015300103486215
+"intr_Current (V)__cwt_coefficients__coeff_8__w_20__widths_(2, 5, 10, 20)",0.00018013808717122815
+intr_Current (V)__partial_autocorrelation__lag_5,0.0001799763651917745
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_96",0.00017993041530087374
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""var""",0.00017707038588253863
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_26",0.0001760676816445697
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_27",0.00017520628273536059
+"task_Robot_I (A)__cwt_coefficients__coeff_6__w_10__widths_(2, 5, 10, 20)",0.00017426272622306227
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_5",0.0001731060184002565
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.2",0.00017125033182652775
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_44",0.0001712416515480027
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""var""",0.000171001893965865
+audio_Amplitude__quantile__q_0.8,0.00017024059953890615
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.2",0.00016886389531430785
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_40",0.0001679769479705496
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_6,0.00016784541577316914
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.6",0.00016718261974564563
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.0",0.0001670680572042467
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""min""",0.00016653664545674215
+audio_Amplitude__quantile__q_0.1,0.00016619898952802893
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_74",0.00016264083293002863
+intr_Torque (Nm)__partial_autocorrelation__lag_7,0.00016163385150451233
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_24",0.00016041473044800037
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_51",0.00015983951541189675
+"task_Robot_I (A)__fft_aggregated__aggtype_""centroid""",0.0001596301433653644
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_19",0.00015879710795127817
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_4,0.00015866193189795715
+intr_Torque (Nm)__partial_autocorrelation__lag_4,0.00015783934967938915
+intr_Current (V)__number_crossing_m__m_1,0.0001566002970718669
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""var""",0.00015584470642487208
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_66",0.00015571406608764276
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_74",0.00015411576866383543
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.4",0.00015404828905253294
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_16",0.00015343813676059616
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.4",0.0001533449153553721
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.6",0.0001531983364468016
+task_Robot_I (A)__ratio_beyond_r_sigma__r_2,0.00015244369882580217
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.4",0.00015179501685221286
+intr_Current (V)__autocorrelation__lag_4,0.0001513237173630776
+task_Robot_I (A)__autocorrelation__lag_5,0.0001506514222089631
+intr_Current (V)__first_location_of_minimum,0.00014903728816347388
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""var""",0.0001475230670295401
+task_Robot_I (A)__longest_strike_below_mean,0.0001463044619475112
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_43",0.0001450847399351491
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""var""",0.00014416554680384244
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_82",0.00014317991621790036
+audio_Amplitude__quantile__q_0.2,0.00014299469991057057
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_62",0.00014249309659277143
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_33",0.00014202412267494378
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_54",0.00014186400031834557
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_68",0.00014184394066983164
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.0",0.00014110943716987758
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_52",0.00014091699842435216
+task_Robot_I (A)__quantile__q_0.9,0.00014043686756135023
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_54",0.00014027290274303103
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_67",0.0001401429893844369
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_1",0.00013664133354354745
+audio_Amplitude__index_mass_quantile__q_0.2,0.00013646251719897682
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_22",0.0001362636596791725
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_81",0.00013608832064856665
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""mean""",0.00013543979323518462
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_31",0.00013499147405620512
+task_Robot_I (A)__mean_abs_change,0.00013435146495884988
+task_Robot_I (A)__permutation_entropy__dimension_3__tau_1,0.00013424023212037326
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_9",0.00013400508396117048
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.2",0.00013349503908186477
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_85",0.00013296248467058134
+intr_Torque (Nm)__index_mass_quantile__q_0.4,0.00013173754435067696
+task_Robot_I (A)__count_above_mean,0.00013135602666860315
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_7",0.00013105038740706163
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""var""",0.00013078447927130103
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_85",0.00013000865772571027
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""mean""",0.00012982384092354666
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.4",0.0001295727931339936
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_14",0.00012925234050162652
+intr_Torque (Nm)__benford_correlation,0.00012914184954004738
+intr_Current (V)__ar_coefficient__coeff_5__k_10,0.00012911121168974538
+intr_Torque (Nm)__spkt_welch_density__coeff_5,0.00012732254850748094
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.6",0.00012644243621444924
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_27",0.00012638453621391144
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.0",0.00012588204622298197
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_71",0.00012524495756517117
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_13",0.0001248484842047762
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_1,0.00012446696911263397
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_68",0.00012446022320991392
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""max""",0.00012415645863208516
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_37",0.00012400749805029104
+task_Robot_I (A)__lempel_ziv_complexity__bins_2,0.00012351432481865334
+intr_Torque (Nm)__first_location_of_maximum,0.000123272931491515
+audio_Amplitude__range_count__max_0__min_-1000000000000.0,0.00012319917291324275
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_49",0.00012280072160643485
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_50",0.00012239868104056697
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_69",0.00012199603203205747
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.4",0.00012195802204910463
+intr_Torque (Nm)__minimum,0.00012195791651912658
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""var""",0.00012139320178385676
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_17",0.00012136786401602517
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_32",0.0001203913291406261
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_16",0.00012030774114822049
+intr_Current (V)__partial_autocorrelation__lag_8,0.00012022026810500658
+intr_Torque (Nm)__permutation_entropy__dimension_7__tau_1,0.00012014856831612376
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""mean""",0.0001194664209033329
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_34",0.00011945372142593122
+intr_Current (V)__permutation_entropy__dimension_5__tau_1,0.00011931019982734416
+intr_Torque (Nm)__count_below__t_0,0.00011924910467062774
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_55",0.00011911925127327384
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_38",0.00011889181242024948
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_62",0.00011781273866681533
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""var""",0.00011772610934421626
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_86",0.00011715651655065078
+task_Robot_I (A)__number_peaks__n_10,0.00011695133327000557
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_97",0.00011639551943270328
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_91",0.00011627618486324237
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_2",0.00011614288258890306
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_63",0.00011612349837449295
+intr_Torque (Nm)__time_reversal_asymmetry_statistic__lag_3,0.00011600901206337289
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_0",0.00011582318913661214
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_1",0.00011579386667484679
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_50",0.00011569141918782334
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""mean""",0.00011555009879164694
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.2",0.00011424157362601722
+"intr_Current (V)__cwt_coefficients__coeff_3__w_20__widths_(2, 5, 10, 20)",0.00011334260158945212
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_18",0.00011315509004026878
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_3,0.00011290590605326952
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.2",0.00011279775931297812
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_4",0.00011225705380132824
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_52",0.00011225382271382519
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_58",0.00011198601006757097
+task_Robot_I (A)__number_crossing_m__m_1,0.00011192926732993758
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.6",0.0001114488050681693
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.0",0.00011141996090287483
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_0",0.00011045763001733517
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_74",0.00011009667093650726
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.2",0.00011001313733768809
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_67",0.00010971311609791836
+intr_Torque (Nm)__friedrich_coefficients__coeff_3__m_3__r_30,0.00010967271151517646
+audio_Amplitude__quantile__q_0.3,0.00010928293810042422
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_46",0.00010820037177028688
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_70",0.00010780675264503678
+intr_Torque (Nm)__quantile__q_0.2,0.00010776266424318753
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.0",0.00010728915343233884
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""var""",0.00010703175689260445
+intr_Current (V)__ratio_beyond_r_sigma__r_3,0.00010696005057631712
+task_Robot_I (A)__spkt_welch_density__coeff_2,0.00010680220248894668
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_76",0.0001066092489154282
+intr_Torque (Nm)__mean_n_absolute_max__number_of_maxima_7,0.00010652897937668345
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.0",0.00010633223937231538
+task_Robot_I (A)__cid_ce__normalize_False,0.0001051580897031122
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_26",0.00010400229794098865
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_70",0.0001033178139027112
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_78",0.00010301069316178291
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_70",0.0001027815849345488
+audio_Amplitude__variance,0.0001024711608560316
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_7",0.00010201568769218772
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_51",0.00010199148069427482
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_64",0.00010177992982898584
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_4",0.00010172831859219365
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_27",0.00010164626927701878
+intr_Torque (Nm)__autocorrelation__lag_2,0.00010121794385623586
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_97",0.00010118863352168274
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""mean""",0.00010093184037388712
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_72",0.00010088271315231625
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_35",0.0001006938441795132
+intr_Current (V)__quantile__q_0.7,0.00010022166516382016
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_27",0.00010007849269749307
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_54",0.0001000043630058612
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_97",9.965356133204927e-05
+task_Robot_I (A)__absolute_maximum,9.95883507320108e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_5__w_20__widths_(2, 5, 10, 20)",9.946480309958114e-05
+"intr_Current (V)__augmented_dickey_fuller__attr_""pvalue""__autolag_""AIC""",9.924809818971667e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_39",9.921445657586467e-05
+task_Robot_I (A)__quantile__q_0.6,9.913743423286471e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_96",9.90771669816631e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_88",9.866655976791306e-05
+"intr_Torque (Nm)__linear_trend__attr_""rvalue""",9.808789685106796e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_69",9.799991010435087e-05
+audio_Amplitude__partial_autocorrelation__lag_3,9.767158133871274e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_64",9.744579966488608e-05
+intr_Torque (Nm)__first_location_of_minimum,9.711090200219993e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_2",9.706574209053527e-05
+audio_Amplitude__ar_coefficient__coeff_5__k_10,9.672910835920811e-05
+audio_Amplitude__ratio_beyond_r_sigma__r_1.5,9.655816757214453e-05
+audio_Amplitude__index_mass_quantile__q_0.8,9.646862692602463e-05
+"intr_Current (V)__cwt_coefficients__coeff_13__w_20__widths_(2, 5, 10, 20)",9.624539807768956e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_46",9.592631397133613e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_67",9.557972560955022e-05
+audio_Amplitude__autocorrelation__lag_3,9.552080064619898e-05
+"intr_Torque (Nm)__cwt_coefficients__coeff_0__w_10__widths_(2, 5, 10, 20)",9.526349068271614e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.0",9.517522150174072e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_64",9.516903268031398e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_76",9.510068497018536e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_18",9.505703599578314e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_56",9.501672585006046e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_49",9.492262719480751e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_92",9.477152743979914e-05
+intr_Torque (Nm)__partial_autocorrelation__lag_2,9.433906502656418e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""max""",9.431674582565976e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_17",9.410080641703967e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""var""",9.382297732773913e-05
+intr_Current (V)__mean_change,9.347431780279623e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_42",9.343358033840179e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_92",9.302469088188334e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_38",9.261372769053979e-05
+audio_Amplitude__ar_coefficient__coeff_0__k_10,9.212051556633849e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_79",9.197825627996904e-05
+audio_Amplitude__index_mass_quantile__q_0.1,9.189424489303166e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_87",9.167153697881757e-05
+"task_Robot_I (A)__augmented_dickey_fuller__attr_""pvalue""__autolag_""AIC""",9.164084575655691e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_72",9.111183449455683e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_62",9.073740416732443e-05
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_0,9.057547701477068e-05
+task_Robot_I (A)__absolute_sum_of_changes,9.047820537676781e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_44",9.034383124836079e-05
+"task_Robot_I (A)__agg_autocorrelation__f_agg_""var""__maxlag_40",9.021721946808038e-05
+intr_Current (V)__quantile__q_0.3,9.012106623194692e-05
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""mean""",9.010921382319868e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_78",9.005946522377881e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_72",8.998272816547638e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_48",8.983433243337417e-05
+audio_Amplitude__max_langevin_fixed_point__m_3__r_30,8.973575049170743e-05
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_59",8.970371900813998e-05
+intr_Torque (Nm)__ar_coefficient__coeff_2__k_10,8.967740124228609e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_70",8.961749519980699e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_18",8.942608024991834e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_67",8.939173186114445e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.0",8.850088411978187e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_82",8.814036527340565e-05
+task_Robot_I (A)__ar_coefficient__coeff_4__k_10,8.75802523006356e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.4",8.724208516024226e-05
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""mean""",8.698076821092471e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_88",8.69569938063626e-05
+audio_Amplitude__minimum,8.690655777599654e-05
+intr_Current (V)__permutation_entropy__dimension_4__tau_1,8.637967898147797e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_37",8.634690174357598e-05
+intr_Torque (Nm)__ar_coefficient__coeff_3__k_10,8.597347236879469e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_65",8.588314710209426e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_20",8.581011276336526e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.0",8.56083833003112e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_77",8.558586203089092e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_77",8.537772174638048e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_73",8.53607516488085e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_4",8.503657138912731e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.0",8.482479810959538e-05
+task_Robot_I (A)__fourier_entropy__bins_3,8.445858897628204e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_79",8.433912754941441e-05
+audio_Amplitude__fourier_entropy__bins_100,8.425511285558467e-05
+audio_Amplitude__permutation_entropy__dimension_5__tau_1,8.413287325554628e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.8",8.407282273993738e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_43",8.396035702173611e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_58",8.383063498356641e-05
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""min""",8.382521229811885e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_82",8.37640686743669e-05
+intr_Torque (Nm)__autocorrelation__lag_3,8.331939014574525e-05
+intr_Torque (Nm)__ar_coefficient__coeff_5__k_10,8.32162563800685e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_33",8.306922435240716e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_90",8.275293907570607e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_3",8.255563161959508e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_33",8.255173661478821e-05
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_5,8.242907123578456e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_33",8.195808201990293e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_19",8.179920578405957e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_31",8.151429553293854e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_22",8.133656427898923e-05
+intr_Current (V)__ar_coefficient__coeff_6__k_10,8.041460989649943e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_66",8.037337810712163e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_3",8.020173850468137e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_26",8.011348820732213e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_30",8.011209894532566e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_36",7.991150715909509e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_35",7.980316942767639e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_63",7.974611207452142e-05
+task_Robot_I (A)__ar_coefficient__coeff_0__k_10,7.958000008086212e-05
+task_Robot_I (A)__ar_coefficient__coeff_10__k_10,7.957085739316371e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.0",7.946129181147657e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_94",7.923741940957525e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_14",7.919561858387191e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_78",7.906749361870816e-05
+"task_Robot_I (A)__agg_autocorrelation__f_agg_""mean""__maxlag_40",7.895849503893076e-05
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""mean""",7.878663790461756e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_45",7.871421853687839e-05
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_9,7.847984874271189e-05
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""mean""",7.842982590687074e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_60",7.831194178183064e-05
+task_Robot_I (A)__index_mass_quantile__q_0.1,7.789262896741344e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.2",7.743530210957711e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_68",7.708479733273384e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_77",7.668941378581929e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_48",7.666077455274678e-05
+task_Robot_I (A)__range_count__max_1__min_-1,7.599086429804621e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_64",7.585617155114922e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_95",7.584573519044867e-05
+task_Robot_I (A)__permutation_entropy__dimension_5__tau_1,7.564802482400778e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_93",7.540166363609133e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_18",7.527522682998108e-05
+intr_Torque (Nm)__skewness,7.524986927934315e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_20",7.519518888951429e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_21",7.516828121000127e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_99",7.512285096886318e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.0",7.510371499035023e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_87",7.487203540342197e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_90",7.474493048853361e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_51",7.469702079046433e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_89",7.42327473943485e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_96",7.42251325362715e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_18",7.399592076481126e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_16",7.39679159544106e-05
+intr_Torque (Nm)__friedrich_coefficients__coeff_2__m_3__r_30,7.390999257305105e-05
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_28",7.389594947869959e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_95",7.388976444872518e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_61",7.34722074402066e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_0__w_10__widths_(2, 5, 10, 20)",7.336699130242227e-05
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""mean""",7.330806051550587e-05
+audio_Amplitude__c3__lag_2,7.327932861180532e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_12",7.326612442886303e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.0",7.32076692369437e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_42",7.32053435358061e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_32",7.28862140318633e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_35",7.284795777910446e-05
+"intr_Current (V)__cwt_coefficients__coeff_7__w_10__widths_(2, 5, 10, 20)",7.266778975674919e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""min""",7.25765733403816e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_25",7.252686804110131e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_93",7.218920817689888e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_28",7.218244002802864e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_89",7.20224989110812e-05
+audio_Amplitude__count_above__t_0,7.18731822147334e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_91",7.146114619157287e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.2",7.124954982218476e-05
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""var""",7.111738666250783e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_90",7.097293474002392e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_93",7.078864874417299e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_75",7.053710387133953e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_43",7.048897734873407e-05
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""max""",7.044152569056577e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.4",7.040575095610909e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_79",7.020450673115571e-05
+"intr_Current (V)__cwt_coefficients__coeff_3__w_10__widths_(2, 5, 10, 20)",7.01995560833886e-05
+task_Robot_I (A)__autocorrelation__lag_1,7.01704903184486e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_11",6.940540047796518e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_2",6.934375160491644e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_65",6.92879145993957e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.4__ql_0.2",6.926132951319055e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_80",6.91076038522195e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_52",6.905911678274133e-05
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_0,6.903047029733282e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_8",6.883609002324654e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_57",6.857305928060363e-05
+intr_Current (V)__count_above__t_0,6.85163786405736e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_85",6.829744774935682e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_57",6.81535985116154e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_5",6.798449283323127e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_50",6.78465938474889e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_55",6.75903905271251e-05
+audio_Amplitude__ar_coefficient__coeff_7__k_10,6.724534004371775e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_24",6.678732411477203e-05
+intr_Torque (Nm)__fourier_entropy__bins_10,6.65762732285285e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""min""",6.635899644797492e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_39",6.60556212066649e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_3",6.56115129135049e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_43",6.557901053107475e-05
+intr_Current (V)__number_peaks__n_3,6.5352908111272e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_75",6.442880565838667e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_77",6.393819063545917e-05
+"intr_Current (V)__cwt_coefficients__coeff_10__w_5__widths_(2, 5, 10, 20)",6.386138124676433e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_4__w_10__widths_(2, 5, 10, 20)",6.382178858284227e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""var""",6.380316953507367e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_47",6.344509620423926e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.2",6.331838628358568e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_27",6.324408070015834e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_60",6.317056649545938e-05
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""max""",6.315016381903999e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.2",6.306981729482454e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_86",6.269109559367498e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_39",6.253475341689434e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.2",6.247493319031915e-05
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""max""",6.247082328082512e-05
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_4,6.242053022020245e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_17",6.205164220932402e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_54",6.1840679197873e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_19",6.17668918664625e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_46",6.173896550373695e-05
+"task_Robot_I (A)__linear_trend__attr_""pvalue""",6.172891581018267e-05
+"intr_Current (V)__cwt_coefficients__coeff_5__w_10__widths_(2, 5, 10, 20)",6.164627764594027e-05
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""min""",6.16034138034548e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_85",6.145555394356497e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_25",6.113145048902038e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_15",6.110730967038865e-05
+task_Robot_I (A)__ar_coefficient__coeff_7__k_10,6.106647457053363e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_54",6.0938032870896704e-05
+task_Robot_I (A)__variation_coefficient,6.083146525889271e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_44",6.027908784569602e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""min""",6.0151032209294165e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_86",6.0137994770226605e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_25",5.99046015494914e-05
+intr_Torque (Nm)__mean_second_derivative_central,5.977712150832902e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_1",5.955886388556356e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_71",5.9532236989863374e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_41",5.948432124492891e-05
+intr_Current (V)__partial_autocorrelation__lag_9,5.941574005782846e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""mean""",5.939232629243709e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_50",5.9279409426136006e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_44",5.926568204054494e-05
+task_Robot_I (A)__abs_energy,5.907323727482978e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_16",5.8998557847997044e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_27",5.894986393719865e-05
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_1,5.894501434690865e-05
+intr_Current (V)__number_peaks__n_5,5.8855495591331724e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_32",5.853793853625668e-05
+"intr_Current (V)__cwt_coefficients__coeff_14__w_20__widths_(2, 5, 10, 20)",5.8240845498464927e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.0",5.800984526612117e-05
+audio_Amplitude__autocorrelation__lag_9,5.787409797398191e-05
+intr_Torque (Nm)__longest_strike_below_mean,5.776028099123773e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_23",5.771256639187488e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_42",5.7372353867401634e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_33",5.701535557838981e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_97",5.685530866020974e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_72",5.658712459401908e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_27",5.6130078598216687e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_90",5.5886395198511875e-05
+audio_Amplitude__maximum,5.587918358319627e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_15",5.569132922249133e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.2__ql_0.0",5.5342797334021425e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_72",5.5057520222050616e-05
+task_Robot_I (A)__ar_coefficient__coeff_5__k_10,5.49328480975832e-05
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_2,5.4758340899043525e-05
+audio_Amplitude__ar_coefficient__coeff_9__k_10,5.4670915917635535e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_80",5.464803387647832e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_92",5.429662893040796e-05
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""mean""",5.4246093943148686e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_52",5.342619134742122e-05
+"task_Robot_I (A)__agg_autocorrelation__f_agg_""median""__maxlag_40",5.339201901048125e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_23",5.334632522493812e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_14",5.320047079269567e-05
+intr_Torque (Nm)__ar_coefficient__coeff_7__k_10,5.3175049546356084e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_84",5.317195987684448e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_55",5.311752144367887e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_80",5.3085830873806854e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.2",5.303872808432415e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""var""",5.303017426050258e-05
+"intr_Torque (Nm)__cwt_coefficients__coeff_14__w_20__widths_(2, 5, 10, 20)",5.294898207652488e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_69",5.252449125912496e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_45",5.2374374321365595e-05
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_9,5.234525109614535e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_39",5.2317350834747485e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.0",5.2316182309979286e-05
+audio_Amplitude__root_mean_square,5.206090842094276e-05
+audio_Amplitude__permutation_entropy__dimension_4__tau_1,5.203717445668233e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""var""",5.196926831190665e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_79",5.172769602361151e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""max""",5.162445819615788e-05
+audio_Amplitude__sum_values,5.1576698788960014e-05
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""min""",5.137358738577291e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_68",5.114164321865076e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_61",5.105643512310029e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.2__ql_0.0",5.1018197689754844e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_36",5.084638173671792e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""max""",5.0705858759107414e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_54",5.070254441585547e-05
+audio_Amplitude__range_count__max_1000000000000.0__min_0,5.064058354686579e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_33",5.0223769415716405e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_26",5.0208725884070867e-05
+intr_Torque (Nm)__ar_coefficient__coeff_4__k_10,5.017247750842513e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_31",5.0142523122717686e-05
+task_Robot_I (A)__skewness,4.998456188462554e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_95",4.974409874724816e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_84",4.97281663064956e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_1__w_5__widths_(2, 5, 10, 20)",4.961781861699939e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_17",4.960693904825014e-05
+audio_Amplitude__last_location_of_maximum,4.94970805697293e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_6__w_5__widths_(2, 5, 10, 20)",4.907737249050941e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_85",4.898894204000469e-05
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_8,4.894437054600839e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_50",4.877640023721874e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_3",4.875182451191147e-05
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_93",4.8681346298563214e-05
+audio_Amplitude__ratio_beyond_r_sigma__r_2.5,4.8652575402444964e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_66",4.858655938819752e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_96",4.853585807095052e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_35",4.8509515937868586e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_81",4.81349135118762e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_26",4.8070121423456703e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_34",4.799109020903146e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_23",4.7970474848743425e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""max""",4.79418943048441e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_11",4.7640568807777414e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_6",4.7507624086054114e-05
+intr_Torque (Nm)__number_peaks__n_3,4.74025514766209e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_62",4.731286181132097e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_22",4.713357725762483e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.6",4.712561909911558e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_76",4.7049717254086314e-05
+audio_Amplitude__autocorrelation__lag_1,4.696746806909648e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_39",4.6876754338376414e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""mean""",4.681562384103113e-05
+task_Robot_I (A)__autocorrelation__lag_3,4.674660817934902e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_81",4.664741977107954e-05
+"intr_Torque (Nm)__cwt_coefficients__coeff_8__w_2__widths_(2, 5, 10, 20)",4.6642123341414466e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_73",4.652968024370262e-05
+task_Robot_I (A)__ratio_beyond_r_sigma__r_1,4.651571814714704e-05
+"intr_Current (V)__cwt_coefficients__coeff_9__w_20__widths_(2, 5, 10, 20)",4.644009790543029e-05
+"intr_Torque (Nm)__fft_aggregated__aggtype_""variance""",4.640638112477343e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_42",4.626879967492268e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_11",4.6231524331779694e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.0",4.6187606154414575e-05
+"audio_Amplitude__augmented_dickey_fuller__attr_""teststat""__autolag_""AIC""",4.6149860892736006e-05
+audio_Amplitude__index_mass_quantile__q_0.3,4.609607255756022e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_42",4.6034890456702365e-05
+"intr_Current (V)__cwt_coefficients__coeff_4__w_10__widths_(2, 5, 10, 20)",4.591448938819314e-05
+"intr_Current (V)__cwt_coefficients__coeff_2__w_20__widths_(2, 5, 10, 20)",4.5867431360290206e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_78",4.580824991895034e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_71",4.5784392111956505e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_53",4.564487862177832e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_28",4.5580451854390256e-05
+audio_Amplitude__partial_autocorrelation__lag_6,4.54628486841927e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_57",4.541853573810331e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.2__ql_0.0",4.5129643736362584e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.8",4.504768693316072e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_93",4.4857535443057095e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_37",4.4714583034659356e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_29",4.470051082105844e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_33",4.461470175181538e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_94",4.4560950097267645e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_41",4.4434598567294866e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_22",4.442086683451935e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_82",4.431254128863008e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.0",4.427790996473853e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_58",4.427699810764174e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_61",4.415019582751574e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_25",4.40921920540676e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_89",4.3846765349266866e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_40",4.375265788330255e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_88",4.3738180209116056e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_65",4.3653000978954626e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""mean""",4.343601683959386e-05
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""var""",4.327427787609282e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_21",4.3158220813434156e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_57",4.315410463277942e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_32",4.3132372853765935e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_47",4.3018439852886244e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_97",4.2835611790583504e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""mean""",4.2655438076499715e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_53",4.2454532599738526e-05
+"intr_Torque (Nm)__cwt_coefficients__coeff_7__w_2__widths_(2, 5, 10, 20)",4.229212295280646e-05
+audio_Amplitude__partial_autocorrelation__lag_4,4.227046454322012e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_17",4.217458152290833e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.2__ql_0.0",4.217100136477165e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_85",4.202231259358981e-05
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""var""",4.2020209486479474e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_7__w_20__widths_(2, 5, 10, 20)",4.1782399438509776e-05
+audio_Amplitude__quantile__q_0.4,4.1543903702105795e-05
+task_Robot_I (A)__ar_coefficient__coeff_2__k_10,4.12488023625171e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_53",4.118672300696785e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_53",4.117855651079714e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_14__w_10__widths_(2, 5, 10, 20)",4.1137140277485316e-05
+"intr_Current (V)__cwt_coefficients__coeff_9__w_5__widths_(2, 5, 10, 20)",4.097806796101059e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_50",4.096828964211236e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_48",4.0951048530205274e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_85",4.090140148577031e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_49",4.088334344100337e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_59",4.088250774532606e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.0",4.072750550764751e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_29",4.055098633634512e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_50",4.025867281901973e-05
+task_Robot_I (A)__kurtosis,4.024055101229242e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_63",4.021791571356381e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_4",4.0145729150454604e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_9",4.014224868489201e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_43",4.0078771599642495e-05
+task_Robot_I (A)__binned_entropy__max_bins_10,3.989835215456737e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_42",3.9776317040958536e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.6",3.9651603346227095e-05
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""var""",3.952687109835275e-05
+intr_Torque (Nm)__index_mass_quantile__q_0.6,3.951613156569587e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_82",3.945602021096102e-05
+intr_Current (V)__ar_coefficient__coeff_2__k_10,3.917769837577305e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_41",3.910109963294426e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_82",3.909866233279733e-05
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""max""",3.8932536669038215e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_21",3.8897698815218207e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.2",3.885511151735243e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_67",3.876155188774026e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.2__ql_0.0",3.876011635679493e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_26",3.873086682229847e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""max""",3.841177066713629e-05
+audio_Amplitude__number_peaks__n_1,3.836647375549646e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_4__w_5__widths_(2, 5, 10, 20)",3.82141699506969e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_96",3.8154571837386234e-05
+task_Robot_I (A)__fourier_entropy__bins_5,3.789216513782404e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_9__w_20__widths_(2, 5, 10, 20)",3.779498135148108e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_1",3.775178438123345e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_78",3.7735790986621204e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_91",3.7735107443975257e-05
+audio_Amplitude__ratio_beyond_r_sigma__r_3,3.760546133575472e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_84",3.7584501445518515e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_20",3.7520685377852894e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.0",3.746888661017025e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_0",3.740364245199976e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_25",3.7084803603851614e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_88",3.696126913574292e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_79",3.6931984389014316e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_7",3.682061388967047e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_13",3.670546626494899e-05
+audio_Amplitude__autocorrelation__lag_2,3.6680021895568123e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_86",3.66477907247055e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_97",3.6527567704768724e-05
+"intr_Current (V)__cwt_coefficients__coeff_2__w_5__widths_(2, 5, 10, 20)",3.6424349732160647e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_36",3.6380399209621686e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_37",3.617192167305858e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.6",3.6088119706937536e-05
+intr_Torque (Nm)__partial_autocorrelation__lag_8,3.6086138921632295e-05
+audio_Amplitude__partial_autocorrelation__lag_9,3.6005904463199836e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_34",3.577436018424869e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_66",3.5669844784204206e-05
+intr_Current (V)__quantile__q_0.1,3.566679823730906e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.2__ql_0.0",3.565724078150561e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_83",3.5606900659028685e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_75",3.5597343570373714e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_47",3.559546209740637e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_64",3.5563412140424434e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_47",3.5513863183239624e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_2",3.540733407436244e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_81",3.534000690976254e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_91",3.526131288913784e-05
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""var""",3.520696601670124e-05
+task_Robot_I (A)__sum_of_reoccurring_data_points,3.511874668181898e-05
+audio_Amplitude__autocorrelation__lag_5,3.497933889127417e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_58",3.4667301810941485e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_7",3.459860816340389e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_87",3.456233094229089e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_44",3.420438557733375e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_87",3.4135877379557724e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""max""",3.404795108367628e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_22",3.402087108663207e-05
+audio_Amplitude__lempel_ziv_complexity__bins_10,3.3866100517045e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_14__w_20__widths_(2, 5, 10, 20)",3.371143513219923e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_86",3.365014204334183e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_70",3.364395455733048e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_76",3.349131706594587e-05
+task_Robot_I (A)__mean_change,3.347690287146754e-05
+task_Robot_I (A)__lempel_ziv_complexity__bins_10,3.3235080061044656e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_18",3.3171498503878786e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_8__w_20__widths_(2, 5, 10, 20)",3.31566954382592e-05
+audio_Amplitude__friedrich_coefficients__coeff_0__m_3__r_30,3.307147124393928e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_6",3.299012219732062e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_41",3.2892139463776766e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_77",3.281390838258502e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_12__w_10__widths_(2, 5, 10, 20)",3.280632723136451e-05
+audio_Amplitude__binned_entropy__max_bins_10,3.276800171473821e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_86",3.274774323979951e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_34",3.269526401885196e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_92",3.252983990866898e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_62",3.2487508312489474e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_28",3.243026949390714e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_38",3.241730985386252e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_18",3.240251408666722e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_23",3.2401091204621895e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_96",3.2357045347145474e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_5",3.2307841567592476e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""var""",3.228693228635128e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_76",3.226487458097995e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_78",3.223325257350402e-05
+intr_Current (V)__time_reversal_asymmetry_statistic__lag_2,3.219316144862151e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_13__w_20__widths_(2, 5, 10, 20)",3.2116004085278504e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""var""",3.211086849118546e-05
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_7,3.211031033496846e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_48",3.196354962672785e-05
+intr_Current (V)__index_mass_quantile__q_0.7,3.1929428690688686e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_8",3.1902631502100253e-05
+intr_Torque (Nm)__spkt_welch_density__coeff_8,3.183709875025698e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_74",3.182940790223147e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.6",3.167806594053461e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_21",3.163093435636343e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_70",3.1470033640350205e-05
+audio_Amplitude__mean_change,3.138300395924112e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_27",3.1189819445051876e-05
+intr_Current (V)__ar_coefficient__coeff_7__k_10,3.1162277048859146e-05
+intr_Torque (Nm)__lempel_ziv_complexity__bins_3,3.115066208020577e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_89",3.108807006589727e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_57",3.1047114022476244e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.4__ql_0.2",3.0996314196352054e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_93",3.094865632192594e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_34",3.094236274605605e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_49",3.092990353033073e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.0",3.0850710840387845e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_63",3.079769619534041e-05
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""max""",3.0779742582757896e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_27",3.076810472925386e-05
+"audio_Amplitude__agg_autocorrelation__f_agg_""var""__maxlag_40",3.075732031601346e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""mean""",3.0675932095840785e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.6",3.0667432790077576e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_69",3.0482105728236943e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_83",3.046262117411194e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""var""",3.037807390579564e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_93",3.03490229140125e-05
+audio_Amplitude__ar_coefficient__coeff_3__k_10,3.0293211959092076e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_66",3.00861959004638e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_88",2.9985906997098674e-05
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_8,2.9928338566191245e-05
+"intr_Current (V)__cwt_coefficients__coeff_3__w_5__widths_(2, 5, 10, 20)",2.9885700619111588e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_77",2.987291207039526e-05
+"intr_Current (V)__cwt_coefficients__coeff_2__w_10__widths_(2, 5, 10, 20)",2.9839580198180834e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_89",2.980114718736173e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_60",2.971390532762412e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_36",2.9518881443648994e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_2__w_2__widths_(2, 5, 10, 20)",2.938759104648312e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.6",2.932840084617001e-05
+intr_Torque (Nm)__count_below_mean,2.9295993413180937e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_63",2.9280264259067297e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_2",2.9245723290649222e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_71",2.9182755293885584e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_16",2.9182500021524737e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""min""",2.899325846866578e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_88",2.8903267191426036e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_5__w_10__widths_(2, 5, 10, 20)",2.8761999174478752e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""min""",2.859045704731835e-05
+"intr_Current (V)__cwt_coefficients__coeff_12__w_10__widths_(2, 5, 10, 20)",2.8558673500595297e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_95",2.8482530766893543e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_76",2.8472202011084456e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_35",2.8272005527810034e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_76",2.8080281976324094e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_63",2.7967167256801205e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_9__w_10__widths_(2, 5, 10, 20)",2.7872156933515994e-05
+task_Robot_I (A)__ratio_beyond_r_sigma__r_3,2.772621092662689e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_71",2.7720952411244467e-05
+intr_Torque (Nm)__permutation_entropy__dimension_6__tau_1,2.7672650102830223e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_48",2.7494201083148414e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_91",2.7484429005126423e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_57",2.7274213692072735e-05
+audio_Amplitude__spkt_welch_density__coeff_2,2.726462559632624e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_99",2.7146511647929998e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_75",2.713351110509721e-05
+audio_Amplitude__autocorrelation__lag_7,2.708773902725715e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_30",2.696911703616176e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_13__w_10__widths_(2, 5, 10, 20)",2.6904792095613027e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_89",2.682505342077178e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_5",2.679988043130269e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_9",2.674293058612921e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_74",2.657179807664303e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_37",2.65292911709302e-05
+task_Robot_I (A)__partial_autocorrelation__lag_7,2.6497810140553753e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_84",2.6341958614927774e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_37",2.6083833086762665e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_43",2.6029179429910756e-05
+intr_Current (V)__partial_autocorrelation__lag_7,2.5935739805760843e-05
+task_Robot_I (A)__ratio_beyond_r_sigma__r_1.5,2.5916367889611394e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_62",2.574792838160879e-05
+intr_Current (V)__lempel_ziv_complexity__bins_100,2.5745926654675778e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_88",2.56784469558478e-05
+intr_Current (V)__ar_coefficient__coeff_10__k_10,2.5673098767791156e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_94",2.561712508635474e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_65",2.560025707243222e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_48",2.5477075165918506e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_90",2.5419052774890877e-05
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""max""",2.5290780572693443e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_32",2.5059824877330756e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_72",2.4966102460698188e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_42",2.4908263083924887e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_68",2.4847572965407942e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_4__w_2__widths_(2, 5, 10, 20)",2.4817744687451528e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_80",2.4803603432954456e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""max""",2.475684254186262e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_40",2.474259164799047e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.2",2.4736169081989256e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_30",2.4684859997974357e-05
+audio_Amplitude__first_location_of_minimum,2.4614483783403087e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_6",2.4599248713243586e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.0",2.4506427906610114e-05
+intr_Current (V)__ratio_beyond_r_sigma__r_2,2.4458542686460005e-05
+"audio_Amplitude__linear_trend__attr_""intercept""",2.444667828835313e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.2__ql_0.0",2.436165533936917e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_46",2.43608614449318e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_31",2.426297478702804e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_36",2.423777769727441e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_56",2.4186912898571734e-05
+task_Robot_I (A)__c3__lag_3,2.4162875954279682e-05
+intr_Current (V)__fourier_entropy__bins_10,2.413463886520372e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_61",2.394961592849864e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_18",2.3881993866629756e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_94",2.3719745529490042e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_7",2.3424211407253836e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_21",2.3390219701767827e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_12",2.3348866252907575e-05
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_1,2.325819516750866e-05
+audio_Amplitude__permutation_entropy__dimension_3__tau_1,2.316918584734488e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_13",2.310509809443679e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_85",2.3072442106143926e-05
+task_Robot_I (A)__ar_coefficient__coeff_9__k_10,2.3071855886989726e-05
+"intr_Current (V)__cwt_coefficients__coeff_8__w_10__widths_(2, 5, 10, 20)",2.3050291943649653e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_16",2.304328469605831e-05
+intr_Torque (Nm)__partial_autocorrelation__lag_3,2.2986539466364673e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_21",2.2937198202075843e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_92",2.2830680805147138e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_42",2.279763840953707e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_62",2.2635935475289188e-05
+intr_Torque (Nm)__ar_coefficient__coeff_10__k_10,2.2587529033689207e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_98",2.2555699286644507e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_36",2.2479027263276292e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_94",2.2427545340097645e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.6",2.2340196160723393e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_70",2.2306620466848344e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_65",2.217623205440913e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_67",2.2060217499956907e-05
+"intr_Current (V)__cwt_coefficients__coeff_12__w_20__widths_(2, 5, 10, 20)",2.202804514863481e-05
+intr_Current (V)__ar_coefficient__coeff_4__k_10,2.1902362386271833e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_11",2.1787460751175958e-05
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""mean""",2.154563120194389e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_21",2.151147282021297e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_42",2.144326445778522e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_75",2.1346138388365748e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_0__w_5__widths_(2, 5, 10, 20)",2.094159469983173e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""min""",2.0811867858927837e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_58",2.0790232686823395e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_20",2.0783481873557774e-05
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""mean""",2.0735282398298472e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_10",2.070631080450662e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_38",2.0560090623969598e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_69",2.055346808330167e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_10",2.0548759215313427e-05
+audio_Amplitude__partial_autocorrelation__lag_2,2.0479714384401185e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_85",2.0438476322504297e-05
+intr_Current (V)__skewness,2.043039447355394e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_25",2.0327449610976065e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_28",2.029058060288602e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_23",2.0154710600323203e-05
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""min""",2.009572241861546e-05
+task_Robot_I (A)__autocorrelation__lag_2,1.9874212289639663e-05
+intr_Torque (Nm)__quantile__q_0.9,1.9842526528215753e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_53",1.9720410189131248e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_72",1.9712892045562106e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_45",1.9677882691968893e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_47",1.953031027126127e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_68",1.947414116512898e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_9",1.9414372863145217e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_56",1.938776310696157e-05
+task_Robot_I (A)__mean,1.933191054662274e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_49",1.910118671022462e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_15",1.9073951551353552e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_67",1.900865308199621e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_90",1.900865308199621e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_73",1.8975531499083586e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_43",1.896692829866366e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_51",1.896540725963772e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_92",1.890162515185658e-05
+task_Robot_I (A)__partial_autocorrelation__lag_4,1.885316645701606e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_13",1.885065738145427e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_61",1.8850477601358395e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_80",1.8836701727560835e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_8",1.880615032193781e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_98",1.880273066787736e-05
+intr_Torque (Nm)__lempel_ziv_complexity__bins_2,1.8773453473947284e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_78",1.8753753211617573e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.0",1.869473253433762e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_91",1.864542098763218e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_78",1.8640566637263563e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_38",1.863406060141334e-05
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_65",1.862698091011949e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_12__w_20__widths_(2, 5, 10, 20)",1.8606287258858815e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_40",1.8602702574715842e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""var""",1.8572641604363356e-05
+"intr_Current (V)__cwt_coefficients__coeff_1__w_10__widths_(2, 5, 10, 20)",1.845362509924672e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_43",1.838100773957801e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_15",1.8269188655772906e-05
+audio_Amplitude__ratio_beyond_r_sigma__r_7,1.8157968566053742e-05
+"intr_Torque (Nm)__fft_aggregated__aggtype_""kurtosis""",1.789118424740807e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.8",1.7595157924682548e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_40",1.757668384872214e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_52",1.7531661273626337e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_28",1.745390491228655e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_92",1.7193335101540554e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_52",1.7128985968377905e-05
+"audio_Amplitude__linear_trend__attr_""rvalue""",1.6861581261565793e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_45",1.681088192374663e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.4",1.6714334447635896e-05
+intr_Current (V)__ar_coefficient__coeff_3__k_10,1.6696831028693005e-05
+"audio_Amplitude__cwt_coefficients__coeff_10__w_10__widths_(2, 5, 10, 20)",1.6638230089649328e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_81",1.6635071055148686e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_46",1.6379313110891466e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_8",1.632179983711905e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_15",1.6249659950048324e-05
+audio_Amplitude__count_below__t_0,1.6052848477052782e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_90",1.586980464147839e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_61",1.58220351532805e-05
+audio_Amplitude__lempel_ziv_complexity__bins_3,1.578674061987312e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_4",1.5552240516006948e-05
+task_Robot_I (A)__ar_coefficient__coeff_3__k_10,1.5373634166555213e-05
+audio_Amplitude__ar_coefficient__coeff_1__k_10,1.5022651639713643e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_82",1.4350682287069903e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.0",1.4209208262496315e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_65",1.4153519546278381e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_38",1.4025895726730584e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_50",1.395428965002219e-05
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""max""",1.381528011741289e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_26",1.380492678579359e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_5__w_5__widths_(2, 5, 10, 20)",1.3584291109680594e-05
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.6",1.3464728731285241e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_35",1.3450813773118085e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_75",1.3366896046509813e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_92",1.3337662504438517e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_14",1.3201748797236413e-05
+"task_Robot_I (A)__linear_trend__attr_""rvalue""",1.3183917649708412e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_88",1.3170979307463884e-05
+intr_Torque (Nm)__ar_coefficient__coeff_6__k_10,1.291023042426895e-05
+audio_Amplitude__ar_coefficient__coeff_6__k_10,1.289788229884145e-05
+"intr_Current (V)__cwt_coefficients__coeff_11__w_20__widths_(2, 5, 10, 20)",1.279578063903132e-05
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""var""",1.2645259650097184e-05
+intr_Current (V)__permutation_entropy__dimension_6__tau_1,1.2537318918665684e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_21",1.2487120715356715e-05
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""max""",1.2438442898460032e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_60",1.2420717509627596e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_26",1.241928847136726e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_50",1.2304554222990898e-05
+audio_Amplitude__permutation_entropy__dimension_7__tau_1,1.2295370322685557e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.2",1.228684794111584e-05
+"intr_Current (V)__cwt_coefficients__coeff_5__w_5__widths_(2, 5, 10, 20)",1.2286012221510729e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_49",1.227971914114827e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_64",1.225617786313979e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_86",1.225399440619746e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_23",1.2249619737257224e-05
+"intr_Current (V)__cwt_coefficients__coeff_10__w_10__widths_(2, 5, 10, 20)",1.2248463046699468e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_28",1.224494677058661e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.6",1.2233250577264192e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.2",1.2225162626368293e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_9",1.222291912494025e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_47",1.2217040575132699e-05
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""min""",1.2205514116451796e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_3",1.2195326602546385e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_1",1.2189420123294143e-05
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.2",1.217466494669123e-05
+audio_Amplitude__ar_coefficient__coeff_4__k_10,1.2171278002940558e-05
+audio_Amplitude__fourier_entropy__bins_3,1.2142356529211981e-05
+"intr_Current (V)__linear_trend__attr_""slope""",1.2136991867615773e-05
+"intr_Current (V)__cwt_coefficients__coeff_7__w_20__widths_(2, 5, 10, 20)",1.2108110524289087e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_98",1.2106639646950772e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_10",1.208985250920385e-05
+task_Robot_I (A)__quantile__q_0.7,1.20882930149529e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.0",1.2071955102574674e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_99",1.2062165639511175e-05
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_9",1.2037487533805278e-05
+intr_Current (V)__count_below_mean,1.2029005349042191e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_93",1.202783490454674e-05
+task_Robot_I (A)__benford_correlation,1.2017063845121715e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""var""",1.2014717411888671e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_33",1.200906235268102e-05
+"audio_Amplitude__linear_trend__attr_""slope""",1.199660592304099e-05
+task_Robot_I (A)__spkt_welch_density__coeff_5,1.198798509560517e-05
+intr_Torque (Nm)__index_mass_quantile__q_0.2,1.1950762588896616e-05
+intr_Torque (Nm)__number_cwt_peaks__n_1,1.1921617154491196e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_25",1.1908748148124827e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_82",1.1904440844616386e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""max""",1.1902867796095404e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_38",1.1898917106732357e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_8",1.1880310774744422e-05
+"intr_Current (V)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""var""",1.1868154466470358e-05
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_10",1.1865028702354305e-05
+intr_Current (V)__range_count__max_1000000000000.0__min_0,1.1802231534469697e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""min""",1.1779985643859184e-05
+"intr_Current (V)__cwt_coefficients__coeff_4__w_20__widths_(2, 5, 10, 20)",1.1777489833122625e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_63",1.1776686141491994e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_31",1.1751445261496181e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.6",1.1720943887394727e-05
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.0",1.1713557858303e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_20",1.1694504215356147e-05
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.4",1.1666965393220866e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_83",1.1631060486331643e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_60",1.1616303868639003e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_68",1.1609261214238016e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.4",1.1608181384599966e-05
+"intr_Current (V)__cwt_coefficients__coeff_7__w_5__widths_(2, 5, 10, 20)",1.158053647746166e-05
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""var""",1.1479071332226456e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_68",1.1466922828698503e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_14",1.1455353740856295e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_66",1.142228682000581e-05
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_9",1.1389983719555024e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_30",1.1383449676229237e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_5",1.1382599248423438e-05
+intr_Torque (Nm)__index_mass_quantile__q_0.7,1.1375570862531688e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_22",1.137525153949417e-05
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_9,1.136432948259022e-05
+audio_Amplitude__ratio_beyond_r_sigma__r_5,1.135349940611244e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_1__w_2__widths_(2, 5, 10, 20)",1.1349776392465117e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_46",1.1337805364706499e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_12",1.1330712253400598e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_77",1.1311975517285224e-05
+task_Robot_I (A)__range_count__max_1000000000000.0__min_0,1.1305041186721725e-05
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.8",1.1272074654782205e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_18",1.1263998831630604e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_20",1.121502813770453e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_28",1.1174689938838735e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_14",1.111453389667636e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_20",1.1096329976269243e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_33",1.1090858907557288e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_24",1.1035495699368504e-05
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_91",1.1009467747571731e-05
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_8",1.097586347554813e-05
+intr_Current (V)__partial_autocorrelation__lag_6,1.0846884229391771e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_80",1.0838052401983369e-05
+intr_Current (V)__energy_ratio_by_chunks__num_segments_10__segment_focus_5,1.0827498776407352e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_38",1.0807410574250047e-05
+audio_Amplitude__ar_coefficient__coeff_10__k_10,1.0772538498916024e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_57",1.0727965101473807e-05
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.2",1.0726311123102372e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_58",1.0679783495284599e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_72",1.0645375914837e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_80",1.0640891061547103e-05
+audio_Amplitude__mean,1.062964112962748e-05
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_98",1.0587884611108913e-05
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_62",1.0573760892327229e-05
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_30",1.054189977835905e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_60",1.0539536205786636e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_98",1.0470797349915863e-05
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_40",1.0442887536335793e-05
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_67",1.042241260495914e-05
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""var""",1.0421223644431984e-05
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_10",1.0404413946738073e-05
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_61",1.0338893738561042e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_55",1.0336076764653704e-05
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_25",1.0164916213121432e-05
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_28",1.0060466378250875e-05
+"intr_Torque (Nm)__cwt_coefficients__coeff_6__w_2__widths_(2, 5, 10, 20)",1.0025295527141929e-05
+"task_Robot_I (A)__cwt_coefficients__coeff_4__w_20__widths_(2, 5, 10, 20)",9.897036659196194e-06
+intr_Torque (Nm)__energy_ratio_by_chunks__num_segments_10__segment_focus_4,9.843759397828837e-06
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""var""",9.826500844464921e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_87",9.757460572869956e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_74",9.734383282787482e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_36",9.706693323854303e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_59",9.681036319109576e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_41",9.676465119205952e-06
+"intr_Current (V)__cwt_coefficients__coeff_2__w_2__widths_(2, 5, 10, 20)",9.643218035323136e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_67",9.622118974218515e-06
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_15",9.610621273386826e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_17",9.518496623001108e-06
+intr_Current (V)__partial_autocorrelation__lag_3,9.39859878270221e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_19",9.397434328999034e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_29",9.367221652542563e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_54",9.335285021998519e-06
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.4",9.32572531485922e-06
+"audio_Amplitude__fft_aggregated__aggtype_""skew""",9.32572531485922e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_30",9.306654257794323e-06
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""max""",9.303183478146554e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_14",8.938592602585308e-06
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""mean""",8.935264541842982e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_99",8.931470427079369e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_31",8.885222813538963e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_11",8.885222813538963e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_99",8.858429797483738e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_63",8.841729479236654e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_87",8.817563621627821e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_82",8.811467410272688e-06
+audio_Amplitude__lempel_ziv_complexity__bins_2,8.765118057091667e-06
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_69",8.765118057091667e-06
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_25",8.744058472084543e-06
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_21",8.712774598150313e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_48",8.594693534211611e-06
+task_Robot_I (A)__partial_autocorrelation__lag_5,8.509839216492695e-06
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.0",8.448220995373812e-06
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.4",8.339580239053448e-06
+"intr_Current (V)__cwt_coefficients__coeff_5__w_20__widths_(2, 5, 10, 20)",8.33901837935568e-06
+task_Robot_I (A)__time_reversal_asymmetry_statistic__lag_3,8.336039065274076e-06
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.4",8.331195704567476e-06
+intr_Current (V)__spkt_welch_density__coeff_5,8.324747143571136e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_38",8.322144506179766e-06
+"audio_Amplitude__linear_trend__attr_""pvalue""",8.313427379497569e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_54",8.303686898950947e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_48",8.302754361308297e-06
+task_Robot_I (A)__permutation_entropy__dimension_6__tau_1,8.302754361308297e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_32",8.289533613208199e-06
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_1,8.286568076089248e-06
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.4",8.272581562483844e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_13",8.26308267950133e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_80",8.246117055785445e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_37",8.235021364195818e-06
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.0",8.23186206716493e-06
+intr_Torque (Nm)__permutation_entropy__dimension_3__tau_1,8.221387233320668e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_73",8.221387233320668e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_60",8.210661053188845e-06
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_8",8.194772621815067e-06
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_29",8.192590688234173e-06
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_38",8.189656555445735e-06
+"task_Robot_I (A)__cwt_coefficients__coeff_1__w_10__widths_(2, 5, 10, 20)",8.178292369150605e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_66",8.151887922491365e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_74",8.144579054261816e-06
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""max""",8.14412667745127e-06
+audio_Amplitude__cid_ce__normalize_False,8.143530125704605e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_64",8.12721457282836e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_24",8.111923169130767e-06
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.6",8.105482821393319e-06
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.0",8.085261101673939e-06
+task_Robot_I (A)__percentage_of_reoccurring_values_to_all_values,8.082834948200846e-06
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.2",8.07975323589465e-06
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.6",8.076430479215403e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_58",8.075591158014572e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_35",8.056199157382608e-06
+task_Robot_I (A)__maximum,8.045892017996894e-06
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.2",8.03377313181411e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_51",8.010109676079775e-06
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""max""",8.00604668197116e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_75",7.97840463216012e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_21",7.935490178423299e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_83",7.901349408583699e-06
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.4",7.867809691098462e-06
+task_Robot_I (A)__minimum,7.85541591181466e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_21",7.841916798552672e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_34",7.835321149947163e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_77",7.517947463199224e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_47",7.514324180469015e-06
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""mean""",7.500104295826645e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_20",7.484846444279008e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_36",7.482053474480794e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_73",7.441975270550663e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_35",7.441081029886333e-06
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_24",7.362699167956993e-06
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""var""",7.288666285405499e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_41",7.128003415324331e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_36",7.0867055783214574e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_24",7.0352084455314946e-06
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_10__f_agg_""var""",6.884759403348258e-06
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_68",6.7422302182888e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_81",6.6197673849556895e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_35",6.538716942971765e-06
+"intr_Current (V)__cwt_coefficients__coeff_14__w_10__widths_(2, 5, 10, 20)",6.358556525267457e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_31",6.284686938169308e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_44",6.1799613983008204e-06
+intr_Torque (Nm)__ar_coefficient__coeff_8__k_10,6.163474666509257e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_74",6.140299199751626e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_62",6.139740224754525e-06
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""var""",6.103047101976408e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_75",6.096336519439288e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_19",6.090623235900817e-06
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""var""",6.0582530637295035e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_52",6.046103817762264e-06
+intr_Torque (Nm)__fourier_entropy__bins_100,6.042219735757174e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_52",6.032016565538077e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_49",6.002505136684024e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_8",5.978626997909101e-06
+audio_Amplitude__mean_n_absolute_max__number_of_maxima_7,5.9281973250383915e-06
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.0",5.858016552728183e-06
+intr_Current (V)__index_mass_quantile__q_0.9,5.70802443609212e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_63",5.5787178160152465e-06
+task_Robot_I (A)__fourier_entropy__bins_10,5.539180010174109e-06
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.6",5.440539670326028e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_23",5.418432845912065e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_62",5.353287387870808e-06
+"task_Robot_I (A)__cwt_coefficients__coeff_8__w_10__widths_(2, 5, 10, 20)",5.319455934339385e-06
+task_Robot_I (A)__first_location_of_maximum,5.313874103066876e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_55",5.197810030749315e-06
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_24",5.145343345560646e-06
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_10",5.137189803828357e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_24",5.098408717097017e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_83",5.016195055667487e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_90",4.804893357313788e-06
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""mean""",4.789603593507331e-06
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.4__ql_0.0",4.6681250794309825e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_11",4.492094640564825e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_91",4.391917262273381e-06
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""min""",4.07206428835321e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_56",4.063304393349817e-06
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.2",4.049282922252677e-06
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.4",4.0484504736957364e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_21",4.03552479421716e-06
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_45",3.9983281684549185e-06
+audio_Amplitude__ar_coefficient__coeff_8__k_10,3.992683273598289e-06
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.2__ql_0.0",3.936659855407221e-06
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.6",3.92272572767884e-06
+audio_Amplitude__first_location_of_maximum,3.917801518543908e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_77",3.903020608706888e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_40",3.902433764586597e-06
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_83",3.824402104125612e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_58",3.619844924970719e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_29",3.516455340360016e-06
+task_Robot_I (A)__percentage_of_reoccurring_datapoints_to_all_datapoints,3.3139302969529438e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_45",3.286718387989594e-06
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.8",3.1601885748818618e-06
+task_Robot_I (A)__sum_values,3.017800141949269e-06
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""var""",2.991038357241491e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_16",2.9234704851617524e-06
+task_Robot_I (A)__ar_coefficient__coeff_6__k_10,2.8663194252987227e-06
+task_Robot_I (A)__partial_autocorrelation__lag_9,2.708901162887774e-06
+task_Robot_I (A)__ratio_value_number_to_time_series_length,2.6989126582915967e-06
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""mean""",2.6736845180393966e-06
+"intr_Current (V)__cwt_coefficients__coeff_0__w_20__widths_(2, 5, 10, 20)",2.6718990275896816e-06
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_74",2.6579450801840912e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_35",2.657309329205e-06
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_48",2.5763627954298165e-06
+audio_Amplitude__percentage_of_reoccurring_datapoints_to_all_datapoints,2.5382419922492733e-06
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_82",2.5366338364348603e-06
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_3,2.534983581564061e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_53",2.389577292855366e-06
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_13",2.3613561814937115e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_25",2.044261842656848e-06
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_83",2.0054528700675924e-06
+intr_Current (V)__permutation_entropy__dimension_3__tau_1,1.8234890223966287e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_47",1.799998546509557e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_84",1.5509435961818936e-06
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_92",1.5503418626629056e-06
+"task_Robot_I (A)__cwt_coefficients__coeff_10__w_10__widths_(2, 5, 10, 20)",1.4885996513582313e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_84",1.4572307785815074e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_9",1.3768967706378383e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_46",1.3269039157838842e-06
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_89",1.3065210887876915e-06
+intr_Torque (Nm)__cid_ce__normalize_False,1.2561024835118319e-06
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.4",1.1613163686192074e-06
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_48",9.935608163815526e-07
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_44",9.844591823640243e-07
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_24",8.780078581022133e-07
+"intr_Current (V)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""min""",8.768013715284727e-07
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_99",8.469516557487251e-07
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_88",8.027106927944893e-07
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_61",7.532477114486207e-07
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_56",6.226215258169379e-07
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_50",5.455729397717258e-07
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_73",4.202628764697026e-07
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_93",3.8661135328781367e-07
+"task_Robot_I (A)__cwt_coefficients__coeff_3__w_5__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_40",0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_6__w_20__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_31",0.0
+audio_Amplitude__partial_autocorrelation__lag_1,0.0
+task_Robot_I (A)__standard_deviation,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_91",0.0
+audio_Amplitude__percentage_of_reoccurring_values_to_all_values,0.0
+audio_Amplitude__ratio_value_number_to_time_series_length,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_39",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_31",0.0
+intr_Torque (Nm)__large_standard_deviation__r_0.1,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_24",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_29",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_6",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_93",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_16",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_85",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_73",0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.2__ql_0.0",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_19",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_43",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_12",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_13",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_93",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_12",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_23",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_60",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_30",0.0
+intr_Current (V)__large_standard_deviation__r_0.1,0.0
+intr_Torque (Nm)__large_standard_deviation__r_0.15000000000000002,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_28",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_9",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_96",0.0
+task_Robot_I (A)__longest_strike_above_mean,0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_3__w_10__widths_(2, 5, 10, 20)",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_49",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_14",0.0
+task_Robot_I (A)__autocorrelation__lag_8,0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.2",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_9",0.0
+audio_Amplitude__variation_coefficient,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_28",0.0
+"task_Robot_I (A)__augmented_dickey_fuller__attr_""usedlag""__autolag_""AIC""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_91",0.0
+task_Robot_I (A)__autocorrelation__lag_6,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_46",0.0
+task_Robot_I (A)__large_standard_deviation__r_0.25,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_47",0.0
+audio_Amplitude__autocorrelation__lag_6,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_51",0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_8__w_5__widths_(2, 5, 10, 20)",0.0
+intr_Current (V)__mean_second_derivative_central,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_23",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_7",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_46",0.0
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_20",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_69",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_41",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_73",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_10",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_5",0.0
+intr_Torque (Nm)__symmetry_looking__r_0.05,0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.2__ql_0.0",0.0
+task_Robot_I (A)__lempel_ziv_complexity__bins_100,0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.4",0.0
+intr_Current (V)__partial_autocorrelation__lag_4,0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_81",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_36",0.0
+audio_Amplitude__time_reversal_asymmetry_statistic__lag_3,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_39",0.0
+audio_Amplitude__large_standard_deviation__r_0.05,0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""var""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_6",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_56",0.0
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_2,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_51",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_32",0.0
+task_Robot_I (A)__autocorrelation__lag_4,0.0
+intr_Current (V)__last_location_of_minimum,0.0
+intr_Torque (Nm)__ar_coefficient__coeff_9__k_10,0.0
+intr_Current (V)__partial_autocorrelation__lag_2,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_18",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_94",0.0
+audio_Amplitude__partial_autocorrelation__lag_7,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_68",0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_2__w_5__widths_(2, 5, 10, 20)",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_26",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_55",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_7",0.0
+intr_Torque (Nm)__fourier_entropy__bins_5,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_29",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_42",0.0
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_7,0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_52",0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_11__w_10__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""mean""",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.4",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_37",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_43",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_99",0.0
+task_Robot_I (A)__partial_autocorrelation__lag_3,0.0
+"intr_Current (V)__cwt_coefficients__coeff_11__w_5__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.4",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_8",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_11",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_79",0.0
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_5,0.0
+intr_Torque (Nm)__number_crossing_m__m_0,0.0
+audio_Amplitude__abs_energy,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_99",0.0
+intr_Current (V)__length,0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_31",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_32",0.0
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""min""",0.0
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_5,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_30",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.4",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_85",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_15",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_83",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_87",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_98",0.0
+intr_Torque (Nm)__index_mass_quantile__q_0.1,0.0
+"audio_Amplitude__fft_aggregated__aggtype_""variance""",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_71",0.0
+audio_Amplitude__number_peaks__n_10,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_52",0.0
+"intr_Current (V)__cwt_coefficients__coeff_4__w_2__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_49",0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""max""",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_83",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_33",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_28",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_77",0.0
+"intr_Current (V)__cwt_coefficients__coeff_3__w_2__widths_(2, 5, 10, 20)",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_95",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_19",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_53",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_19",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_13",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_57",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_57",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_40",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_15",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_43",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_19",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_31",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_53",0.0
+"intr_Torque (Nm)__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""max""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_68",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_86",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_15",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_4",0.0
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_8,0.0
+audio_Amplitude__ratio_beyond_r_sigma__r_10,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_14",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_53",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_93",0.0
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_0",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_58",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_17",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_35",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_84",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.8",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_58",0.0
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.2",0.0
+"intr_Current (V)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""min""",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_56",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_95",0.0
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.6",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_14",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_52",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_19",0.0
+task_Robot_I (A)__permutation_entropy__dimension_4__tau_1,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_35",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_33",0.0
+"intr_Current (V)__cwt_coefficients__coeff_1__w_20__widths_(2, 5, 10, 20)",0.0
+task_Robot_I (A)__fourier_entropy__bins_100,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_30",0.0
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.2",0.0
+intr_Torque (Nm)__range_count__max_0__min_-1000000000000.0,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_47",0.0
+intr_Torque (Nm)__count_above__t_0,0.0
+task_Robot_I (A)__number_peaks__n_50,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_17",0.0
+"task_Robot_I (A)__augmented_dickey_fuller__attr_""teststat""__autolag_""AIC""",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_21",0.0
+task_Robot_I (A)__time_reversal_asymmetry_statistic__lag_1,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_76",0.0
+task_Robot_I (A)__first_location_of_minimum,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_84",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_14",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_32",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_87",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_25",0.0
+intr_Torque (Nm)__number_peaks__n_50,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_39",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_51",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_22",0.0
+audio_Amplitude__index_mass_quantile__q_0.6,0.0
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.8",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.6__ql_0.0",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_92",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_23",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_99",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_60",0.0
+task_Robot_I (A)__symmetry_looking__r_0.05,0.0
+task_Robot_I (A)__root_mean_square,0.0
+audio_Amplitude__has_duplicate,0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_2",0.0
+audio_Amplitude__c3__lag_1,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_46",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_74",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_79",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_39",0.0
+intr_Torque (Nm)__partial_autocorrelation__lag_9,0.0
+"task_Robot_I (A)__fft_aggregated__aggtype_""kurtosis""",0.0
+"intr_Current (V)__cwt_coefficients__coeff_1__w_2__widths_(2, 5, 10, 20)",0.0
+"audio_Amplitude__augmented_dickey_fuller__attr_""pvalue""__autolag_""AIC""",0.0
+audio_Amplitude__count_above_mean,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_58",0.0
+audio_Amplitude__length,0.0
+audio_Amplitude__range_count__max_1__min_-1,0.0
+intr_Current (V)__number_peaks__n_1,0.0
+intr_Current (V)__fourier_entropy__bins_3,0.0
+audio_Amplitude__number_cwt_peaks__n_1,0.0
+task_Robot_I (A)__lempel_ziv_complexity__bins_5,0.0
+audio_Amplitude__value_count__value_0,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_91",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_36",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_7",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_41",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_48",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_59",0.0
+audio_Amplitude__quantile__q_0.6,0.0
+audio_Amplitude__quantile__q_0.7,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_59",0.0
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.8",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_45",0.0
+audio_Amplitude__lempel_ziv_complexity__bins_100,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_51",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_27",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_79",0.0
+intr_Current (V)__count_below__t_0,0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_6",0.0
+audio_Amplitude__ar_coefficient__coeff_2__k_10,0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_2",0.0
+task_Robot_I (A)__ratio_beyond_r_sigma__r_6,0.0
+audio_Amplitude__autocorrelation__lag_8,0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.8",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_29",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_71",0.0
+intr_Torque (Nm)__fourier_entropy__bins_3,0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_30",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_20",0.0
+task_Robot_I (A)__large_standard_deviation__r_0.15000000000000002,0.0
+intr_Torque (Nm)__permutation_entropy__dimension_4__tau_1,0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""stderr""__chunk_len_5__f_agg_""max""",0.0
+task_Robot_I (A)__partial_autocorrelation__lag_1,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_4",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_34",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.6",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.2",0.0
+"audio_Amplitude__agg_autocorrelation__f_agg_""median""__maxlag_40",0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_3",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_73",0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.2",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_94",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_55",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.0",0.0
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_26",0.0
+audio_Amplitude__ratio_beyond_r_sigma__r_2,0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_81",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_51",0.0
+"intr_Current (V)__fft_aggregated__aggtype_""skew""",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_96",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_44",0.0
+"intr_Torque (Nm)__agg_linear_trend__attr_""stderr""__chunk_len_50__f_agg_""var""",0.0
+task_Robot_I (A)__ratio_beyond_r_sigma__r_2.5,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_76",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_24",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_24",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_34",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_45",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.8__ql_0.6",0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""var""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_67",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_49",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_66",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_37",0.0
+task_Robot_I (A)__ratio_beyond_r_sigma__r_5,0.0
+intr_Torque (Nm)__ratio_beyond_r_sigma__r_10,0.0
+audio_Amplitude__benford_correlation,0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.0",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_94",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_73",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_99",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_59",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_56",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_61",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_41",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_28",0.0
+audio_Amplitude__ratio_beyond_r_sigma__r_1,0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_97",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_90",0.0
+intr_Current (V)__percentage_of_reoccurring_datapoints_to_all_datapoints,0.0
+intr_Current (V)__ratio_value_number_to_time_series_length,0.0
+intr_Current (V)__percentage_of_reoccurring_values_to_all_values,0.0
+intr_Current (V)__sum_of_reoccurring_values,0.0
+intr_Current (V)__sum_of_reoccurring_data_points,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_26",0.0
+intr_Torque (Nm)__last_location_of_minimum,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_86",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_27",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_99",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_12",0.0
+intr_Current (V)__range_count__max_0__min_-1000000000000.0,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_96",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_17",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_92",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_90",0.0
+"intr_Torque (Nm)__linear_trend__attr_""pvalue""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_29",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_25",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_7",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_5",0.0
+task_Robot_I (A)__ar_coefficient__coeff_1__k_10,0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.2",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_55",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_47",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_11",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_98",0.0
+"task_Robot_I (A)__fft_aggregated__aggtype_""skew""",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_95",0.0
+audio_Amplitude__mean_abs_change,0.0
+intr_Torque (Nm)__autocorrelation__lag_4,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_81",0.0
+audio_Amplitude__kurtosis,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_78",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_35",0.0
+intr_Current (V)__large_standard_deviation__r_0.25,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_13",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_65",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_79",0.0
+intr_Torque (Nm)__binned_entropy__max_bins_10,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_87",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_80",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_79",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_40",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_51",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_63",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_8",0.0
+"intr_Torque (Nm)__augmented_dickey_fuller__attr_""usedlag""__autolag_""AIC""",0.0
+audio_Amplitude__count_below_mean,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_3",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_44",0.0
+audio_Amplitude__skewness,0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""var""",0.0
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.4__ql_0.2",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_98",0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_4",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.0",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_4",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_67",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_78",0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_11",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_44",0.0
+"intr_Torque (Nm)__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.2",0.0
+audio_Amplitude__number_cwt_peaks__n_5,0.0
+task_Robot_I (A)__number_cwt_peaks__n_1,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_78",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_39",0.0
+"intr_Current (V)__cwt_coefficients__coeff_11__w_10__widths_(2, 5, 10, 20)",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_38",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_81",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_82",0.0
+intr_Current (V)__fourier_entropy__bins_2,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_65",0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.4",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_69",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_96",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_10",0.0
+intr_Torque (Nm)__symmetry_looking__r_0.15000000000000002,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_72",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_67",0.0
+intr_Current (V)__first_location_of_maximum,0.0
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""min""",0.0
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.4",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_21",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_33",0.0
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_3",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_64",0.0
+"audio_Amplitude__fft_aggregated__aggtype_""kurtosis""",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_34",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_6",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_97",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_94",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_96",0.0
+intr_Torque (Nm)__ratio_value_number_to_time_series_length,0.0
+intr_Torque (Nm)__percentage_of_reoccurring_datapoints_to_all_datapoints,0.0
+intr_Torque (Nm)__percentage_of_reoccurring_values_to_all_values,0.0
+intr_Torque (Nm)__sum_of_reoccurring_data_points,0.0
+intr_Torque (Nm)__sum_of_reoccurring_values,0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_9",0.0
+intr_Torque (Nm)__symmetry_looking__r_0.1,0.0
+audio_Amplitude__friedrich_coefficients__coeff_3__m_3__r_30,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_84",0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""rvalue""__chunk_len_5__f_agg_""max""",0.0
+task_Robot_I (A)__c3__lag_2,0.0
+task_Robot_I (A)__permutation_entropy__dimension_7__tau_1,0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_44",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_42",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_7",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_79",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_70",0.0
+intr_Torque (Nm)__lempel_ziv_complexity__bins_5,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_18",0.0
+audio_Amplitude__spkt_welch_density__coeff_5,0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_97",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_11",0.0
+task_Robot_I (A)__quantile__q_0.2,0.0
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_False__qh_1.0__ql_0.0",0.0
+audio_Amplitude__longest_strike_below_mean,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_95",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_64",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_22",0.0
+"intr_Torque (Nm)__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""var""",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_90",0.0
+intr_Current (V)__has_duplicate,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_3",0.0
+"intr_Current (V)__cwt_coefficients__coeff_6__w_10__widths_(2, 5, 10, 20)",0.0
+audio_Amplitude__ratio_beyond_r_sigma__r_6,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_97",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_14",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_56",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_46",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_61",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_37",0.0
+intr_Torque (Nm)__has_duplicate,0.0
+task_Robot_I (A)__has_duplicate,0.0
+intr_Current (V)__large_standard_deviation__r_0.2,0.0
+intr_Current (V)__number_crossing_m__m_0,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_6",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_16",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_15",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_84",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_34",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_55",0.0
+intr_Torque (Nm)__partial_autocorrelation__lag_6,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_65",0.0
+"task_Robot_I (A)__linear_trend__attr_""intercept""",0.0
+audio_Amplitude__friedrich_coefficients__coeff_2__m_3__r_30,0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_7__w_10__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""mean""",0.0
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""mean""",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_79",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_50",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_26",0.0
+audio_Amplitude__absolute_maximum,0.0
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""max""",0.0
+"intr_Current (V)__linear_trend__attr_""intercept""",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_49",0.0
+audio_Amplitude__median,0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_6",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_55",0.0
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_7,0.0
+intr_Torque (Nm)__large_standard_deviation__r_0.30000000000000004,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_41",0.0
+"intr_Current (V)__cwt_coefficients__coeff_9__w_10__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_2",0.0
+audio_Amplitude__absolute_sum_of_changes,0.0
+intr_Current (V)__ratio_beyond_r_sigma__r_5,0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_68",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_46",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_64",0.0
+"intr_Current (V)__cwt_coefficients__coeff_13__w_10__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_18",0.0
+task_Robot_I (A)__lempel_ziv_complexity__bins_3,0.0
+intr_Current (V)__ratio_beyond_r_sigma__r_10,0.0
+intr_Torque (Nm)__number_cwt_peaks__n_5,0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_11__w_20__widths_(2, 5, 10, 20)",0.0
+audio_Amplitude__ratio_beyond_r_sigma__r_0.5,0.0
+task_Robot_I (A)__symmetry_looking__r_0.1,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_46",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_54",0.0
+audio_Amplitude__last_location_of_minimum,0.0
+audio_Amplitude__permutation_entropy__dimension_6__tau_1,0.0
+audio_Amplitude__fourier_entropy__bins_10,0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_95",0.0
+task_Robot_I (A)__fourier_entropy__bins_2,0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_True__qh_0.8__ql_0.6",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_70",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_97",0.0
+task_Robot_I (A)__ar_coefficient__coeff_8__k_10,0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.0",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_60",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_81",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_5",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_59",0.0
+"intr_Torque (Nm)__agg_linear_trend__attr_""slope""__chunk_len_10__f_agg_""mean""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_88",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_57",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_13",0.0
+"intr_Current (V)__cwt_coefficients__coeff_8__w_5__widths_(2, 5, 10, 20)",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_76",0.0
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.6__ql_0.4",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_96",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_57",0.0
+audio_Amplitude__cid_ce__normalize_True,0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_23",0.0
+audio_Amplitude__index_mass_quantile__q_0.4,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_44",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_59",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_96",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_29",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_69",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_30",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_83",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_43",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_16",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_89",0.0
+"intr_Current (V)__cwt_coefficients__coeff_6__w_5__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_12",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_40",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_90",0.0
+intr_Torque (Nm)__fourier_entropy__bins_2,0.0
+"audio_Amplitude__fft_aggregated__aggtype_""centroid""",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_37",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_False__qh_0.2__ql_0.0",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_33",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_70",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_26",0.0
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_True__qh_1.0__ql_0.8",0.0
+intr_Current (V)__index_mass_quantile__q_0.8,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_94",0.0
+"audio_Amplitude__agg_linear_trend__attr_""rvalue""__chunk_len_50__f_agg_""min""",0.0
+task_Robot_I (A)__partial_autocorrelation__lag_8,0.0
+intr_Torque (Nm)__symmetry_looking__r_0.2,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_62",0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_1",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_79",0.0
+task_Robot_I (A)__quantile__q_0.4,0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_7",0.0
+intr_Current (V)__symmetry_looking__r_0.1,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_45",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_64",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_44",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_22",0.0
+audio_Amplitude__autocorrelation__lag_4,0.0
+audio_Amplitude__lempel_ziv_complexity__bins_5,0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_3__w_2__widths_(2, 5, 10, 20)",0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_15",0.0
+audio_Amplitude__longest_strike_above_mean,0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_10__w_20__widths_(2, 5, 10, 20)",0.0
+intr_Current (V)__root_mean_square,0.0
+"intr_Current (V)__cwt_coefficients__coeff_10__w_20__widths_(2, 5, 10, 20)",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_60",0.0
+intr_Current (V)__symmetry_looking__r_0.05,0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_5",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_77",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_45",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_12",0.0
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.4",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_14",0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_1",0.0
+"audio_Amplitude__cwt_coefficients__coeff_11__w_10__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_32",0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_7",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_34",0.0
+task_Robot_I (A)__energy_ratio_by_chunks__num_segments_10__segment_focus_7,0.0
+"intr_Torque (Nm)__cwt_coefficients__coeff_12__w_20__widths_(2, 5, 10, 20)",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_30",0.0
+audio_Amplitude__index_mass_quantile__q_0.7,0.0
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_50__f_agg_""var""",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_71",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_9",0.0
+task_Robot_I (A)__mean_n_absolute_max__number_of_maxima_7,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_59",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_45",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_77",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_66",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_56",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_8",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_1",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_53",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_40",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_91",0.0
+audio_Amplitude__fourier_entropy__bins_5,0.0
+task_Robot_I (A)__quantile__q_0.8,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_48",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_62",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_23",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_38",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""mean""__isabs_True__qh_0.8__ql_0.2",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_72",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_55",0.0
+"audio_Amplitude__change_quantiles__f_agg_""mean""__isabs_True__qh_0.4__ql_0.0",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_98",0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_3",0.0
+"audio_Amplitude__fft_coefficient__attr_""angle""__coeff_1",0.0
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_5__f_agg_""max""",0.0
+intr_Current (V)__ar_coefficient__coeff_8__k_10,0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_97",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_73",0.0
+"intr_Current (V)__linear_trend__attr_""pvalue""",0.0
+"intr_Current (V)__cwt_coefficients__coeff_4__w_5__widths_(2, 5, 10, 20)",0.0
+"intr_Current (V)__agg_linear_trend__attr_""slope""__chunk_len_50__f_agg_""min""",0.0
+audio_Amplitude__large_standard_deviation__r_0.1,0.0
+"audio_Amplitude__fft_coefficient__attr_""imag""__coeff_14",0.0
+"task_Robot_I (A)__change_quantiles__f_agg_""var""__isabs_True__qh_0.6__ql_0.0",0.0
+audio_Amplitude__standard_deviation,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_56",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_71",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""imag""__coeff_89",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_94",0.0
+task_Robot_I (A)__sum_of_reoccurring_values,0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_40",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_13",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_65",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_69",0.0
+"audio_Amplitude__agg_linear_trend__attr_""slope""__chunk_len_5__f_agg_""var""",0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_28",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_47",0.0
+task_Robot_I (A)__quantile__q_0.1,0.0
+"audio_Amplitude__change_quantiles__f_agg_""var""__isabs_False__qh_1.0__ql_0.8",0.0
+"task_Robot_I (A)__cwt_coefficients__coeff_7__w_5__widths_(2, 5, 10, 20)",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_76",0.0
+intr_Current (V)__large_standard_deviation__r_0.15000000000000002,0.0
+audio_Amplitude__index_mass_quantile__q_0.9,0.0
+"audio_Amplitude__fft_coefficient__attr_""real""__coeff_0",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_18",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_90",0.0
+audio_Amplitude__fourier_entropy__bins_2,0.0
+"intr_Current (V)__fft_coefficient__attr_""abs""__coeff_77",0.0
+"intr_Current (V)__fft_coefficient__attr_""angle""__coeff_7",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""real""__coeff_42",0.0
+audio_Amplitude__partial_autocorrelation__lag_8,0.0
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_True__qh_1.0__ql_0.0",0.0
+"intr_Torque (Nm)__cwt_coefficients__coeff_13__w_20__widths_(2, 5, 10, 20)",0.0
+"intr_Current (V)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.8__ql_0.0",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_31",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_69",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_43",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_75",0.0
+"intr_Current (V)__change_quantiles__f_agg_""var""__isabs_False__qh_0.4__ql_0.0",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_52",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""real""__coeff_12",0.0
+"intr_Current (V)__fft_coefficient__attr_""imag""__coeff_51",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_23",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_92",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_22",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""imag""__coeff_27",0.0
+task_Robot_I (A)__large_standard_deviation__r_0.2,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_39",0.0
+"intr_Current (V)__fft_coefficient__attr_""real""__coeff_32",0.0
+"task_Robot_I (A)__fft_coefficient__attr_""abs""__coeff_53",0.0
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""mean""",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_20",0.0
+"audio_Amplitude__agg_linear_trend__attr_""intercept""__chunk_len_10__f_agg_""min""",0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""angle""__coeff_12",0.0
+task_Robot_I (A)__last_location_of_maximum,0.0
+"intr_Torque (Nm)__fft_coefficient__attr_""abs""__coeff_59",0.0
+"audio_Amplitude__agg_linear_trend__attr_""stderr""__chunk_len_10__f_agg_""max""",0.0
+intr_Torque (Nm)__friedrich_coefficients__coeff_1__m_3__r_30,0.0
+"task_Robot_I (A)__fft_coefficient__attr_""angle""__coeff_39",0.0
+"audio_Amplitude__fft_coefficient__attr_""abs""__coeff_72",0.0
+audio_Amplitude__energy_ratio_by_chunks__num_segments_10__segment_focus_4,0.0
+"intr_Torque (Nm)__change_quantiles__f_agg_""mean""__isabs_False__qh_0.6__ql_0.2",0.0
