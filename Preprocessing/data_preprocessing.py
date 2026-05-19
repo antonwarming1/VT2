@@ -379,7 +379,7 @@ def preprocess_audio(file_path, out_path, samplerate):
         freq_mask_smooth_hz=100,
         time_mask_smooth_ms=128,
         prop_decrease = 0.8,
-        stationary = False
+        stationary = True
         )
     df["Amplitude"] = lowpass_filter(df["Amplitude"].values, samplerate, highcut=1000)
 
