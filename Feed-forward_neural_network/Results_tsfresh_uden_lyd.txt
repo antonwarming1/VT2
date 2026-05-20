@@ -1,0 +1,109 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1779213666.456087   14168 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1779213668.313843   14168 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+Feed-Forward Neural Network — Multi-Class Classification
+
+Loading data...
+  X: (1341, 2046),  y: (1341,)
+  Train: 937  Val: 269  Test: 135
+
+--- Hyperparameter Search ---
+
+Base model cross-validation...
+WARNING:tensorflow:From C:\Users\kjaer\miniconda3\envs\VT2\Lib\site-packages\keras\src\backend\common\global_state.py:82: The name tf.reset_default_graph is deprecated. Please use tf.compat.v1.reset_default_graph instead.
+
+I0000 00:00:1779213672.018291   14168 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+WARNING:tensorflow:5 out of the last 13 calls to <function TensorFlowTrainer.make_predict_function.<locals>.one_step_on_data_distributed at 0x000001414574F740> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+WARNING:tensorflow:5 out of the last 13 calls to <function TensorFlowTrainer.make_predict_function.<locals>.one_step_on_data_distributed at 0x00000141487689A0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+  CV F1-Macro: 0.9539 (+/- 0.0141)
+
+Grid Search CV...
+Fitting 5 folds for each of 160 candidates, totalling 800 fits
+  Best score:  0.9605
+  Best params: {'batch_size': 32, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__hidden_layers': [256, 128, 64], 'model__l2': 0.0, 'optimizer__learning_rate': 0.001}
+
+Random Search CV...
+Fitting 5 folds for each of 50 candidates, totalling 250 fits
+  Best score:  0.9587
+  Best params: {'batch_size': 32, 'model__activation': 'relu', 'model__dropout_rate': np.float64(0.3162819772756388), 'model__hidden_layers': [128, 64], 'model__l2': np.float64(0.0042424886748968355), 'optimizer__learning_rate': np.float64(0.0010414253710293575)}
+
+=== RUNNING BAYESIAN OPTIMIZATION (50 trials) ===
+Best trial: 14. Best value: 0.959266: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [23:07<00:00, 27.75s/it]
+
+=== OPTIMIZATION COMPLETE ===
+Best trial: 14
+Best validation F1 score (macro): 0.9593
+
+Best hyperparameters:
+  hidden_dim: 48
+  num_layers: 3
+  activation: relu
+  dropout_rate: 0.3
+  lr: 0.0002854467698593318
+  batch_size: 16
+c:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\FNN.py:314: FutureWarning: 
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
+
+  sns.barplot(x=methods, y=scores, palette='Blues_d')
+
+Best method: Grid Search  (CV F1-Macro 0.9605)
+Params: {'batch_size': 32, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__hidden_layers': [256, 128, 64], 'model__l2': 0.0, 'optimizer__learning_rate': 0.001}
+
+--- Final Training [Grid Search params] ---
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Layer (type)                         ┃ Output Shape                ┃         Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ dense (Dense)                        │ (None, 256)                 │         524,032 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout (Dropout)                    │ (None, 256)                 │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense_1 (Dense)                      │ (None, 128)                 │          32,896 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout_1 (Dropout)                  │ (None, 128)                 │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense_2 (Dense)                      │ (None, 64)                  │           8,256 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout_2 (Dropout)                  │ (None, 64)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense_3 (Dense)                      │ (None, 5)                   │             325 │
+└──────────────────────────────────────┴─────────────────────────────┴─────────────────┘
+ Total params: 565,509 (2.16 MB)
+ Trainable params: 565,509 (2.16 MB)
+ Non-trainable params: 0 (0.00 B)
+
+Training final model...
+Epoch 1/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 1s 8ms/step - accuracy: 0.8901 - loss: 0.4230 - val_accuracy: 0.9740 - val_loss: 0.2339
+Epoch 2/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - accuracy: 0.9509 - loss: 0.2682 - val_accuracy: 0.9665 - val_loss: 0.1928
+Epoch 3/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - accuracy: 0.9648 - loss: 0.1584 - val_accuracy: 0.9591 - val_loss: 0.2797
+Epoch 4/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - accuracy: 0.9637 - loss: 0.1392 - val_accuracy: 0.9628 - val_loss: 0.2293
+Epoch 5/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - accuracy: 0.9797 - loss: 0.0664 - val_accuracy: 0.9665 - val_loss: 0.2239
+Epoch 6/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - accuracy: 0.9776 - loss: 0.0855 - val_accuracy: 0.9740 - val_loss: 0.1977
+Epoch 7/100
+30/30 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - accuracy: 0.9861 - loss: 0.0459 - val_accuracy: 0.9703 - val_loss: 0.2428
+
+Test Accuracy: 0.9630
+              precision    recall  f1-score   support
+
+           N       0.98      0.95      0.96        42
+          NS       0.94      1.00      0.97        16
+          OT       0.97      0.97      0.97        31
+          NE       0.94      1.00      0.97        15
+          UT       0.97      0.94      0.95        31
+    accuracy                           0.96       135
+   macro avg       0.96      0.97      0.96       135
+weighted avg       0.96      0.96      0.96       135
+
+  Saved training history -> C:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\training_history.png
+  Saved confusion matrix -> C:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\confusion_matrix.png
+Model saved to C:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\trained_model.keras
