@@ -234,7 +234,7 @@ def objective(trial, X_train, y_labels, config):
     return scores.mean()
 
 
-def bayesian_search(X_train, y_labels, config, n_trials=20):
+def bayesian_search(X_train, y_labels, config, n_trials=50):
     print(f"\n=== RUNNING BAYESIAN OPTIMIZATION ({n_trials} trials) ===")
 
     sampler = optuna.samplers.TPESampler(seed=config.RANDOM_STATE)
@@ -373,13 +373,14 @@ def main():
     # Run search methods (grid search excluded — too many candidates for available memory)
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
-    
+    grid_search_score, grid_search_params = grid_search(X_train, y_train, Config)
     random_score, random_params = random_search(X_train, y_train, Config)
     bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
 
     # Compare and pick the best
     results = {
         'Base Model': (base_score, None),
+        'Grid Search': (grid_search_score, grid_search_params),
         'Rand Search': (random_score, random_params),
         'Bayesian': (bayes_score, bayes_params),
     }
