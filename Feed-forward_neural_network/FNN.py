@@ -30,7 +30,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_extracted_manual.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
     TRAINING_HISTORY_PATH = BASE_DIR / "Feed-forward_neural_network" / "training_history.png"
@@ -292,7 +292,7 @@ def train_model(model, X_train, y_train, X_val, y_val, config):
         callbacks=[early_stop],
         verbose=1
     )
-    return history, model
+    return model, history
 
 
 def evaluate_model(model, X_test, y_test, config):
@@ -356,7 +356,7 @@ def plot_confusion_matrix(cm, class_names, save_path=None):
 def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
     print("\nTraining solo model with default Config params...")
     model = build_final_model(config, X_train.shape[1], len(config.CLASS_LABELS))
-    history = train_model(model, X_train, y_train, X_val, y_val, config)
+    _, history = train_model(model, X_train, y_train, X_val, y_val, config)
     cm = evaluate_model(model, X_test, y_test, config)[2]
     plot_training_history(history, save_path=config.TRAINING_HISTORY_PATH)
     plot_confusion_matrix(cm, list(config.CLASS_LABELS.values()), save_path=config.CONFUSION_MATRIX_PATH)
@@ -364,8 +364,9 @@ def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
+    """
     print("Feed-Forward Neural Network — Multi-Class Classification\n")
-    
+
     # Load and prepare data
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
@@ -373,7 +374,7 @@ def main():
     # Run search methods (grid search excluded — too many candidates for available memory)
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
-    
+
     grid_score, grid_params = grid_search(X_train, y_train, Config)
     random_score, random_params = random_search(X_train, y_train, Config)
     bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
@@ -408,24 +409,24 @@ def main():
     # Train final model on train/val splits (no cross-validation)
     print(f"\n--- Final Training [{best_name} params] ---")
     model = build_final_model(Config, X_train.shape[1], len(Config.CLASS_LABELS))
-    history, model = train_model(model, X_train, y_train, X_val, y_val, Config)
+    model, history = train_model(model, X_train, y_train, X_val, y_val, Config)
 
     # Evaluate and plot
     _, _, cm = evaluate_model(model, X_test, y_test, Config)
     plot_training_history(history, save_path=Config.TRAINING_HISTORY_PATH)
     plot_confusion_matrix(cm, list(Config.CLASS_LABELS.values()), save_path=Config.CONFUSION_MATRIX_PATH)
-    
+
 
     # Save
     model.save(Config.MODEL_SAVE_PATH)
     print(f"Model saved to {Config.MODEL_SAVE_PATH}")
-    
-    # For quick testing without running the full search, you can comment out the search methods and directly train with default Config params:
     """
+    # For quick testing without running the full search, you can comment out the search methods and directly train with default Config params:
+
     X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
-    model, history = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
+    model = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
     model.save(Config.MODEL_SAVE_PATH)
-    """
+    
 if __name__ == "__main__":
     main()

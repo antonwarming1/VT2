@@ -237,19 +237,26 @@ def exstract_feature_without_tsfresh(df, name):
                 feat[f"{col}__peak"]       = x[peak_idx]
                 feat[f"{col}__peak_time"]  = group["time"].values[peak_idx]
                 feat[f"{col}__range"]      = np.max(x) - np.min(x)
-                feat[f"{col}__area"]       = np.trapz(np.abs(x), group["time"].values)
+                feat[f"{col}__area"]       = np.trapezoid(np.abs(x), group["time"].values)
                 feat[f"{col}__wl"]         = np.sum(np.abs(np.diff(x)))
                 feat[f"{col}__iqr"]        = np.percentile(x, 75) - np.percentile(x, 25)
                 feat[f"{col}__skew"]       = np.mean(((x - mean) / std) ** 3)
                 feat[f"{col}__kurt"]       = np.mean(((x - mean) / std) ** 4)
                 feat[f"{col}__max_grad"]   = np.max(np.abs(np.diff(x)))   # steepest change
             #else intrinsic data
-            else:
-                # Intrinsic: overall level matters most (e.g. high torque or current)
+            elif name == "Intrinsic":
                 feat[f"{col}__mean"] = mean
-                feat[f"{col}__std"]  = std
+                feat[f"{col}__std"] = std
+                feat[f"{col}__min"] = np.min(x)
+                feat[f"{col}__max"] = np.max(x)
+                feat[f"{col}__range"] = np.max(x) - np.min(x)
+                feat[f"{col}__rms"] = np.sqrt(np.mean(x ** 2))
+            else:
+                raise ValueError(f"Unknown feature type: {name}")
+            
 
-                
+
+
                 
             rows[sample_id] = feat
 
@@ -339,7 +346,9 @@ def extract_audio_features(use_tsfresh=False):
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
+    TSFRESH = False
     do_select = "--no-select" not in sys.argv
+
     label_map = OLD_LABEL_MAP if DATASET == "old" else NEW_LABEL_MAP
 
     # Build dataset
@@ -355,47 +364,61 @@ def main():
     print(f"  Task shape:      {task_long.shape}")
     print(f"  Intrinsic shape: {intr_long.shape}")
 
-    # Extract features
-    print("\nExtracting features...")
-    task_features = extract_from_long(task_long, "Task").add_prefix("task_")
-    intr_features = extract_from_long(intr_long, "Intrinsic").add_prefix("intr_")
+    if TSFRESH:
+        # Extract features
+        print("\nExtracting features...")
+        task_features  = extract_from_long(task_long, "Task").add_prefix("task_")
+        intr_features  = extract_from_long(intr_long, "Intrinsic").add_prefix("intr_")
+        audio_features = extract_from_long(extr_long, "Audio").add_prefix("audio_")
 
-    # Extract audio features
-    audio_features = extract_from_long(extr_long, "Audio").add_prefix("audio_")
+        # Combine
+        all_features = pd.concat([task_features, intr_features], axis=1)
+        all_features_audio = pd.concat([all_features, audio_features], axis=1)
+        all_features.index.name = "id"
+        print(f"\nCombined: {all_features.shape}")
 
-    # Combine
-    all_features = pd.concat([task_features, intr_features], axis=1)
-    all_features_audio = pd.concat([all_features, audio_features], axis=1)
-    all_features.index.name = "id"
-    print(f"\nCombined: {all_features.shape}")
+        # Save extracted features
+        all_features.to_csv(OUTPUT_DIR / "features_extracted.csv")
+        print(f"Saved -> features_extracted.csv")
+        audio_features.to_csv(OUTPUT_DIR / "features_extracted_audio.csv")
+        print(f"Saved -> features_extracted_audio.csv")
 
-    # Save extracted features
-    all_features.to_csv(OUTPUT_DIR / "features_extracted.csv")
-    print(f"Saved -> features_extracted.csv")
-    # Save extracted audio features
-    audio_features.to_csv(OUTPUT_DIR / "features_extracted_audio.csv")
-    print(f"Saved -> features_extracted_audio.csv")
+        # Feature selection
+        if do_select:
+            print("\nSelecting relevant features...")
+            selected = select_features(all_features, y, n_jobs=10)
+            print(f"Selected: {selected.shape[1]} / {all_features.shape[1]}")
+            selected.to_csv(OUTPUT_DIR / "features_selected.csv")
+            print(f"Saved -> features_selected.csv")
+            selected_audio = select_features(all_features_audio, y, n_jobs=10)
+            print(f"Selected (with audio): {selected_audio.shape[1]} / {all_features_audio.shape[1]}")
+            selected_audio.to_csv(OUTPUT_DIR / "features_selected_audio.csv")
+            print(f"Saved -> features_selected_audio.csv")
 
-    
+        # Save labels
+        y.to_csv(OUTPUT_DIR / "labels.csv", header=True)
+        print(f"Saved -> labels.csv")
 
-    # Feature selection
-    if do_select:
-        print("\nSelecting relevant features...")
-        selected = select_features(all_features, y, n_jobs=10)
-        print(f"Selected: {selected.shape[1]} / {all_features.shape[1]}")
-        selected.to_csv(OUTPUT_DIR / "features_selected.csv")
-        print(f"Saved -> features_selected.csv")
-        selected_audio = select_features(all_features_audio, y, n_jobs=10)
-        print(f"Selected (with audio): {selected_audio.shape[1]} / {all_features_audio.shape[1]}")
-        selected_audio.to_csv(OUTPUT_DIR / "features_selected_audio.csv")
-        print(f"Saved -> features_selected_audio.csv")
+    else:
+        print("\nExtracting manual features...")
+        task_features  = exstract_feature_without_tsfresh(task_long, "Task").add_prefix("task_")
+        intr_features  = exstract_feature_without_tsfresh(intr_long, "Intrinsic").add_prefix("intr_")
+        audio_features = exstract_feature_without_tsfresh(extr_long, "Audio").add_prefix("audio_")
 
+        all_features = pd.concat([task_features, intr_features], axis=1)
+        all_features_audio = pd.concat([all_features, audio_features], axis=1)
+        all_features.index.name = "id"
+        print(f"\nCombined: {all_features.shape}")
 
-        
+        # Save extracted features
+        all_features.to_csv(OUTPUT_DIR / "features_extracted_manual.csv")
+        print(f"Saved -> features_extracted_manual.csv")
+        all_features_audio.to_csv(OUTPUT_DIR / "features_extracted_manual_audio.csv")
+        print(f"Saved -> features_extracted_manual_audio.csv")
 
-    # Save labels
-    y.to_csv(OUTPUT_DIR / "labels.csv", header=True)
-    print(f"Saved -> labels.csv")
+        # Save labels
+        y.to_csv(OUTPUT_DIR / "labels_manual.csv", header=True)
+        print(f"Saved -> labels_manual.csv")
 
     print("\nDone!")
 
