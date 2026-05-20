@@ -40,12 +40,14 @@ from Preprocessing.data_preprocessing import preprocess_old_pair_df, lowpass_fil
 from Preprocessing.exclude_features import drop_csv_columns_df
 from Feature_engineering.code import _csv_df_to_long
 
-RAW_ROOT    = Path(r"C:\github\VT2\Data fra tidligere project\Dataset")
-LABELS_PATH = Path(r"C:\github\VT2\Feature_engineering\labels.csv")
+BASE_PATH = Path(__file__).parent.parent
+
+RAW_ROOT    = BASE_PATH / "Data fra tidligere project" / "Dataset"
+LABELS_PATH = BASE_PATH / "Feature_engineering" / "labels.csv"
 LABELS      = ["N", "NS", "OT", "P", "UT"]
 _LABEL_REMAP = {"P": "NE"}
 
-AUDIO_RAW_ROOT   = Path(r"C:\github\VT2\Data fra tidligere project\Dataset\Extrinsic data")
+AUDIO_RAW_ROOT   = BASE_PATH / "Data fra tidligere project" / "Dataset" / "Extrinsic data"
 AUDIO_SAMPLERATE = 2200
 
 # Each model was trained with its own test split — reconstruct the matching one
