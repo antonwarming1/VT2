@@ -35,13 +35,13 @@ CLASS_META = {
 
 MODEL_PATH    = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
 SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
-RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
+RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf_tsfresh_uden_lyd.joblib" #New model
 FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
 
 # ── With-audio models — set paths here when trained ──────────────────────────
 AUDIO_MODEL_PATH     = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
 AUDIO_SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
-AUDIO_RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf.joblib"
+AUDIO_RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\RandomForrest_tsfresh_med_lyd.joblib" #New model
 AUDIO_FEATURES_PATH  = r"C:\github\VT2\Feature_engineering\features_selected_audio.csv"
 
 # ── Lazy singletons ───────────────────────────────────────────────────────────

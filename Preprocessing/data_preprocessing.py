@@ -242,7 +242,7 @@ def resample_uniform(df, smooth=False, smooth_cols=None):
             kind="linear", bounds_error=False, fill_value="extrapolate"
         )
         values = interpolator(time_uniform)
-
+        
         # Optionally smooth (only for columns like Robot_I, not step-like TCP positions)
         if smooth and col in smooth_cols and len(values) >= SAVGOL_WINDOW:
             values = savgol_filter(values, SAVGOL_WINDOW, SAVGOL_POLY)

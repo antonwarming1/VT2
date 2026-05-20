@@ -151,7 +151,8 @@ def build_new_dataset():
 
         csv_files = {f.stem: f for f in sorted(folder.glob("*.csv"))}
         json_files = {f.stem: f for f in sorted(folder.glob("*.json"))}
-        paired = sorted(csv_files.keys() & json_files.keys())
+        extr_files = {f.stem: f for f in sorted(folder.glob("e*.csv"))}
+        paired = sorted(csv_files.keys() & json_files.keys() & extr_files.keys())
 
         if not paired:
             print(f"  WARNING: no pairs in {subfolder}")
@@ -161,11 +162,13 @@ def build_new_dataset():
         for stem in paired:
             task_frames.append(_csv_to_long(csv_files[stem], sample_id))
             intr_frames.append(_json_to_long(json_files[stem], sample_id))
+            extr_frames.append(_csv_to_long(extr_files[stem], sample_id))
             labels[sample_id] = label
             sample_id += 1
 
     return (pd.concat(task_frames, ignore_index=True),
             pd.concat(intr_frames, ignore_index=True),
+            pd.concat(extr_frames, ignore_index=True),
             pd.Series(labels, name="label"))
 
 
@@ -189,6 +192,73 @@ def extract_from_long(df, name):
         print(f"  Dropped {len(unreliable)} features with any NaN across training instances")
     print(f"  {name} features: {features.shape}")
     return features
+
+
+def exstract_feature_without_tsfresh(df, name):
+    print(f"  Extracting {name} features (manual)...")
+    rows = {}
+   
+
+    
+    for sample_id, group in df.groupby("id"):
+        sig_cols = [c for c in group.columns if c not in ("id", "time")]
+        feat = {}
+
+        for col in sig_cols:
+            x = group[col].values.astype(np.float64)
+            mean = np.mean(x)
+            std  = np.std(x) or 1e-9
+
+            if name=="Audio":
+                # Sound: frequency content matters most
+                spec  = np.abs(np.fft.rfft(x))
+                freqs = np.fft.rfftfreq(len(x))
+                total_power = np.sum(spec ** 2) or 1e-9
+
+                feat[f"{col}__rms"]             = np.sqrt(np.mean(x ** 2))
+                feat[f"{col}__mav"]             = np.mean(np.abs(x))
+                feat[f"{col}__zero_cross_rate"] = np.sum(np.diff(np.sign(x)) != 0) / len(x)
+                feat[f"{col}__wamp"]            = np.sum(np.abs(np.diff(x)) > 0.5)
+                feat[f"{col}__wl"]              = np.sum(np.abs(np.diff(x)))
+                feat[f"{col}__dom_freq"]        = freqs[np.argmax(spec)]
+                feat[f"{col}__spec_centroid"]   = np.sum(freqs * spec ** 2) / total_power
+                feat[f"{col}__spec_energy"]     = total_power
+                feat[f"{col}__spec_rolloff"]    = freqs[np.searchsorted(np.cumsum(spec**2), 0.85 * total_power)]
+                feat[f"{col}__skew"]            = np.mean(((x - mean) / std) ** 3)
+                feat[f"{col}__kurt"]            = np.mean(((x - mean) / std) ** 4)
+
+            elif name=="Task":
+                # Task / Intrinsic: tightening curve shape matters most
+                peak_idx = np.argmax(np.abs(x))
+
+                feat[f"{col}__mean"]       = mean
+                feat[f"{col}__std"]        = std
+                feat[f"{col}__rms"]        = np.sqrt(np.mean(x ** 2))
+                feat[f"{col}__peak"]       = x[peak_idx]
+                feat[f"{col}__peak_time"]  = group["time"].values[peak_idx]
+                feat[f"{col}__range"]      = np.max(x) - np.min(x)
+                feat[f"{col}__area"]       = np.trapz(np.abs(x), group["time"].values)
+                feat[f"{col}__wl"]         = np.sum(np.abs(np.diff(x)))
+                feat[f"{col}__iqr"]        = np.percentile(x, 75) - np.percentile(x, 25)
+                feat[f"{col}__skew"]       = np.mean(((x - mean) / std) ** 3)
+                feat[f"{col}__kurt"]       = np.mean(((x - mean) / std) ** 4)
+                feat[f"{col}__max_grad"]   = np.max(np.abs(np.diff(x)))   # steepest change
+            #else intrinsic data
+            else:
+                # Intrinsic: overall level matters most (e.g. high torque or current)
+                feat[f"{col}__mean"] = mean
+                feat[f"{col}__std"]  = std
+
+                
+                
+            rows[sample_id] = feat
+
+    features = pd.DataFrame.from_dict(rows, orient="index")
+    features.index.name = "id"
+    print(f"  {name} features: {features.shape}")
+    return features
+
+
 
 
 def extract_audio_features(use_tsfresh=False):
