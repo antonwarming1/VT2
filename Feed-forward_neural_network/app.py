@@ -33,14 +33,14 @@ CLASS_META = {
     "UT": {"full": "Under Tightened", "color": "#3b82f6"},
 }
 
-MODEL_PATH    = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
-SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
+MODEL_PATH    = r"C:\github\VT2\Feed-forward_neural_network\trained_model_tsfresh_uden_lyd.keras"
+SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm_tsfresh_ulyd.joblib"
 RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\trained_rf_tsfresh_uden_lyd.joblib" #New model
 FEATURES_PATH = r"C:\github\VT2\Feature_engineering\features_selected.csv"
 
 # ── With-audio models — set paths here when trained ──────────────────────────
-AUDIO_MODEL_PATH     = r"C:\github\VT2\Feed-forward_neural_network\trained_model.keras"
-AUDIO_SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm.joblib"
+AUDIO_MODEL_PATH     = r"C:\github\VT2\Feed-forward_neural_network\trained_model_tsfresh_med_lyd.keras"
+AUDIO_SVM_MODEL_PATH = r"C:\github\VT2\SVM\trained_svm_tsfresh_mlyd.joblib"
 AUDIO_RF_MODEL_PATH  = r"C:\github\VT2\RandomForest\RandomForrest_tsfresh_med_lyd.joblib" #New model
 AUDIO_FEATURES_PATH  = r"C:\github\VT2\Feature_engineering\features_selected_audio.csv"
 

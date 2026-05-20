@@ -214,12 +214,12 @@ def random_search(X_train, y_labels, config, scoring='f1_macro'):
 
 def objective(trial, X_train, y_labels, config):
     # Select hyperparameters to tune
-    hidden_dim = trial.suggest_int('hidden_dim', 32, 256)
-    num_layers = trial.suggest_int('num_layers', 1, 4)
-    activation = trial.suggest_categorical('activation', ['relu', 'tanh'])
-    dropout_rate = trial.suggest_float('dropout_rate', 0.1, 0.3, step=0.1)
-    lr = trial.suggest_float('lr', 1e-4, 1e-2, log=True)
-    batch_size = trial.suggest_categorical('batch_size', [16, 32, 64])
+    hidden_dim = trial.suggest_int('model__hidden_dim', 32, 256)
+    num_layers = trial.suggest_int('model__num_layers', 1, 4)
+    activation = trial.suggest_categorical('model__activation', ['relu', 'tanh'])
+    dropout_rate = trial.suggest_float('model__dropout_rate', 0.1, 0.3, step=0.1)
+    lr = trial.suggest_float('optimizer__learning_rate', 1e-4, 1e-2, log=True)
+    batch_size = trial.suggest_categorical('batch_size', [16, 32, 64],)
 
     # Build and evaluate model via cross-validation
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS,
