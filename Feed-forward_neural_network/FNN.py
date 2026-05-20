@@ -30,7 +30,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
     TRAINING_HISTORY_PATH = BASE_DIR / "Feed-forward_neural_network" / "training_history.png"
@@ -373,14 +373,15 @@ def main():
     # Run search methods (grid search excluded — too many candidates for available memory)
     print("\n--- Hyperparameter Search ---")
     base_score, _ = base_model_cv(X_train, y_train, Config)
-    grid_search_score, grid_search_params = grid_search(X_train, y_train, Config)
+    
+    grid_score, grid_params = grid_search(X_train, y_train, Config)
     random_score, random_params = random_search(X_train, y_train, Config)
     bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
 
     # Compare and pick the best
     results = {
         'Base Model': (base_score, None),
-        'Grid Search': (grid_search_score, grid_search_params),
+        'Grid Search': (grid_score, grid_params),
         'Rand Search': (random_score, random_params),
         'Bayesian': (bayes_score, bayes_params),
     }
