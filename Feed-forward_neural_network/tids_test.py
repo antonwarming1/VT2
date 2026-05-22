@@ -878,9 +878,9 @@ if __name__ == "__main__":
   print(f"avg total time: {times['t_total'].mean():.3f}s")
 
   print(f"\n>> {len(over_limit)} out of {len(times)} predictions exceeded 4 seconds:")
-  print(over_limit[["N", "Label", "t_total", "ID"]])
   print(f"\n>> Saving times to 'timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv'...")
   times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv"), index=False)
+  print(f">> Saving over-limit predictions to 'timeResults/over_limit_predictions_{Model_name}_{len(times)}_predictions.csv'...")
   over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{len(times)}_predictions.csv"), index=False)
  
   visualize_times(times, Model_name)
