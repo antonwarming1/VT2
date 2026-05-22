@@ -820,7 +820,7 @@ def index():
 
 # ── Visualizations ─────────────────────────────────────────────────────────────
 
-def visualize_times(times_df):
+def visualize_times(times_df, model_name):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
@@ -830,8 +830,8 @@ def visualize_times(times_df):
     plt.xlabel("Screw Type")
     plt.ylabel("Total Time (s)")
     plt.tight_layout()
-    plt.savefig(Path("timeResults/inference_times_boxplot.png"))
-    print(">> Boxplot saved to 'timeResults/inference_times_boxplot.png'")
+    plt.savefig(Path(f"timeResults/inference_times_boxplot_{model_name}.png"))
+    print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{model_name}.png'")
     plt.show()
     
 
@@ -840,6 +840,7 @@ def visualize_times(times_df):
 if __name__ == "__main__":
   import uvicorn
 
+  Model_name = "fnn"
   times = pd.DataFrame()
   time_over = pd.DataFrame()
 
@@ -849,11 +850,11 @@ if __name__ == "__main__":
           break
       except ValueError:
           print("Please enter a valid integer.")
-
+  _predict_one_instance(0, model_name=Model_name, audio_mode=True, _print=True)  # warm-up run
 
   for i in range(tests):
       print(f"\n>> Running single prediction test #{i+1}...")
-      result , time_result = _predict_one_instance(i, model_name="fnn", audio_mode=True, _print=False)
+      result , time_result = _predict_one_instance(i, model_name=Model_name, audio_mode=True, _print=False)
       times = pd.concat([times, pd.DataFrame([{
           "N": i + 1,
           "Label": result.label,
@@ -871,12 +872,12 @@ if __name__ == "__main__":
   over_limit = times[times["t_total"] > 4.0]
 
   print(times.head())
-  print(">> Saving times to 'timeResults/inference_times.csv'...")
-  times.to_csv(Path("timeResults/inference_times.csv"), index=False)
+  print(f">> Saving times to 'timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv'...")
+  times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv"), index=False)
   print(f">> {len(over_limit)} out of {len(times)} predictions exceeded 4 seconds:")
-  over_limit.to_csv(Path("timeResults/over_limit_predictions.csv"), index=False)
+  over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{len(times)}_predictions.csv"), index=False)
   print(over_limit[["N", "Label", "t_total", "ID"]])
-  visualize_times(times)
+  visualize_times(times, Model_name)
   
   
   # uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=False)
