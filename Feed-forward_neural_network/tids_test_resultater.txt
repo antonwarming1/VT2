@@ -1,0 +1,116 @@
+                                    SVM uden lyd:
+
+>> Prediction distribution:
+Label
+N     108
+OT     66
+UT     62
+NE     37
+NS     27
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 0.952s
+avg inference time: 0.001s
+avg total time: 0.953s
+
+>> 0 out of 300 predictions exceeded 4 seconds:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                                    SVM med lyd: 
+
+>> Prediction distribution:
+Label
+OT    88
+N     77
+UT    59
+NS    42
+NE    34
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.825s
+avg inference time: 0.001s
+avg total time: 1.826s
+
+>> 0 out of 300 predictions exceeded 4 seconds:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                                    RF uden lyd
+>> Prediction distribution:
+Label
+N     90
+OT    77
+UT    65
+NE    34
+NS    34
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 0.944s
+avg inference time: 0.035s
+avg total time: 0.979s
+
+>> 0 out of 300 predictions exceeded 4 seconds:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                    RF med lyd
+>> Prediction distribution:
+Label
+N     86
+OT    83
+UT    57
+NS    44
+NE    30
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.732s
+avg inference time: 0.057s
+avg total time: 1.789s
+
+>> 0 out of 300 predictions exceeded 4 seconds:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                                    FNN uden lyd
+>> Prediction distribution:
+Label
+N     94
+UT    72
+OT    61
+NS    37
+NE    36
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 0.900s
+avg inference time: 0.055s
+avg total time: 0.955s
+
+>> 0 out of 300 predictions exceeded 4 seconds:
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                    FNN med lyd
+>> Prediction distribution:
+Label
+OT    93
+N     75
+UT    61
+NS    38
+NE    33
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.772s
+avg inference time: 0.059s
+avg total time: 1.831s
+
+>> 0 out of 300 predictions exceeded 4 seconds:
