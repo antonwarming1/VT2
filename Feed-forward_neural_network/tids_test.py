@@ -830,8 +830,8 @@ def visualize_times(times_df, model_name):
     plt.xlabel("Screw Type")
     plt.ylabel("Total Time (s)")
     plt.tight_layout()
-    plt.savefig(Path(f"timeResults/inference_times_boxplot_{model_name}.png"))
-    print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{model_name}.png'")
+    plt.savefig(Path(f"timeResults/inference_times_boxplot_{model_name}_{len(times_df)}_predictions.png"))
+    print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{model_name}_{len(times_df)}_predictions.png'")
     plt.show()
     
 
@@ -850,7 +850,8 @@ if __name__ == "__main__":
           break
       except ValueError:
           print("Please enter a valid integer.")
-  _predict_one_instance(0, model_name=Model_name, audio_mode=True, _print=True)  # warm-up run
+
+  _predict_one_instance(0, model_name=Model_name, audio_mode=True, _print=False)  # warm-up run
 
   for i in range(tests):
       print(f"\n>> Running single prediction test #{i+1}...")
@@ -871,11 +872,17 @@ if __name__ == "__main__":
   print(distribution)    
   over_limit = times[times["t_total"] > 4.0]
 
-  print(times.head())
+  print(f"avg asset time: {times['t_asset'].mean():.3f}s")
+  print(f"avg pipeline time: {times['t_pipeline'].mean():.3f}s")
+  print(f"avg inference time: {times['t_inference'].mean():.3f}s")
+  print(f"avg total time: {times['t_total'].mean():.3f}s")
+
   print(f">> Saving times to 'timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv'...")
   times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv"), index=False)
+  
   print(f">> {len(over_limit)} out of {len(times)} predictions exceeded 4 seconds:")
   over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{len(times)}_predictions.csv"), index=False)
+ 
   print(over_limit[["N", "Label", "t_total", "ID"]])
   visualize_times(times, Model_name)
   
