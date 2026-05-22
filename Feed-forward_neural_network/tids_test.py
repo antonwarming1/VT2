@@ -824,16 +824,15 @@ def visualize_times(times_df, model_name):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
-    plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(10, 6))
     sns.boxplot(data=times_df, x="Label", y="t_total", palette="Set2")
     plt.title("Total Time Taken by Screw Type")
     plt.xlabel("Screw Type")
     plt.ylabel("Total Time (s)")
     plt.tight_layout()
-    plt.savefig(Path(f"timeResults/inference_times_boxplot_{model_name}_{len(times_df)}_predictions.png"))
-    print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{model_name}_{len(times_df)}_predictions.png'")
     plt.show()
-    
+
+    return fig
 
 # ── Dev entry point ────────────────────────────────────────────────────────────
 
@@ -847,15 +846,27 @@ if __name__ == "__main__":
   while True:
       try:
           tests = int(input("Enter number of single prediction tests to run: "))
+          Model_name = input("Enter model to test (fnn, svm, rf): ").strip().lower()
+          if Model_name not in ["fnn", "svm", "rf"]:
+              print("Invalid model name. Please enter 'fnn', 'svm', or 'rf'.")
+              continue
+          audio_input = input("Audio mode? (y/n): ").strip().lower()
+          if audio_input == "y":
+              audio_mode = True
+          elif audio_input == "n":
+              audio_mode = False
+          else:
+              print("Invalid input. Please enter 'y' or 'n'.")
+              continue
           break
       except ValueError:
           print("Please enter a valid integer.")
 
-  _predict_one_instance(0, model_name=Model_name, audio_mode=True, _print=False)  # warm-up run
+  _predict_one_instance(0, model_name=Model_name, audio_mode=audio_mode, _print=False)  # warm-up run
 
   for i in range(tests):
       print(f">> Running single prediction test #{i+1}...")
-      result , time_result = _predict_one_instance(i, model_name=Model_name, audio_mode=True, _print=False)
+      result , time_result = _predict_one_instance(i, model_name=Model_name, audio_mode=audio_mode, _print=False)
       times = pd.concat([times, pd.DataFrame([{
           "N": i + 1,
           "Label": result.label,
@@ -878,12 +889,15 @@ if __name__ == "__main__":
   print(f"avg total time: {times['t_total'].mean():.3f}s")
 
   print(f"\n>> {len(over_limit)} out of {len(times)} predictions exceeded 4 seconds:")
-  print(f"\n>> Saving times to 'timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv'...")
-  times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{len(times)}_predictions.csv"), index=False)
-  print(f">> Saving over-limit predictions to 'timeResults/over_limit_predictions_{Model_name}_{len(times)}_predictions.csv'...")
-  over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{len(times)}_predictions.csv"), index=False)
+  print(f"\n>> Saving times to 'timeResults/inference_times_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv'...")
+  times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv"), index=False)
+  print(f">> Saving over-limit predictions to 'timeResults/over_limit_predictions_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv'...")
+  over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv"), index=False)
  
-  visualize_times(times, Model_name)
+  fig = visualize_times(times, Model_name)
+  fig.savefig(Path(f"timeResults/inference_times_boxplot_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.png"))
+  print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.png'")
+    
   
   
   # uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=False)
