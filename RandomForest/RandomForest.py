@@ -26,15 +26,15 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
-
+#C:\github\VT2\Feature_engineering\features_extracted_manual_audio.csv
 # ── Configuration ────────────────────────────────────────────────────────────
 
 
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
-    LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_extracted_manual_audio.csv"
+    LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels_manual.csv"
     MODEL_SAVE_PATH = BASE_DIR / "RandomForest" / "trained_rf.joblib"
 
     # RF training is non-iterative, so no validation split is needed.
