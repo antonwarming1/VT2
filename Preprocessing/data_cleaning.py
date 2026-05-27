@@ -58,15 +58,11 @@ def load_wav(filepath, sr=None):
 
 
 def clean_task_df(df):
-    """In-memory clean for a Task CSV DataFrame: drop NaN rows, shift time to start at 0."""
+    """In-memory clean for a Task CSV DataFrame: drop NaN rows, clip negative Current."""
     if df.isnull().sum().sum() > 0:
         df = df.dropna()
-    time_col = "Time (ms)"
-    if time_col in df.columns:
-        t0 = df[time_col].iloc[0]
-        if t0 != 0.0:
-            df = df.copy()
-            df[time_col] = df[time_col] - t0
+    if "Current (V)" in df.columns:
+        df["Current (V)"] = df["Current (V)"].clip(lower=0)
     return df.reset_index(drop=True)
 
 
@@ -93,13 +89,11 @@ def clean_csv(filepath, output_path):
         actions.append(f"  WARNING: {nan_count} NaN values found — dropped rows with NaN")
         df = df.dropna()
 
-    # Shift time to start at 0
-    time_col = "Time (ms)"
-    if time_col in df.columns:
-        t0 = df[time_col].iloc[0]
-        if t0 != 0.0:
-            df[time_col] = df[time_col] - t0
-            actions.append(f"  Time shifted by -{t0:.3f} ms (was starting at {t0})")
+    if "Current (V)" in df.columns:
+        neg = (df["Current (V)"] < 0).sum()
+        if neg > 0:
+            df["Current (V)"] = df["Current (V)"].clip(lower=0)
+            actions.append(f"  Current: clipped {neg} negative values to 0")
 
     df.to_csv(output_path, index=False)
 
