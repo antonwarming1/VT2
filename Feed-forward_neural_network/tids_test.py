@@ -888,12 +888,14 @@ if __name__ == "__main__":
   print(f"avg inference time: {times['t_inference'].mean():.3f}s")
   print(f"avg total time: {times['t_total'].mean():.3f}s")
 
-  print(f"\n>> {len(over_limit)} out of {len(times)} predictions exceeded 4 seconds:")
+  if len(over_limit) > 0:
+    print(f"\n>> {len(over_limit)} out of {len(times)} predictions exceeded 4 seconds:")
+    print(f">> Saving over-limit predictions to 'timeResults/over_limit_predictions_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv'...")
+    over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv"), index=False)
+ 
   print(f"\n>> Saving times to 'timeResults/inference_times_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv'...")
   times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv"), index=False)
-  print(f">> Saving over-limit predictions to 'timeResults/over_limit_predictions_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv'...")
-  over_limit.to_csv(Path(f"timeResults/over_limit_predictions_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv"), index=False)
- 
+  
   fig = visualize_times(times, Model_name)
   fig.savefig(Path(f"timeResults/inference_times_boxplot_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.png"))
   print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.png'")
