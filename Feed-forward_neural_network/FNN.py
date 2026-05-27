@@ -220,6 +220,7 @@ def objective(trial, X_train, y_labels, config):
     dropout_rate = trial.suggest_float('model__dropout_rate', 0.1, 0.3, step=0.1)
     lr = trial.suggest_float('optimizer__learning_rate', 1e-4, 1e-2, log=True)
     batch_size = trial.suggest_categorical('batch_size', [16, 32, 64],)
+    l2_reg = trial.suggest_float('model__l2', 1e-4, 1e-1, log=True)
 
     # Build and evaluate model via cross-validation
     clf = make_clf(X_train.shape[1], len(config.CLASS_LABELS), config.SEARCH_EPOCHS,
@@ -227,6 +228,7 @@ def objective(trial, X_train, y_labels, config):
                    model__activation=activation,
                    model__dropout_rate=dropout_rate,
                    optimizer__learning_rate=lr,
+                   model__l2=l2_reg,
                    batch_size=batch_size)
 
     cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=config.RANDOM_STATE)
@@ -256,6 +258,7 @@ def bayesian_search(X_train, y_labels, config, n_trials=50):
         'model__dropout_rate': best['dropout_rate'],
         'batch_size': best['batch_size'],
         'optimizer__learning_rate': best['lr'],
+        'model__l2': best['l2_reg'],
     }
     return study.best_value, best_params
 

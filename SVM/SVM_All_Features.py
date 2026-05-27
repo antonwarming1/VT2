@@ -200,6 +200,7 @@ def build_final_model(config):
         class_weight=config.CLASS_WEIGHT,
         decision_function_shape="ovr",
         random_state=config.RANDOM_STATE,
+        probability=True,  # SVM probabilities are expensive and not needed for this task
     )
     # gamma is only meaningful for non-linear kernels
     if config.KERNEL != "linear":

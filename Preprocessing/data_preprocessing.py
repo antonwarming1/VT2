@@ -40,7 +40,7 @@ OLD_OR_NEW_DATA = ["old"]       # ["old"], ["new"], or ["old", "new"]
 FOLDERS_OLD = ["Extrinsic data", "Intrinsic data", "Task data"]  # For old data: which subfolders to include
 
 RESAMPLE_MS    = 2       # Target sample interval (ms)
-IDLE_DEPTH_RATE = 0.005  # Depth rate threshold (mm/ms) to detect screwing start
+IDLE_DEPTH_RATE = 0.01  # Depth rate threshold (mm/ms) to detect screwing start
 IDLE_WINDOW    = 50      # Rolling window size (ms) for smoothing the depth rate
 IDLE_MARGIN_MS = 0       # Keep this many ms before detected screwing start
 

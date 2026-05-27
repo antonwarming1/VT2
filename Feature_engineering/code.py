@@ -346,7 +346,7 @@ def extract_audio_features(use_tsfresh=False):
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    TSFRESH = False
+    TSFRESH = True
     do_select = "--no-select" not in sys.argv
 
     label_map = OLD_LABEL_MAP if DATASET == "old" else NEW_LABEL_MAP

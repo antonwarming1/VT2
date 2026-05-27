@@ -112,16 +112,18 @@ def clean_json(filepath, output_path):
     vectors = data["XML_Data"]["Wsk3Vectors"]
     axes = vectors["Y_AxesList"]["AxisData"]
 
-    for axis in axes:
+    # Load all axes values and find rows where any axis has NaN
+    all_values = [[float(v) for v in axis["Values"]["float"]] for axis in axes]
+    n = len(all_values[0]) if all_values else 0
+    bad_rows = {i for i in range(n) if any(v != v for vals in all_values for v in [vals[i]])}
+    if bad_rows:
+        actions.append(f"  WARNING: {len(bad_rows)} rows with NaN values — dropped")
+    good_rows = [i for i in range(n) if i not in bad_rows]
+
+    for axis, values in zip(axes, all_values):
         name = axis["Header"]["Name"]
         unit = axis["Header"]["Unit"]
-        values = [float(v) for v in axis["Values"]["float"]]
-
-        # Check for NaN
-        nan_count = sum(1 for v in values if v != v)  # NaN != NaN
-        if nan_count > 0:
-            actions.append(f"  WARNING: {name} has {nan_count} NaN values — replaced with 0")
-            values = [0.0 if v != v else v for v in values]
+        values = [values[i] for i in good_rows]
 
         # Clip negative Torque to 0
         if name.lower() == "torque":

@@ -28,9 +28,6 @@ PROCESS_SUBFOLDERS = ["--all"]   # ["Normal"], ["Normal","Under"], or ["--all"]
 
 EXCLUDE_CSV = [
     # Task CSV — new data (mm)
-    "TCP_x (mm)",
-    "TCP_y (mm)",
-    "TCP_z (mm)",
     "TCP_rx (mm)",
     "TCP_ry (mm)",
     "TCP_rz (mm)",
