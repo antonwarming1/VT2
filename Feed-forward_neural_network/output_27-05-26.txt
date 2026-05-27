@@ -1,0 +1,56 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1779907074.959919   25532 port.cc:153] oneDNN custom operations are on. You fferent computation orders. To turn them off, set the environment variable `TF_ENABLE_ON
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1779907076.759840   25532 port.cc:153] oneDNN custom operations are on. You fferent computation orders. To turn them off, set the environment variable `TF_ENABLE_ON
+Feed-Forward Neural Network — Multi-Class Classification
+
+Loading data...
+  X: (1341, 3167),  y: (1341,)
+  Train: 937  Val: 269  Test: 135
+
+--- Hyperparameter Search ---
+
+Base model cross-validation...
+WARNING:tensorflow:From C:\Users\kjaer\miniconda3\envs\VT2\Lib\site-packages\keras\src\b tf.compat.v1.reset_default_graph instead.
+
+I0000 00:00:1779907081.361906   25532 cpu_feature_guard.cc:227] This TensorFlow binary i
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 FMA, in other operatio
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorF TensorFlow-DirectML plugin.
+WARNING:tensorflow:5 out of the last 13 calls to <function TensorFlowTrainer.make_predicon retracing. Tracing is expensive and the excessive number of tracings could be due to (3) passing Python objects instead of tensors. For (1), please define your @tf.function unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/functioe details.
+WARNING:tensorflow:5 out of the last 13 calls to <function TensorFlowTrainer.make_predicon retracing. Tracing is expensive and the excessive number of tracings could be due to (3) passing Python objects instead of tensors. For (1), please define your @tf.function unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/functioe details.
+  CV F1-Macro: 0.9619 (+/- 0.0136)
+
+Grid Search CV...
+Fitting 5 folds for each of 160 candidates, totalling 800 fits
+  Best score:  0.9659
+  Best params: {'batch_size': 32, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__hidden_layers': [256, 128, 64], 'model__l2': 0.0, 'optimizer__learning_rate': 0.0001}
+
+Random Search CV...
+Fitting 5 folds for each of 50 candidates, totalling 250 fits
+  Best score:  0.9660
+  Best params: {'batch_size': 16, 'model__activation': 'tanh', 'model__dropout_rate': np.float64(0.3136811769773326), 'model__hidden_layers': [256, 128, 64, 32], 'model__l2': np.float64(0.000715354779469316), 'optimizer__learning_rate': np.float64(0.00011851515660043118)}
+
+=== RUNNING BAYESIAN OPTIMIZATION (50 trials) ===
+Best trial: 28. Best value: 0.965544: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [22:57<00:00, 27.56s/it]
+
+=== OPTIMIZATION COMPLETE ===
+Best trial: 28
+Best validation F1 score (macro): 0.9655
+
+Best hyperparameters:
+  model__hidden_dim: 106
+  model__num_layers: 3
+  model__activation: relu
+  model__dropout_rate: 0.2
+  optimizer__learning_rate: 0.00036446390832397277
+  batch_size: 16
+Traceback (most recent call last):
+  File "c:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\FNN.py", line 433, in <module>
+    main()
+  File "c:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\FNN.py", line 381, in main
+    bayes_score, bayes_params = bayesian_search(X_train, y_train, Config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\kjaer\OneDrive - Aalborg Universitet\8. semester\Project\Github\VT2_Hjemme\VT2\Feed-forward_neural_network\FNN.py", line 254, in bayesian_search
+    'model__hidden_layers': [best['hidden_dim']] * best['num_layers'],
+                             ~~~~^^^^^^^^^^^^^^
+KeyError: 'hidden_dim'
