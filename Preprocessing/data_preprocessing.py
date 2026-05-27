@@ -53,7 +53,6 @@ SAVGOL_POLY    = 3
 
 EXTRINSIC_ONLY = False            # If True, only preprocess the Extrinsic data from the old dataset (no Task/Intrinsic pairs)
 SAMPLERATE = int(Path(OLD_DATA_ROOT / "Extrinsic data" / "samplerate.txt").read_text().strip())
-Y_NOISE, sr_noise = librosa.load(Path(__file__).parent.parent / "soundcleaning" / "Optaget_støj.wav", sr = SAMPLERATE, mono=True)
 
 # ── JSON helpers ─────────────────────────────────────────────────────────────
 
@@ -373,8 +372,8 @@ def lowpass_filter(data, samplerate, highcut, order=6):
     filtered = sosfiltfilt(sos, data, axis=0)
     return filtered
 
-def preprocess_audio(file_path, out_path, samplerate):
-    """Read csv, apply noise reduction and lowpass filter, save cleaned csv."""
+"""def preprocess_audio(file_path, out_path, samplerate, Y_NOISE=None):
+    Read csv, apply noise reduction and lowpass filter, save cleaned csv.
     if not file_path.exists():
         raise FileNotFoundError(f"Audio file not found: {file_path}")
     
@@ -394,14 +393,14 @@ def preprocess_audio(file_path, out_path, samplerate):
         freq_mask_smooth_hz=100,
         time_mask_smooth_ms=128,
         prop_decrease = 0.8,
-        stationary = False
+        stationary = True
         )
-    df["Amplitude"] = lowpass_filter(df["Amplitude"].values, samplerate, highcut=1000)
+    
 
     df.to_csv(out_path, index=False)
     print(f"Processed audio saved to {out_path.relative_to(OLD_DATA_ROOT.parent)}")
 
-
+"""
 
 def main():
     """Find all CSV/JSON pairs in the configured subfolders and preprocess them."""
@@ -409,6 +408,7 @@ def main():
     print(f"Resample: {RESAMPLE_MS} ms | Idle threshold: {IDLE_DEPTH_RATE} mm/ms | "
           f"Smooth: {'SavGol' if SMOOTH_CSV else 'OFF'}\n")
 
+    
     # ── Process new dataset ──
     if "new" in OLD_OR_NEW_DATA:
         if not DATA_ROOT.exists():
@@ -475,7 +475,7 @@ def main():
                         )
                     else:
                         print(f"  WARNING: no audio file for {base_id}, skipping audio trim")
-        if "Extrinsic data" in FOLDERS_OLD:
+        """if "Extrinsic data" in FOLDERS_OLD:
             print(f"\n{'#'*50}")
             print(f"  EXTRINSIC DATASET")
             print(f"{'#'*50}")
@@ -491,8 +491,8 @@ def main():
                     out_dir.mkdir(parents=True, exist_ok=True)
                     extr_files = {f.stem: f for f in sorted(Label_dir.glob("*.csv"))}
                     for base in extr_files:
-                        preprocess_audio(Label_dir / f"{base}.csv", out_dir / f"{base}.csv", SAMPLERATE)
-                        
+                        preprocess_audio(Label_dir / f"{base}.csv", out_dir / f"{base}.csv", SAMPLERATE, Y_NOISE=Y_NOISE)
+                        """
                   
                     
                     

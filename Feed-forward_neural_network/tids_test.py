@@ -820,13 +820,13 @@ def index():
 
 # ── Visualizations ─────────────────────────────────────────────────────────────
 
-def visualize_times(times_df, model_name):
+def visualize_times(times_df, model_name, audio_mode):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
     fig = plt.figure(figsize=(10, 6))
     sns.boxplot(data=times_df, x="Label", y="t_total", palette="Set2")
-    plt.title("Total Time Taken by Screw Type")
+    plt.title("Boxplot of time taken for each screw type Model: " + model_name.upper() + (" (With Audio)" if audio_mode else " (No Audio)"))
     plt.xlabel("Screw Type")
     plt.ylabel("Total Time (s)")
     plt.tight_layout()
@@ -896,7 +896,7 @@ if __name__ == "__main__":
   print(f"\n>> Saving times to 'timeResults/inference_times_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv'...")
   times.to_csv(Path(f"timeResults/inference_times_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.csv"), index=False)
   
-  fig = visualize_times(times, Model_name)
+  fig = visualize_times(times, Model_name, audio_mode)
   fig.savefig(Path(f"timeResults/inference_times_boxplot_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.png"))
   print(f">> Boxplot saved to 'timeResults/inference_times_boxplot_{Model_name}_{'med' if audio_mode else 'uden'}_audio_{len(times)}_tests.png'")
     
