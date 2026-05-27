@@ -364,7 +364,7 @@ def preprocess_old_pair_df(task_df, intr_df, sound_df=None):
 
 # ------------------- Audio preprocessing functions -------------------
 
-"""def lowpass_filter(data, samplerate, highcut, order=6):
+def lowpass_filter(data, samplerate, highcut, order=6):
     nyquist = samplerate / 2
     high = highcut / nyquist
 
@@ -372,7 +372,7 @@ def preprocess_old_pair_df(task_df, intr_df, sound_df=None):
     filtered = sosfiltfilt(sos, data, axis=0)
     return filtered
 
-def preprocess_audio(file_path, out_path, samplerate, Y_NOISE=None):
+"""def preprocess_audio(file_path, out_path, samplerate, Y_NOISE=None):
     Read csv, apply noise reduction and lowpass filter, save cleaned csv.
     if not file_path.exists():
         raise FileNotFoundError(f"Audio file not found: {file_path}")

@@ -256,7 +256,6 @@ def resample_audio_df(df, target_sr=2200, original_sr = 44100):
 
 def clean_wav(filepath, samplerate=None):
     """Clean a single WAV file. Returns list of actions taken."""
-    Actions = []
     y, sr = load_wav(filepath, sr=None)
     df = pd.DataFrame({"Time (ms)": np.arange(len(y)) / sr * 1000, "Amplitude": y})
 
@@ -266,7 +265,6 @@ def clean_wav(filepath, samplerate=None):
     # Check for NaN
     nan_count = df["Amplitude"].isnull().sum()
     if nan_count > 0:
-        Actions.append(f"  WARNING: {nan_count} NaN values found in audio — replaced with 0")
         df["Amplitude"] = df["Amplitude"].fillna(0)
 
 
@@ -296,12 +294,12 @@ def preprocess_audio(df, out_path, samplerate, Y_NOISE=None):
     df.to_csv(out_path, index=False)
     print(f"Processed audio saved to {out_path}")
 
+y_noise, sr_noise = librosa.load(Path(__file__).parent.parent / "soundcleaning" / "Optaget_støj.wav", sr = SAMPLERATE, mono=True)
+y_noise = lowpass_filter(y_noise, samplerate=sr_noise, highcut=1000, order=6)
+Y_NOISE = librosa.resample(y_noise, orig_sr=sr_noise, target_sr=SAMPLERATE)
+
 def main():
 
-    # load noise filter and resample to target samplerate
-    y_noise, sr_noise = librosa.load(Path(__file__).parent.parent / "soundcleaning" / "Optaget_støj.wav", sr = SAMPLERATE, mono=True)
-    y_noise = lowpass_filter(y_noise, samplerate=sr_noise, highcut=1000, order=6)
-    Y_NOISE = librosa.resample(y_noise, orig_sr=sr_noise, target_sr=SAMPLERATE)
 
     # Resolve subfolders from config
     if PROCESS_SUBFOLDERS == ["--all"]:
