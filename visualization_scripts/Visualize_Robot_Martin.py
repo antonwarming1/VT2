@@ -33,7 +33,7 @@ time = df["Time (ms)"] / 1000
 
 tcp_rx = df["TCP_rx (mm)"].astype(float)
 tcp_ry = df["TCP_ry (mm)"].astype(float)
-tcp_rz = df["TCP_rz (mm)"].astype(float)
+tcp_rz = -df["TCP_rz (mm)"].astype(float)
 
 # ============================================================
 # Rotation plot
