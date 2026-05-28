@@ -12,12 +12,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # ── PARAMETERS — edit these ──────────────────────────────────────────────────
-IDLE_DEPTH_RATE   = 0.02   # mm/ms — depth-rate threshold to detect active screwing
+IDLE_DEPTH_RATE   = 0.01   # mm/ms — depth-rate threshold to detect active screwing
 IDLE_WINDOW       = 50      # samples — rolling window for smoothing depth rate
 MIN_ACTIVE_SAMPLES = 10     # consecutive samples above threshold before looking for plateau
 
 LABEL       = "N"           # which class folder to sample from
-N_SAMPLES   = 100             # how many files to test
+N_SAMPLES   = 100           # how many files to test
+DEPTH_ONLY  = True          # True = single depth plot with red line / False = all columns before+after
 # ─────────────────────────────────────────────────────────────────────────────
 
 DATA_ROOT  = Path(r"C:\github\VT2\data_old_cleaned\Intrinsic data")
@@ -69,28 +70,34 @@ def trim_to_start(df, t):
 
 
 def plot_trim(df_raw, df_trim, plateau_ms, title, save_path):
-    cols = [c for c in df_raw.columns if c != "Time (ms)"]
-    n    = len(cols)
-    fig, axes = plt.subplots(n, 2, figsize=(14, 3 * n), sharex="col")
-    if n == 1:
-        axes = [axes]
-
-    fig.suptitle(title, fontsize=10)
-    axes[0][0].set_title(f"BEFORE  (plateau @ {plateau_ms:.0f} ms)", fontsize=9, color="#3333aa")
-    axes[0][1].set_title("AFTER  (from plateau onward)", fontsize=9, color="#226622")
-
-    for i, col in enumerate(cols):
-        axes[i][0].plot(df_raw["Time (ms)"], df_raw[col], color="#4444cc", linewidth=0.7)
-        axes[i][0].axvline(plateau_ms, color="red", linestyle="--", linewidth=0.9)
-        axes[i][0].set_ylabel(col, fontsize=7)
-        axes[i][0].grid(True, alpha=0.25)
-
-        axes[i][1].plot(df_trim["Time (ms)"], df_trim[col], color="#228822", linewidth=0.7)
-        axes[i][1].set_ylabel(col, fontsize=7)
-        axes[i][1].grid(True, alpha=0.25)
-
-    axes[-1][0].set_xlabel("Time (ms)")
-    axes[-1][1].set_xlabel("Time (ms)")
+    if DEPTH_ONLY:
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(df_raw["Time (ms)"], df_raw["Depth (mm)"], color="#4444cc", linewidth=0.8)
+        ax.axvline(plateau_ms, color="red", linestyle="--", linewidth=1.2, label=f"Plateau @ {plateau_ms:.0f} ms")
+        ax.set_xlabel("Time (ms)")
+        ax.set_ylabel("Depth (mm)")
+        ax.set_title(title, fontsize=9)
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.25)
+    else:
+        cols = [c for c in df_raw.columns if c != "Time (ms)"]
+        n    = len(cols)
+        fig, axes = plt.subplots(n, 2, figsize=(14, 3 * n), sharex="col")
+        if n == 1:
+            axes = [axes]
+        fig.suptitle(title, fontsize=10)
+        axes[0][0].set_title(f"BEFORE  (plateau @ {plateau_ms:.0f} ms)", fontsize=9, color="#3333aa")
+        axes[0][1].set_title("AFTER  (from plateau onward)", fontsize=9, color="#226622")
+        for i, col in enumerate(cols):
+            axes[i][0].plot(df_raw["Time (ms)"], df_raw[col], color="#4444cc", linewidth=0.7)
+            axes[i][0].axvline(plateau_ms, color="red", linestyle="--", linewidth=0.9)
+            axes[i][0].set_ylabel(col, fontsize=7)
+            axes[i][0].grid(True, alpha=0.25)
+            axes[i][1].plot(df_trim["Time (ms)"], df_trim[col], color="#228822", linewidth=0.7)
+            axes[i][1].set_ylabel(col, fontsize=7)
+            axes[i][1].grid(True, alpha=0.25)
+        axes[-1][0].set_xlabel("Time (ms)")
+        axes[-1][1].set_xlabel("Time (ms)")
     plt.tight_layout()
     plt.savefig(save_path, dpi=100)
     plt.close()

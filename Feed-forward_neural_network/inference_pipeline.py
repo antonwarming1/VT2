@@ -25,6 +25,7 @@ from pathlib import Path
 import noisereduce
 import numpy as np
 import pandas as pd
+import librosa
 from sklearn.model_selection import train_test_split
 from tsfresh import extract_features
 from tsfresh.feature_extraction.settings import from_columns
@@ -35,8 +36,8 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from Preprocessing.data_cleaning import clean_task_df, clean_intrinsic_df, load_wav
-from Preprocessing.data_preprocessing import preprocess_old_pair_df, lowpass_filter, Y_NOISE
+from Preprocessing.data_cleaning import clean_task_df, clean_intrinsic_df, load_wav, lowpass_filter, Y_NOISE
+from Preprocessing.data_preprocessing import preprocess_old_pair_df
 from Preprocessing.exclude_features import drop_csv_columns_df
 from Feature_engineering.code import _csv_df_to_long
 
@@ -253,16 +254,31 @@ def build_kind_fc_parameters_audio(selected_columns):
     return task_fc, intr_fc, audio_fc
 
 
-def _clean_wav_df(wav_path, samplerate=AUDIO_SAMPLERATE):
+def _clean_wav_df(wav_path, samplerate=44100):
     """Load a WAV file into a Time(ms)/Amplitude DataFrame — mirrors data_cleaning.clean_wav."""
     y, sr = load_wav(str(wav_path), sr=samplerate)
     y = np.where(np.isnan(y), 0.0, y)
     time_ms = np.arange(len(y)) / sr * 1000
     return pd.DataFrame({"Time (ms)": time_ms, "Amplitude": y})
 
+def resample_audio_df(df, target_sr=2200, original_sr = 44100):
+    """Resample audio df to 2200 hz.""" 
+      # Assuming original is always 44100 Hz
+    if target_sr == original_sr:
+        return df
+    
+    # Resample using librosa
+    y = df["Amplitude"].values
+    y_resampled = librosa.resample(y, orig_sr=original_sr, target_sr=target_sr)
+    time_resampled = np.arange(len(y_resampled)) / target_sr * 1000
+    
+    
+    return pd.DataFrame({"Time (ms)": time_resampled, "Amplitude": y_resampled})
+
+    
 
 def _preprocess_audio_df(df, samplerate=AUDIO_SAMPLERATE):
-    """Noise-reduce and lowpass-filter — mirrors data_preprocessing.preprocess_audio."""
+    """Noise-reduce — mirrors data_preprocessing.preprocess_audio."""
     cleaned = noisereduce.reduce_noise(
         y=df["Amplitude"].to_numpy(dtype=np.float32),
         y_noise=Y_NOISE,
@@ -273,10 +289,10 @@ def _preprocess_audio_df(df, samplerate=AUDIO_SAMPLERATE):
         time_mask_smooth_ms=128,
     )
     out = df.copy()
-    out["Amplitude"] = lowpass_filter(cleaned, samplerate, highcut=1000)
+    out["Amplitude"] = cleaned
     return out
 
-
+    
 def pipeline_one_audio(task_csv_path, intr_csv_path, audio_wav_path, sample_id,
                         task_kind_to_fc, intr_kind_to_fc, audio_kind_to_fc,
                         selected_columns, training_means=None):
@@ -289,6 +305,14 @@ def pipeline_one_audio(task_csv_path, intr_csv_path, audio_wav_path, sample_id,
     intr_df  = clean_intrinsic_df(pd.read_csv(intr_csv_path))
     audio_df = _clean_wav_df(audio_wav_path)
 
+    #lowpass-filter while still in 44100 hz samplerate
+    audio_df["Amplitude"] = lowpass_filter(audio_df["Amplitude"], 44100, highcut=1000)
+
+    audio_df = resample_audio_df(audio_df, target_sr=AUDIO_SAMPLERATE)
+    
+    # Noise reduce
+    audio_df = _preprocess_audio_df(audio_df)
+
     result = preprocess_old_pair_df(task_df, intr_df, audio_df)
     if result is None:
         return None
@@ -297,8 +321,7 @@ def pipeline_one_audio(task_csv_path, intr_csv_path, audio_wav_path, sample_id,
     task_df = drop_csv_columns_df(task_df)
     intr_df = drop_csv_columns_df(intr_df)
 
-    # Noise reduce + lowpass on the already-trimmed audio
-    audio_df = _preprocess_audio_df(audio_df)
+    
 
     # Step 4: tsfresh long format
     task_long  = _csv_df_to_long(task_df,  sample_id)

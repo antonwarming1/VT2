@@ -26,6 +26,8 @@ import sys
 from pathlib import Path
 import librosa
 import numpy as np
+from scipy.signal import butter, sosfiltfilt
+import noisereduce as nr
 
 DATA_ROOT = Path(__file__).parent.parent / "data_opsamling"
 OUTPUT_ROOT = Path(__file__).parent.parent / "data_opsamling_cleaned"
@@ -56,15 +58,11 @@ def load_wav(filepath, sr=None):
 
 
 def clean_task_df(df):
-    """In-memory clean for a Task CSV DataFrame: drop NaN rows, shift time to start at 0."""
+    """In-memory clean for a Task CSV DataFrame: drop NaN rows, clip negative Current."""
     if df.isnull().sum().sum() > 0:
         df = df.dropna()
-    time_col = "Time (ms)"
-    if time_col in df.columns:
-        t0 = df[time_col].iloc[0]
-        if t0 != 0.0:
-            df = df.copy()
-            df[time_col] = df[time_col] - t0
+    if "Current (V)" in df.columns:
+        df["Current (V)"] = df["Current (V)"].clip(lower=0)
     return df.reset_index(drop=True)
 
 
@@ -91,13 +89,11 @@ def clean_csv(filepath, output_path):
         actions.append(f"  WARNING: {nan_count} NaN values found — dropped rows with NaN")
         df = df.dropna()
 
-    # Shift time to start at 0
-    time_col = "Time (ms)"
-    if time_col in df.columns:
-        t0 = df[time_col].iloc[0]
-        if t0 != 0.0:
-            df[time_col] = df[time_col] - t0
-            actions.append(f"  Time shifted by -{t0:.3f} ms (was starting at {t0})")
+    if "Current (V)" in df.columns:
+        neg = (df["Current (V)"] < 0).sum()
+        if neg > 0:
+            df["Current (V)"] = df["Current (V)"].clip(lower=0)
+            actions.append(f"  Current: clipped {neg} negative values to 0")
 
     df.to_csv(output_path, index=False)
 
@@ -112,16 +108,18 @@ def clean_json(filepath, output_path):
     vectors = data["XML_Data"]["Wsk3Vectors"]
     axes = vectors["Y_AxesList"]["AxisData"]
 
-    for axis in axes:
+    # Load all axes values and find rows where any axis has NaN
+    all_values = [[float(v) for v in axis["Values"]["float"]] for axis in axes]
+    n = len(all_values[0]) if all_values else 0
+    bad_rows = {i for i in range(n) if any(v != v for vals in all_values for v in [vals[i]])}
+    if bad_rows:
+        actions.append(f"  WARNING: {len(bad_rows)} rows with NaN values — dropped")
+    good_rows = [i for i in range(n) if i not in bad_rows]
+
+    for axis, values in zip(axes, all_values):
         name = axis["Header"]["Name"]
         unit = axis["Header"]["Unit"]
-        values = [float(v) for v in axis["Values"]["float"]]
-
-        # Check for NaN
-        nan_count = sum(1 for v in values if v != v)  # NaN != NaN
-        if nan_count > 0:
-            actions.append(f"  WARNING: {name} has {nan_count} NaN values — replaced with 0")
-            values = [0.0 if v != v else v for v in values]
+        values = [values[i] for i in good_rows]
 
         # Clip negative Torque to 0
         if name.lower() == "torque":
@@ -229,26 +227,76 @@ def clean_subfolder(data_dir, output_dir):
 
     return total_actions
 
-def clean_wav(filepath, output_path, sr=None):
+def lowpass_filter(data, samplerate, highcut, order=6):
+    nyquist = samplerate / 2
+    high = highcut / nyquist
+
+    sos = butter(order, high, btype="lowpass", output="sos")
+    filtered = sosfiltfilt(sos, data, axis=0)
+    return filtered
+
+def resample_audio_df(df, target_sr=2200, original_sr = 44100):
+    """Resample audio df to 2200 hz.""" 
+      # Assuming original is always 44100 Hz
+    if target_sr == original_sr:
+        return df
+    
+    # Resample using librosa
+    y = df["Amplitude"].values
+    y_resampled = librosa.resample(y, orig_sr=original_sr, target_sr=target_sr)
+    time_resampled = np.arange(len(y_resampled)) / target_sr * 1000
+    
+    
+    return pd.DataFrame({"Time (ms)": time_resampled, "Amplitude": y_resampled})
+
+
+def clean_wav(filepath, samplerate=None):
     """Clean a single WAV file. Returns list of actions taken."""
-    Actions = []
-    y, sr = load_wav(filepath, sr=sr)
+    y, sr = load_wav(filepath, sr=None)
     df = pd.DataFrame({"Time (ms)": np.arange(len(y)) / sr * 1000, "Amplitude": y})
-       
+
+    df['Amplitude'] = lowpass_filter(df['Amplitude'], samplerate=sr, highcut=1000, order=6)
+    df = resample_audio_df(df, target_sr=samplerate, original_sr = sr)
+   
     # Check for NaN
     nan_count = df["Amplitude"].isnull().sum()
     if nan_count > 0:
-        Actions.append(f"  WARNING: {nan_count} NaN values found in audio — replaced with 0")
         df["Amplitude"] = df["Amplitude"].fillna(0)
 
-    df.to_csv(output_path, index=False)
-    outpath = output_path.relative_to(OLD_OUTPUT_ROOT.parent.parent) 
-    Actions.append(f"  Audio saved to {outpath}")
 
-    return Actions
+    return df
 
+def preprocess_audio(df, out_path, samplerate, Y_NOISE=None):
+    """Read csv, apply noise reduction and lowpass filter, save cleaned csv."""
+    
+    samplerate = int(samplerate)
+    if samplerate <= 0:
+        raise ValueError(f"Invalid samplerate: {samplerate}")
+    
+    if "Amplitude" not in df.columns:
+        raise ValueError(f"'Amplitude' column not found in dataframe")
+
+    df["Amplitude"] = nr.reduce_noise(
+        y = df["Amplitude"].to_numpy(dtype=np.float32),
+        sr = samplerate,
+        y_noise = Y_NOISE,
+        freq_mask_smooth_hz=100,
+        time_mask_smooth_ms=128,
+        prop_decrease = 0.8,
+        stationary = True
+        )
+    
+
+    df.to_csv(out_path, index=False)
+    print(f"Processed audio saved to {out_path}")
+
+y_noise, sr_noise = librosa.load(Path(__file__).parent.parent / "soundcleaning" / "Optaget_støj.wav", sr = SAMPLERATE, mono=True)
+y_noise = lowpass_filter(y_noise, samplerate=sr_noise, highcut=1000, order=6)
+Y_NOISE = librosa.resample(y_noise, orig_sr=sr_noise, target_sr=SAMPLERATE)
 
 def main():
+
+
     # Resolve subfolders from config
     if PROCESS_SUBFOLDERS == ["--all"]:
         if not DATA_ROOT.exists():
@@ -305,14 +353,9 @@ def main():
                         print(f"{f.name}: OK")
                 for f in wav_files:
                     out = out_dir / f.name.replace(".wav", ".csv")
-                    actions = clean_wav(f, out, sr=SAMPLERATE)
-                    if actions:
-                        print(f"{f.name}:")
-                        for a in actions:
-                            print(a)
-                        grand_total += len(actions)
-                    else:
-                        print(f"{f.name}: OK")
+                    df = clean_wav(f, samplerate=SAMPLERATE)
+                    preprocess_audio(df, out, samplerate=SAMPLERATE, Y_NOISE=Y_NOISE)
+                    
         Path(OLD_OUTPUT_ROOT / "Extrinsic data" / "samplerate.txt").write_text(f"{'44100' if SAMPLERATE is None else SAMPLERATE}")
                     
                 
