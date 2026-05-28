@@ -79,3 +79,19 @@ avg asset time: 0.000s
 avg pipeline time: 2.270s
 avg inference time: 0.061s
 avg total time: 2.331s
+
+
+            RF uden lyd
+>> Prediction distribution:
+Label
+N     84
+OT    82
+UT    70
+NS    37
+NE    27
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.526s
+avg inference time: 0.060s
+avg total time: 1.586s
