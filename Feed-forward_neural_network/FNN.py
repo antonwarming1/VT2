@@ -30,7 +30,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
     TRAINING_HISTORY_PATH = BASE_DIR / "Feed-forward_neural_network" / "training_history.png"
@@ -96,7 +96,7 @@ def load_data(features_path, labels_path):
     plt.xticks(ticks=range(len(class_names)), labels=class_names, rotation=45)
     for i, (target, count) in enumerate(target_counts):
         plt.text(i, count + 5, str(count), ha='center', fontsize=12)
-    plt.show()
+    #plt.show()
 
     return X, y
 
@@ -251,12 +251,11 @@ def bayesian_search(X_train, y_labels, config, n_trials=50):
 
     best = study.best_params
     best_params = {
-        'model__hidden_layers': [best['hidden_dim']] * best['num_layers'],
-        'model__activation': best['activation'],
-        'model__dropout_rate': best['dropout_rate'],
+        'model__hidden_layers': [best['model__hidden_dim']] * best['model__num_layers'],
+        'model__activation': best['model__activation'],
+        'model__dropout_rate': best['model__dropout_rate'],
         'batch_size': best['batch_size'],
-        'optimizer__learning_rate': best['lr'],
-        'model__l2': best['l2_reg'],
+        'optimizer__learning_rate': best['optimizer__learning_rate'],
     }
     return study.best_value, best_params
 
@@ -320,7 +319,7 @@ def plot_search_comparison(scores_by_method):
         plt.text(i, s + 0.01, f"{s:.4f}", ha='center', fontweight='bold')
     plt.tight_layout()
     plt.savefig(r"Feed-forward_neural_network\cv_comparison.png", dpi=300)
-    plt.show()
+    #plt.show()
 
 
 def plot_training_history(history, save_path=None):
@@ -338,7 +337,7 @@ def plot_training_history(history, save_path=None):
     if save_path:
         plt.savefig(save_path, dpi=300)
         print(f"  Saved training history -> {save_path}")
-    plt.show()
+    #plt.show()
 
 
 def plot_confusion_matrix(cm, class_names, save_path=None):
@@ -351,7 +350,7 @@ def plot_confusion_matrix(cm, class_names, save_path=None):
     if save_path:
         plt.savefig(save_path, dpi=300)
         print(f"  Saved confusion matrix -> {save_path}")
-    plt.show()
+    #plt.show()
 
 
 def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
@@ -422,6 +421,7 @@ def main():
     model.save(Config.MODEL_SAVE_PATH)
     print(f"Model saved to {Config.MODEL_SAVE_PATH}")
     
+    plt.show()
     # For quick testing without running the full search, you can comment out the search methods and directly train with default Config params:
 
     """X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
