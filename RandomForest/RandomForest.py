@@ -33,7 +33,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_extracted_manual_audio.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels_manual.csv"
     MODEL_SAVE_PATH = BASE_DIR / "RandomForest" / "trained_rf.joblib"
 

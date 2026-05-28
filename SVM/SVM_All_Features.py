@@ -32,7 +32,7 @@ class Config:
     # With sound
     # FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
     # Without sound
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
     
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "SVM" / "trained_svm.joblib"

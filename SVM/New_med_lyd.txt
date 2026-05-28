@@ -1,0 +1,57 @@
+(ml_fixed) C:\github\VT2>C:\Users\anton\anaconda3\envs\ml_fixed\python.exe c:/github/VT2/SVM/SVM_All_Features.py
+SVM — Multi-Class Classification
+
+Loading data...
+  X: (1341, 3167),  y: (1341,)
+  Train: 1072  Test: 269
+
+--- Hyperparameter Search ---
+
+Base model cross-validation...
+  CV f1_macro: 0.9573 (+/- 0.0145)
+
+=== Grid Search CV (SVM) ===
+Fitting 5 folds for each of 40 candidates, totalling 200 fits
+  Best score:  0.9611
+  Best params: {'C': 0.1, 'class_weight': None, 'kernel': 'linear'}
+
+=== Randomized Search CV (SVM) ===
+Fitting 5 folds for each of 30 candidates, totalling 150 fits
+  Best score:  0.9650
+  Best params: {'C': np.float64(17.12337597316399), 'class_weight': None, 'gamma': np.float64(0.00011584172310543988), 'kernel': 'rbf'}
+
+=== Bayesian Optimization (SVM, 30 trials) ===
+Best trial: 23. Best value: 0.965699: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 30/30 [01:31<00:00,  3.05s/it]
+  Best trial: 23
+  Best CV f1_macro: 0.9657
+  Best hyperparameters:
+    C: 5.589294537297723
+    gamma: 0.00013303132927578349
+    class_weight: None
+
+Best method: Bayesian  (CV f1_macro 0.9657)
+Params: {'C': 5.589294537297723, 'gamma': 0.00013303132927578349, 'kernel': 'rbf', 'class_weight': None}
+
+--- Final Training [Bayesian params] ---
+
+Final model: SVC(C=5.589294537297723, gamma=0.00013303132927578349, probability=True,
+    random_state=42)
+
+Training final model...
+
+Test Accuracy: 0.9517
+              precision    recall  f1-score   support
+
+           N       0.97      0.93      0.95        83
+          NS       0.94      1.00      0.97        32
+          OT       0.97      0.97      0.97        62
+           P       0.93      0.93      0.93        30
+          UT       0.92      0.95      0.94        62
+
+    accuracy                           0.95       269
+   macro avg       0.95      0.96      0.95       269
+weighted avg       0.95      0.95      0.95       269
+
+Model saved to C:\github\VT2\SVM\trained_svm.joblib
+
+Execution time: 2928.47 seconds

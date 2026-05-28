@@ -1,0 +1,54 @@
+-- Hyperparameter Search ---
+
+Base model cross-validation...
+  CV f1_macro: 0.9701 (+/- 0.0125)
+
+=== Grid Search CV (Random Forest) ===
+Fitting 5 folds for each of 432 candidates, totalling 2160 fits
+  Best score:  0.9708
+  Best params: {'class_weight': 'balanced', 'max_depth': None, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 100}
+
+=== Randomized Search CV (Random Forest) ===
+Fitting 5 folds for each of 50 candidates, totalling 250 fits
+  Best score:  0.9708
+  Best params: {'class_weight': None, 'max_depth': 40, 'max_features': 'sqrt', 'min_samples_leaf': 2, 'min_samples_split': 4, 'n_estimators': 314}
+
+=== Bayesian Optimization (Random Forest, 50 trials) ===
+Best trial: 49. Best value: 0.970842: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [03:42<00:00,  4.45s/it]
+  Best trial: 49
+  Best CV f1_macro: 0.9708
+  Best hyperparameters:
+    n_estimators: 110
+    max_depth: 18
+    min_samples_split: 12
+    min_samples_leaf: 4
+    max_features: log2
+    class_weight: None
+
+Best method: Bayesian  (CV f1_macro 0.9708)
+Params: {'n_estimators': 110, 'max_depth': 18, 'min_samples_split': 12, 'min_samples_leaf': 4, 'max_features': 'log2', 'class_weight': None}
+
+--- Final Training [Bayesian params] ---
+
+Final model: RandomForestClassifier(max_depth=18, max_features='log2', min_samples_leaf=4,
+                       min_samples_split=12, n_estimators=110, n_jobs=-1,
+                       random_state=42)
+
+Training final model...
+
+Test Accuracy: 0.9665
+              precision    recall  f1-score   support
+
+           N       1.00      0.94      0.97        83
+          NS       0.94      1.00      0.97        32
+          OT       0.97      0.98      0.98        62
+           P       0.94      0.97      0.95        30
+          UT       0.95      0.97      0.96        62
+
+    accuracy                           0.97       269
+   macro avg       0.96      0.97      0.97       269
+weighted avg       0.97      0.97      0.97       269
+
+Model saved to C:\github\VT2\RandomForest\trained_rf.joblib
+
+Execution time: 1480.27 seconds

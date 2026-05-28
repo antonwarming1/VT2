@@ -1,0 +1,61 @@
+RandomFores
+(ml_fixed) C:\github\VT2>C:\Users\anton\anaconda3\envs\ml_fixed\python.exe c:/github/VT2/RandomForest/RandomForest.py
+Random Forest — Multi-Class Classification
+
+Loading data...
+  X: (1341, 2929),  y: (1341,)
+  Train: 1072  Test: 269
+
+--- Hyperparameter Search ---
+
+Base model cross-validation...
+  CV f1_macro: 0.9693 (+/- 0.0124)
+
+=== Grid Search CV (Random Forest) ===
+Fitting 5 folds for each of 432 candidates, totalling 2160 fits
+  Best score:  0.9708
+  Best params: {'class_weight': 'balanced', 'max_depth': None, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 100}
+
+=== Randomized Search CV (Random Forest) ===
+Fitting 5 folds for each of 50 candidates, totalling 250 fits
+  Best score:  0.9708
+  Best params: {'class_weight': None, 'max_depth': 40, 'max_features': 'log2', 'min_samples_leaf': 2, 'min_samples_split': 10, 'n_estimators': 287}
+
+=== Bayesian Optimization (Random Forest, 50 trials) ===
+Best trial: 9. Best value: 0.97083: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [02:13<00:00,  2.67s/it]
+  Best trial: 9
+  Best CV f1_macro: 0.9708
+  Best hyperparameters:
+    n_estimators: 103
+    max_depth: 34
+    min_samples_split: 11
+    min_samples_leaf: 6
+    max_features: sqrt
+    class_weight: None
+
+Best method: Bayesian  (CV f1_macro 0.9708)
+Params: {'n_estimators': 103, 'max_depth': 34, 'min_samples_split': 11, 'min_samples_leaf': 6, 'max_features': 'sqrt', 'class_weight': None}
+
+--- Final Training [Bayesian params] ---
+
+Final model: RandomForestClassifier(max_depth=34, min_samples_leaf=6, min_samples_split=11,
+                       n_estimators=103, n_jobs=-1, random_state=42)
+
+Training final model...
+
+Test Accuracy: 0.9665
+              precision    recall  f1-score   support
+
+           N       1.00      0.94      0.97        83
+          NS       0.94      1.00      0.97        32
+          OT       0.97      0.98      0.98        62
+           P       0.94      0.97      0.95        30
+          UT       0.95      0.97      0.96        62
+
+    accuracy                           0.97       269
+   macro avg       0.96      0.97      0.97       269
+weighted avg       0.97      0.97      0.97       269
+
+Model saved to C:\github\VT2\RandomForest\trained_rf.joblib
+
+Execution time: 1170.62 seconds

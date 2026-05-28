@@ -1,0 +1,12 @@
+Combined: (1341, 4558)
+Saved -> features_extracted.csv
+Saved -> features_extracted_audio.csv
+
+Selecting relevant features...
+Selected: 2929 / 4558
+Saved -> features_selected.csv
+Selected (with audio): 3167 / 5334
+Saved -> features_selected_audio.csv
+Saved -> labels.csv
+
+Done!
