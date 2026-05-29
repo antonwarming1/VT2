@@ -30,7 +30,7 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
 
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_torque.csv"
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "Feed-forward_neural_network" / "trained_model.keras"
     TRAINING_HISTORY_PATH = BASE_DIR / "Feed-forward_neural_network" / "training_history.png"
@@ -364,7 +364,7 @@ def solo_model(X_train, y_train, X_val, y_val, X_test, y_test, config):
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
-    
+    """
     print("Feed-Forward Neural Network — Multi-Class Classification\n")
 
     # Load and prepare data
@@ -423,11 +423,11 @@ def main():
     
     plt.show()
     # For quick testing without running the full search, you can comment out the search methods and directly train with default Config params:
-
-    """X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
+    """
+    X, y = load_data(Config.FEATURES_PATH, Config.LABELS_PATH)
     X_train, X_val, X_test, y_train, y_val, y_test = split_and_normalize(X, y, Config)
     model, history = solo_model(X_train, y_train, X_val, y_val, X_test, y_test, Config)
-    model.save(Config.MODEL_SAVE_PATH)"""
+    model.save(Config.MODEL_SAVE_PATH)
     
 if __name__ == "__main__":
     main()

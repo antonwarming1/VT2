@@ -295,33 +295,37 @@ def main():
     if TSFRESH:
         # Extract features
         print("\nExtracting features...")
-        task_features  = extract_from_long(task_long, "Task").add_prefix("task_")
+        #task_features  = extract_from_long(task_long, "Task").add_prefix("task_")
         intr_features  = extract_from_long(intr_long, "Intrinsic").add_prefix("intr_")
-        audio_features = extract_from_long(extr_long, "Audio").add_prefix("audio_")
-
+        #audio_features = extract_from_long(extr_long, "Audio").add_prefix("audio_")
+        """
         # Combine
         all_features = pd.concat([task_features, intr_features], axis=1)
         all_features_audio = pd.concat([all_features, audio_features], axis=1)
         all_features.index.name = "id"
         print(f"\nCombined: {all_features.shape}")
-
+        """
+        intr_features.to_csv(OUTPUT_DIR / "features_torque.csv")
+        """
         # Save extracted features
         all_features.to_csv(OUTPUT_DIR / "features_extracted.csv")
         print(f"Saved -> features_extracted.csv")
         audio_features.to_csv(OUTPUT_DIR / "features_extracted_audio.csv")
         print(f"Saved -> features_extracted_audio.csv")
-
+        """
         # Feature selection
         if do_select:
             print("\nSelecting relevant features...")
-            selected = select_features(all_features, y,multiclass=True,fdr_level=0.001,n_significant=3, n_jobs=10)
-            print(f"Selected: {selected.shape[1]} / {all_features.shape[1]}")
-            selected.to_csv(OUTPUT_DIR / "features_selected.csv")
+            selected = select_features(intr_features, y,multiclass=True,fdr_level=0.001,n_significant=3, n_jobs=10)
+            print(f"Selected: {selected.shape[1]} / {intr_features.shape[1]}")
+            selected.to_csv(OUTPUT_DIR / "features_selected_torque.csv")
+            """
             print(f"Saved -> features_selected.csv")
             selected_audio = select_features(all_features_audio, y, multiclass=True, n_jobs=10, n_significant=3, fdr_level=0.001)
             print(f"Selected (with audio): {selected_audio.shape[1]} / {all_features_audio.shape[1]}")
             selected_audio.to_csv(OUTPUT_DIR / "features_selected_audio.csv")
             print(f"Saved -> features_selected_audio.csv")
+            """
 
         # Save labels
         y.to_csv(OUTPUT_DIR / "labels.csv", header=True)

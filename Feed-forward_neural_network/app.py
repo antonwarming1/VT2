@@ -36,16 +36,15 @@ CLASS_META = {
 BASE_PATH = Path(__file__).parent.parent
 
 MODEL_PATH    = BASE_PATH / "Feed-forward_neural_network" / "trained_model_tsfresh_uden_lyd.keras"
-SVM_MODEL_PATH = BASE_PATH / "SVM" / "trained_svm_tsfresh_ulyd.joblib"
-RF_MODEL_PATH  = BASE_PATH / "RandomForest" / "trained_rf_tsfresh_uden_lyd.joblib" #New model
+SVM_MODEL_PATH = BASE_PATH / "SVM" / "New_trained_svm_uden_lyd.joblib"
+RF_MODEL_PATH  = BASE_PATH / "RandomForest" / "New_trained_rf_with_out_sound.joblib" #New model
 FEATURES_PATH = BASE_PATH / "Feature_engineering" / "features_selected.csv"
 
 # ── With-audio models — set paths here when trained ──────────────────────────
 AUDIO_MODEL_PATH     = BASE_PATH / "Feed-forward_neural_network" / "trained_model_tsfresh_med_lyd.keras"
-AUDIO_SVM_MODEL_PATH = BASE_PATH / "SVM" / "trained_svm_tsfresh_mlyd.joblib"
-AUDIO_RF_MODEL_PATH  = BASE_PATH / "RandomForest" / "RandomForrest_tsfresh_med_lyd.joblib" #New model
+AUDIO_SVM_MODEL_PATH = BASE_PATH / "SVM" / "New_trained_svm_med_lyd.joblib"
+AUDIO_RF_MODEL_PATH  = BASE_PATH / "RandomForest" / "New_trained_rf_with_sound.joblib" #New model
 AUDIO_FEATURES_PATH  = BASE_PATH / "Feature_engineering" / "features_selected_audio.csv"
-
 # ── Lazy singletons ───────────────────────────────────────────────────────────
 
 _model           = None
@@ -292,8 +291,10 @@ def _predict_one_instance(screw_number, model_name="fnn", audio_mode=False):
 
         if model_name == "svm":
             model_fn = get_audio_svm_model if audio_mode else get_svm_model
-            cls  = int(model_fn().predict(X)[0])
-            conf = None
+            svm = model_fn()
+            cls  = int(svm.predict(X)[0])
+            probs = svm.predict_proba(X)[0]
+            conf  = round(float(probs[cls]) * 100, 1)
         elif model_name == "rf":
             model_fn = get_audio_rf_model if audio_mode else get_rf_model
             rf     = model_fn()

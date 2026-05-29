@@ -37,6 +37,7 @@ EXCLUDE_CSV = [
     "Nset (1/min)",
     "Angle (deg)",
     "Depth (mm)",
+    "Current (V)"
 ]
 
 # Columns to remove from JSON files (new dataset screwing cell data)
@@ -44,6 +45,8 @@ EXCLUDE_JSON = [
     "Nset",
     "Angle",
     "Depth",
+    "Current (V)"
+
 ]
 
 
