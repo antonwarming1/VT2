@@ -52,7 +52,13 @@ SAVGOL_WINDOW  = 11              # Must be odd
 SAVGOL_POLY    = 3
 
 EXTRINSIC_ONLY = False            # If True, only preprocess the Extrinsic data from the old dataset (no Task/Intrinsic pairs)
-SAMPLERATE = int(Path(OLD_DATA_ROOT / "Extrinsic data" / "samplerate.txt").read_text().strip())
+
+# Try to read samplerate from file, use default if it doesn't exist
+_samplerate_file = OLD_DATA_ROOT / "Extrinsic data" / "samplerate.txt"
+if _samplerate_file.exists():
+    SAMPLERATE = int(_samplerate_file.read_text().strip())
+else:
+    SAMPLERATE = 48000  # Default samplerate (Hz) when file is missing
 
 # ── JSON helpers ─────────────────────────────────────────────────────────────
 

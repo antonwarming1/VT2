@@ -1,0 +1,97 @@
+            FNN med lyd
+
+>> Prediction distribution:
+Label
+N     90
+UT    70
+OT    68
+NS    44
+NE    28
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 2.409s
+avg inference time: 0.059s
+avg total time: 2.468s
+
+>> 2 out of 300 predictions exceeded 4 seconds:
+
+
+            FNN uden lyd
+>> Prediction distribution:
+Label
+OT    79
+UT    77
+N     65
+NS    44
+NE    35
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.654s
+avg inference time: 0.058s
+avg total time: 1.712s
+
+
+            SVM med lyd
+>> Prediction distribution:
+Label
+OT    86
+N     84
+UT    73
+NS    33
+NE    24
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 2.261s
+avg inference time: 0.002s
+avg total time: 2.263s
+
+
+            SVM uden lyd
+>> Prediction distribution:
+Label
+N     95
+OT    71
+UT    65
+NS    42
+NE    27
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.530s
+avg inference time: 0.002s
+avg total time: 1.531s
+
+
+            RF med lyd
+>> Prediction distribution:
+Label
+UT    83
+OT    76
+N     75
+NS    35
+NE    31
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 2.270s
+avg inference time: 0.061s
+avg total time: 2.331s
+
+
+            RF uden lyd
+>> Prediction distribution:
+Label
+N     84
+OT    82
+UT    70
+NS    37
+NE    27
+Name: count, dtype: int64
+
+avg asset time: 0.000s
+avg pipeline time: 1.526s
+avg inference time: 0.060s
+avg total time: 1.586s

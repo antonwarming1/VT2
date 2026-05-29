@@ -29,10 +29,10 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 class Config:
     BASE_DIR = Path(__file__).resolve().parents[1]
-    # With sound
-    # FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
     # Without sound
-    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    # FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected.csv"
+    # With sound
+    FEATURES_PATH = BASE_DIR / "Feature_engineering" / "features_selected_audio.csv"
     
     LABELS_PATH = BASE_DIR / "Feature_engineering" / "labels.csv"
     MODEL_SAVE_PATH = BASE_DIR / "SVM" / "trained_svm.joblib"
@@ -98,6 +98,11 @@ def base_model_cv(X_train, y_train, config):
                 decision_function_shape="ovr", random_state=config.RANDOM_STATE)
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.RANDOM_STATE)
     scores = cross_val_score(model, X_train, y_train, cv=cv, scoring="f1_macro", n_jobs=-1)
+    
+    # Calculate and print the actual gamma value when gamma="scale"
+    n_features = X_train.shape[1]
+    gamma_scale = 1.0 / (n_features * X_train.var())
+    print(f"  Gamma (scale): {gamma_scale:.6f}")
     print(f"  CV f1_macro: {scores.mean():.4f} (+/- {scores.std():.4f})")
     return scores.mean(), None
 

@@ -1,38 +1,38 @@
-
 Loading data...
-  X: (1341, 3167),  y: (1341,)
+  X: (1341, 2929),  y: (1341,)
   Train: 1072  Test: 269
 
 --- Hyperparameter Search ---
 
 Base model cross-validation...
-  CV f1_macro: 0.9573 (+/- 0.0145)
+  Gamma (scale): 0.000341
+  CV f1_macro: 0.9624 (+/- 0.0137)
 
 === Grid Search CV (SVM) ===
 Fitting 5 folds for each of 40 candidates, totalling 200 fits
-  Best score:  0.9611
-  Best params: {'C': 0.1, 'class_weight': None, 'kernel': 'linear'}
+  Best score:  0.9639
+  Best params: {'C': 10, 'class_weight': None, 'gamma': 'scale', 'kernel': 'rbf'}
 
 === Randomized Search CV (SVM) ===
 Fitting 5 folds for each of 30 candidates, totalling 150 fits
-  Best score:  0.9650
-  Best params: {'C': np.float64(17.12337597316399), 'class_weight': None, 'gamma': np.float64(0.00011584172310543988), 'kernel': 'rbf'}
+  Best score:  0.9662
+  Best params: {'C': np.float64(85.68869785189007), 'class_weight': None, 'gamma': np.float64(0.00015339162591163628), 'kernel': 'rbf'}
 
 === Bayesian Optimization (SVM, 30 trials) ===
-Best trial: 23. Best value: 0.965699: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 30/30 [01:31<00:00,  3.05s/it]
-  Best trial: 23
-  Best CV f1_macro: 0.9657
+Best trial: 21. Best value: 0.967796: 100%|███████████████| 30/30 [03:02<00:00,  6.07s/it]
+  Best trial: 21
+  Best CV f1_macro: 0.9678
   Best hyperparameters:
-    C: 5.589294537297723
-    gamma: 0.00013303132927578349
+    C: 5.677223401727728
+    gamma: 0.00021107084145919412
     class_weight: None
 
-Best method: Bayesian  (CV f1_macro 0.9657)
-Params: {'C': 5.589294537297723, 'gamma': 0.00013303132927578349, 'kernel': 'rbf', 'class_weight': None}
+Best method: Bayesian  (CV f1_macro 0.9678)
+Params: {'C': 5.677223401727728, 'gamma': 0.00021107084145919412, 'kernel': 'rbf', 'class_weight': None}
 
 --- Final Training [Bayesian params] ---
 
-Final model: SVC(C=5.589294537297723, gamma=0.00013303132927578349, probability=True,
+Final model: SVC(C=5.677223401727728, gamma=0.00021107084145919412, probability=True,
     random_state=42)
 
 Training final model...
@@ -49,7 +49,3 @@ Test Accuracy: 0.9517
     accuracy                           0.95       269
    macro avg       0.95      0.96      0.95       269
 weighted avg       0.95      0.95      0.95       269
-
-Model saved to C:\github\VT2\SVM\trained_svm.joblib
-
-Execution time: 2928.47 seconds
